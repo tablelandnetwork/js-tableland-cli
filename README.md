@@ -1,7 +1,7 @@
 # @tableland/cli
 
 [![GitHub license](https://img.shields.io/github/license/tablelandnetwork/js-tableland-cli.svg)](./LICENSE)
-[![GitHub package.json version](https://img.shields.io/github/package-json/v/tableland/cli.svg)](./package.json)
+[![GitHub package.json version](https://img.shields.io/github/package-json/v/tablelandnetwork/js-tableland-cli.svg)](./package.json)
 [![Release](https://img.shields.io/github/release/tablelandnetwork/js-tableland-cli.svg)](https://github.com/tablelandnetwork/js-tableland-cli/releases/latest)
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg)](https://github.com/RichardLitt/standard-readme)
 

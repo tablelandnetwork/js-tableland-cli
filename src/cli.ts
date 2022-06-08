@@ -17,19 +17,39 @@ const _ = yargs(hideBin(process.argv))
   .env("TBL")
   .option("k", {
     alias: "privateKey",
-    demandOption: true,
     type: "string",
     description: "Private key string",
   })
   .option("h", {
     alias: "host",
     type: "string",
-    description: "Remote API host",
-    default: "https://testnet.tableland.network",
+    description:
+      "Remote API host (e.g. https://{testnet,staging}.tableland.network)",
+    default: "https://testnetv2.tableland.network",
   })
   .option("network", {
     type: "string",
-    description: "The EVM compatible network to target (currently ignored)",
-    default: "rinkeby",
+    description: "The EVM compatible network to target",
+    default: "goerli",
   })
+  .options({
+    alchemy: {
+      type: "string",
+      description: "Alchemy provider API key",
+    },
+    infura: {
+      type: "string",
+      description: "Infura provider API key",
+    },
+    etherscan: {
+      type: "string",
+      description: "Etherscan provider API key",
+    },
+  })
+  .option("t", {
+    alias: "token",
+    type: "string",
+    description: "Signed SIWE token (see `token --help`)",
+  })
+
   .strict().argv;

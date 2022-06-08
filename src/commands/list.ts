@@ -1,34 +1,41 @@
 import yargs, { Arguments, CommandBuilder } from "yargs";
 import { Wallet } from "ethers";
 import fetch from "node-fetch";
+import { SUPPORTED_NETWORKS } from "@tableland/sdk";
 
 type Options = {
   // Local
-  controller: string;
+  address: string;
 
   // Global
   privateKey: string;
   host: string;
+  network: string;
 };
 
-export const command = "list [controller]";
-export const desc = "List tables by controller";
+export const command = "list [address]";
+export const desc = "List tables by address";
 
 export const builder: CommandBuilder<Options, Options> = (yargs) => {
-  return yargs.positional("controller", {
+  return yargs.positional("address", {
     type: "string",
-    description: "The target controller address",
+    description: "The target address",
   }) as yargs.Argv<Options>;
 };
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  const { privateKey, host } = argv;
-  let { controller } = argv;
-  if (privateKey && !controller) {
-    controller = new Wallet(privateKey).address;
+  const { privateKey, host, network } = argv;
+  let { address } = argv;
+  if (privateKey && !address) {
+    address = new Wallet(privateKey).address;
   }
-  const res = await fetch(`${host}/tables/controller/${controller}`);
+
+  const chainId =
+    SUPPORTED_NETWORKS.find((net) => net.key === network)?.chainId ?? 5;
+  const res = await fetch(
+    `${host}/chain/${chainId}/tables/controller/${address}`
+  );
   const out = JSON.stringify(await res.json(), null, 2);
-  process.stdout.write(`${out}\n`);
+  console.log(out);
   process.exit(0);
 };

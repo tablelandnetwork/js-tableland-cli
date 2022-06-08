@@ -1,5 +1,6 @@
 import yargs, { Arguments, CommandBuilder } from "yargs";
 import fetch from "node-fetch";
+import { SUPPORTED_NETWORKS } from "@tableland/sdk";
 
 type Options = {
   // Local
@@ -7,10 +8,11 @@ type Options = {
 
   // Global
   host: string;
+  network: string;
 };
 
 export const command = "info <id>";
-export const desc = "Get info about a given table by id.";
+export const desc = "Get info about a given table by id";
 
 export const builder: CommandBuilder = (yargs) =>
   yargs.positional("id", {
@@ -19,9 +21,11 @@ export const builder: CommandBuilder = (yargs) =>
   }) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  const { host, id } = argv;
-  const res = await fetch(`${host}/tables/${id}`);
+  const { host, id, network } = argv;
+  const chainId =
+    SUPPORTED_NETWORKS.find((net) => net.key === network)?.chainId ?? 5;
+  const res = await fetch(`${host}/chain/${chainId}/tables/${id}`);
   const out = JSON.stringify(await res.json(), null, 2);
-  process.stdout.write(`${out}\n`);
+  console.log(out);
   process.exit(0);
 };

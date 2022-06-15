@@ -1,6 +1,6 @@
 import type { Arguments, CommandBuilder } from "yargs";
 import { Wallet, providers } from "ethers";
-import { connect, ConnectionOptions, resultsToObjects } from "@tableland/sdk";
+import { connect, ConnectOptions } from "@tableland/sdk";
 import yargs from "yargs";
 
 type Options = {
@@ -8,7 +8,7 @@ type Options = {
   hash: string;
 
   // Global
-  privateKey: string;
+  token: string;
   host: string;
 };
 
@@ -23,23 +23,16 @@ export const builder: CommandBuilder<Options, Options> = (yargs) =>
   }) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  const { hash, host, privateKey } = argv;
-  const options: ConnectionOptions = {};
-  if (privateKey) {
-    // FIXME: This is a hack due to js-tableland's restrictive use of provider
-    // See: https://github.com/tablelandnetwork/js-tableland/issues/22
-    options.signer = new Wallet(privateKey, {
-      getNetwork: async () => {
-        return {
-          name: "goerli",
-          chainId: 5,
-        };
-      },
-      _isProvider: true,
-    } as providers.Provider);
+  const { hash, host, token } = argv;
+  if (!token) {
+    console.error("missing required flag (`-t` or `--token`)\n");
+    process.exit(1);
   }
-  if (host) {
-    options.host = host;
+  const options: ConnectOptions = {
+    host,
+  };
+  if (token) {
+    options.token = { token };
   }
   const tbl = await connect(options);
   const res = await tbl.receipt(hash);

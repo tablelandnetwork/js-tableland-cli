@@ -27,10 +27,10 @@ const _ = yargs(hideBin(process.argv))
       "Remote API host (e.g. https://{testnet,staging}.tableland.network)",
     default: "https://testnetv2.tableland.network",
   })
-  .option("network", {
+  .option("chain", {
     type: "string",
-    description: "The EVM compatible network to target",
-    default: "goerli",
+    description: "The EVM compatible chain to target",
+    default: "ethereum-goerli",
   })
   .options({
     alchemy: {

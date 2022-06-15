@@ -1,6 +1,6 @@
 import yargs, { Arguments, CommandBuilder } from "yargs";
 import fetch from "node-fetch";
-import { SUPPORTED_NETWORKS } from "@tableland/sdk";
+import { ChainName, SUPPORTED_CHAINS } from "@tableland/sdk";
 
 type Options = {
   // Local
@@ -8,7 +8,7 @@ type Options = {
 
   // Global
   host: string;
-  network: string;
+  chain: ChainName;
 };
 
 export const command = "info <id>";
@@ -21,9 +21,12 @@ export const builder: CommandBuilder = (yargs) =>
   }) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  const { host, id, network } = argv;
-  const chainId =
-    SUPPORTED_NETWORKS.find((net) => net.key === network)?.chainId ?? 5;
+  const { host, id, chain } = argv;
+  const chainId = SUPPORTED_CHAINS[chain]?.chainId;
+  if (!chainId) {
+    console.error("unsupported chain. see `chains` command for details");
+    process.exit(1);
+  }
   const res = await fetch(`${host}/chain/${chainId}/tables/${id}`);
   const out = JSON.stringify(await res.json(), null, 2);
   console.log(out);

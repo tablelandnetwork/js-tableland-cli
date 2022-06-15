@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import fetch, { Headers, Request, Response } from "node-fetch";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
 
 if (!globalThis.fetch) {
   (globalThis as any).fetch = fetch;
@@ -9,9 +11,7 @@ if (!globalThis.fetch) {
   (globalThis as any).Response = Response;
 }
 
-import yargs from "yargs";
-import { hideBin } from "yargs/helpers";
-
+// eslint-disable-next-line no-unused-vars
 const _ = yargs(hideBin(process.argv))
   .commandDir("commands")
   .env("TBL")
@@ -27,10 +27,10 @@ const _ = yargs(hideBin(process.argv))
       "Remote API host (e.g. https://{testnet,staging}.tableland.network)",
     default: "https://testnetv2.tableland.network",
   })
-  .option("network", {
+  .option("chain", {
     type: "string",
-    description: "The EVM compatible network to target",
-    default: "goerli",
+    description: "The EVM compatible chain to target",
+    default: "ethereum-goerli",
   })
   .options({
     alchemy: {

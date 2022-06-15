@@ -1,6 +1,11 @@
 import type { Arguments, CommandBuilder } from "yargs";
 import { Wallet, providers, getDefaultProvider } from "ethers";
-import { connect, ConnectionOptions, SUPPORTED_NETWORKS } from "@tableland/sdk";
+import {
+  connect,
+  ConnectOptions,
+  SUPPORTED_CHAINS,
+  ChainName,
+} from "@tableland/sdk";
 import yargs from "yargs";
 
 type Options = {
@@ -11,19 +16,15 @@ type Options = {
   // Global
   privateKey: string;
   host: string;
-  network: string;
+  chain: ChainName;
   alchemy: string | undefined;
   infura: string | undefined;
   etherscan: string | undefined;
   token: string;
 };
 
-const supportedNetworks: Record<string, string> = SUPPORTED_NETWORKS.reduce(
-  (map, { key, name }) => ({
-    ...map,
-    [key]: name,
-  }),
-  {}
+const supportedNetworks = Object.fromEntries(
+  Object.entries(SUPPORTED_CHAINS).map(([key, value]) => [key, value.name])
 );
 
 export const command = "create <schema> [prefix]";
@@ -50,43 +51,41 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     alchemy,
     infura,
     etherscan,
-    network,
+    chain,
   } = argv;
 
-  const options: ConnectionOptions = {};
+  const options: ConnectOptions = {
+    host,
+  };
+  if (token) {
+    options.token = { token };
+  }
   if (!privateKey) {
-    throw new Error("private key string required for create statements");
+    console.error("missing required flag (`-k` or `--privateKey`)\n");
+    process.exit(1);
   }
 
   const wallet = new Wallet(privateKey);
   let provider: providers.BaseProvider | undefined;
   if (infura) {
-    provider = new providers.InfuraProvider(supportedNetworks[network], infura);
+    provider = new providers.InfuraProvider(supportedNetworks[chain], infura);
   } else if (etherscan) {
     provider = new providers.EtherscanProvider(
-      supportedNetworks[network],
+      supportedNetworks[chain],
       etherscan
     );
   } else if (alchemy) {
-    provider = new providers.AlchemyProvider(
-      supportedNetworks[network],
-      alchemy
-    );
+    provider = new providers.AlchemyProvider(supportedNetworks[chain], alchemy);
   } else {
     // This will be significantly rate limited, but we only need to run it once
-    provider = getDefaultProvider(supportedNetworks[network]);
+    provider = getDefaultProvider(supportedNetworks[chain]);
   }
 
   if (!provider) {
-    throw new Error("Unable to create ETH API provider");
+    console.error("unable to create ETH API provider\n");
+    process.exit(1);
   }
   options.signer = wallet.connect(provider);
-  if (token) {
-    options.token = { token };
-  }
-  if (host) {
-    options.host = host;
-  }
   const tbl = await connect(options);
   const res = await tbl.create(schema, prefix);
   const out = JSON.stringify(

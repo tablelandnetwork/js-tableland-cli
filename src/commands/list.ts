@@ -1,7 +1,7 @@
 import yargs, { Arguments, CommandBuilder } from "yargs";
 import { Wallet } from "ethers";
 import fetch from "node-fetch";
-import { SUPPORTED_NETWORKS } from "@tableland/sdk";
+import { ChainName, SUPPORTED_CHAINS } from "@tableland/sdk";
 
 type Options = {
   // Local
@@ -10,7 +10,7 @@ type Options = {
   // Global
   privateKey: string;
   host: string;
-  network: string;
+  chain: ChainName;
 };
 
 export const command = "list [address]";
@@ -24,14 +24,17 @@ export const builder: CommandBuilder<Options, Options> = (yargs) => {
 };
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  const { privateKey, host, network } = argv;
+  const { privateKey, host, chain } = argv;
   let { address } = argv;
-  if (privateKey && !address) {
-    address = new Wallet(privateKey).address;
+  if (!address) {
+    if (privateKey) {
+      address = new Wallet(privateKey).address;
+    } else {
+      console.error("must supply `--privateKey` or `address` positional\n");
+      process.exit(1);
+    }
   }
-
-  const chainId =
-    SUPPORTED_NETWORKS.find((net) => net.key === network)?.chainId ?? 5;
+  const chainId = SUPPORTED_CHAINS[chain].chainId ?? 5;
   const res = await fetch(
     `${host}/chain/${chainId}/tables/controller/${address}`
   );

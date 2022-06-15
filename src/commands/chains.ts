@@ -10,7 +10,6 @@ export const desc = "List information about supported chains";
 
 export const builder: CommandBuilder<Options, Options> = (yargs) => yargs;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const handler = async (_argv: Arguments<Options>): Promise<void> => {
   const out = JSON.stringify(SUPPORTED_CHAINS, null, 2);
   console.log(out);

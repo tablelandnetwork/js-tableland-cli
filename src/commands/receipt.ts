@@ -1,5 +1,4 @@
 import type { Arguments, CommandBuilder } from "yargs";
-import { Wallet, providers } from "ethers";
 import { connect, ConnectOptions } from "@tableland/sdk";
 import yargs from "yargs";
 

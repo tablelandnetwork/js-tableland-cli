@@ -14,7 +14,7 @@ type Options = {
 export const command = "read <query>";
 export const desc = "Run a read-only query against a remote table";
 
-export const builder: CommandBuilder<Options, Options> = (yargs) =>
+export const builder: CommandBuilder<Options, Options> = (_yargs) =>
   yargs
     .positional("query", {
       type: "string",

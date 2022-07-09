@@ -1,6 +1,6 @@
-import { SUPPORTED_CHAINS, ChainName, SupportedChain } from "@tableland/sdk";
+import { SUPPORTED_CHAINS } from "@tableland/sdk";
 
-export default function getChains(): Record<ChainName, SupportedChain> {
+export default function getChains(): any {
   const chains: any = SUPPORTED_CHAINS;
   for (const [name] of Object.entries(chains)) {
     if (name.includes("staging")) {

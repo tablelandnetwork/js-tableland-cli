@@ -17,7 +17,7 @@
     "build": "npx tsc && chmod +x dist/cli.js",
     "clean": "rm -rf dist",
     "package": "pkg . --targets node18-macos-x64 --output tableland",
-    "install": "npm run build && npm run package && mv tableland /usr/local/bin/",
+    "install": "npm run clean && npm run build && npm run package && mv tableland /usr/local/bin/",
     "lint": "eslint '**/*.{js,ts}'",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "prettier '**/*.{ts,json,sol,md}' --check",

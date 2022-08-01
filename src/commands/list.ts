@@ -32,13 +32,13 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     if (privateKey) {
       address = new Wallet(privateKey).address;
     } else {
-      console.error("must supply `--privateKey` or `address` positional\n");
+      console.error("must supply `--privateKey` or `address` positional");
       process.exit(1);
     }
   }
   const network = getChains()[chain];
   if (!network) {
-    console.error("unsupported chain (see `chains` command for details)\n");
+    console.error("unsupported chain (see `chains` command for details)");
     process.exit(1);
   }
 

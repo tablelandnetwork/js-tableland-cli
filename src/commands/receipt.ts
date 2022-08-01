@@ -40,8 +40,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     chain,
     signer: new Wallet(privateKey),
   };
-  const tbl = await connect(options);
-  const res = await tbl.receipt(hash);
+  const res = await connect(options).receipt(hash);
   const out = JSON.stringify(res, null, 2);
   console.log(out);
   process.exit(0);

@@ -44,8 +44,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   const options: ConnectOptions = {
     chain,
   };
-  const tbl = await connect(options);
-  const res = await tbl.read(query);
+  const res = await connect(options).read(query);
   const formatted = format === "raw" ? res : resultsToObjects(res);
 
   if (format.startsWith("tab")) {

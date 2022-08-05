@@ -33,7 +33,7 @@ const _ = yargs(hideBin(process.argv))
     alias: "rpcRelay",
     type: "boolean",
     description: "Whether writes should be relayed via a validator",
-    default: true,
+    default: false,
   })
   .options({
     alchemy: {

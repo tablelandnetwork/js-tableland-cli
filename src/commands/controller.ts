@@ -9,6 +9,7 @@ type Options = {
   controller: string;
 
   // Global
+  rpcRelay: boolean;
   privateKey: string;
   chain: ChainName;
   alchemy: string | undefined;
@@ -31,7 +32,20 @@ export const builder: CommandBuilder<Options, Options> = (yargs) =>
           description: "The target table name",
         }) as yargs.Argv<Options>,
       async (argv) => {
-        const { name, chain, privateKey, etherscan, infura, alchemy } = argv;
+        const {
+          name,
+          chain,
+          privateKey,
+          etherscan,
+          infura,
+          alchemy,
+          rpcRelay,
+        } = argv;
+
+        if (rpcRelay) {
+          console.error("Cannot relay controller calls via RPC");
+          process.exit(1);
+        }
 
         try {
           const signer = getWallet({
@@ -77,7 +91,13 @@ export const builder: CommandBuilder<Options, Options> = (yargs) =>
           etherscan,
           infura,
           alchemy,
+          rpcRelay,
         } = argv;
+
+        if (rpcRelay) {
+          console.error("Cannot relay controller calls via RPC");
+          process.exit(1);
+        }
 
         try {
           const signer = getWallet({
@@ -110,7 +130,20 @@ export const builder: CommandBuilder<Options, Options> = (yargs) =>
           description: "The target table name",
         }) as yargs.Argv<Options>,
       async (argv) => {
-        const { name, chain, privateKey, etherscan, infura, alchemy } = argv;
+        const {
+          name,
+          chain,
+          privateKey,
+          etherscan,
+          infura,
+          alchemy,
+          rpcRelay,
+        } = argv;
+
+        if (rpcRelay) {
+          console.error("Cannot relay controller calls via RPC");
+          process.exit(1);
+        }
 
         try {
           const signer = getWallet({

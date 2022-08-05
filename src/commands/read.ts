@@ -44,14 +44,19 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   const options: ConnectOptions = {
     chain,
   };
-  const res = await connect(options).read(query);
-  const formatted = format === "raw" ? res : resultsToObjects(res);
+  try {
+    const res = await connect(options).read(query);
+    const formatted = format === "raw" ? res : resultsToObjects(res);
 
-  if (format.startsWith("tab")) {
-    console.table(formatted);
-  } else {
-    const out = JSON.stringify(formatted, null, 2);
-    console.log(out);
+    if (format.startsWith("tab")) {
+      console.table(formatted);
+    } else {
+      const out = JSON.stringify(formatted, null, 2);
+      console.log(out);
+    }
+    process.exit(0);
+  } catch (err: any) {
+    console.error(err.message);
+    process.exit(1);
   }
-  process.exit(0);
 };

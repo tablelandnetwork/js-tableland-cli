@@ -41,8 +41,13 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     rpcRelay,
     signer: new Wallet(privateKey),
   };
-  const res = await connect(options).write(statement);
-  const out = JSON.stringify(res, null, 2);
-  process.stdout.write(`${out}\n`);
-  process.exit(0);
+  try {
+    const res = await connect(options).write(statement);
+    const out = JSON.stringify(res, null, 2);
+    console.log(out);
+    process.exit(0);
+  } catch (err: any) {
+    console.error(err.message);
+    process.exit(1);
+  }
 };

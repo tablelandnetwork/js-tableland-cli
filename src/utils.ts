@@ -10,6 +10,48 @@ export interface Options {
   etherscan: string | undefined;
 }
 
+export function getLink(chain: ChainName, hash: string): string {
+  if (!hash) {
+    return "";
+  }
+  if (chain.includes("ethereum")) {
+    return `https://etherscan.io/tx/${hash}`;
+  } else if (chain.includes("polygon")) {
+    return `https://polygonscan.com/tx/${hash}`;
+  } else if (chain.includes("optimism")) {
+    return `https://optimistic.etherscan.io/tx/${hash}`;
+  } else if (chain.includes("arbitrum")) {
+    return `https://arbiscan.io/tx/${hash}`;
+  }
+  return "";
+}
+
+export function getSignerOnly({
+  privateKey,
+  chain,
+}: {
+  privateKey: string;
+  chain: ChainName;
+}): Wallet {
+  if (!privateKey) {
+    throw new Error("missing required flag (`-k` or `--privateKey`)");
+  }
+  const network = getChains()[chain];
+  if (!network) {
+    throw new Error("unsupported chain (see `chains` command for details)");
+  }
+
+  // FIXME: This is a hack due to a regression in js-tableland
+  // See: https://github.com/tablelandnetwork/js-tableland/issues/22
+  const signer = new Wallet(privateKey, {
+    getNetwork: async () => {
+      return network;
+    },
+    _isProvider: true,
+  } as providers.Provider);
+  return signer;
+}
+
 export function getWallet({
   privateKey,
   chain,

@@ -15,12 +15,26 @@ export function getLink(chain: ChainName, hash: string): string {
     return "";
   }
   if (chain.includes("ethereum")) {
+    if (chain.includes("goerli")) {
+      return `https://goerli.etherscan.io/tx/${hash}`;
+    }
     return `https://etherscan.io/tx/${hash}`;
   } else if (chain.includes("polygon")) {
+    if (chain.includes("mumbai")) {
+      return `https://mumbai.polygonscan.com/tx/${hash}`;
+    }
     return `https://polygonscan.com/tx/${hash}`;
   } else if (chain.includes("optimism")) {
+    if (chain.includes("kovan")) {
+      return `https://kovan-optimistic.etherscan.io/tx/${hash}`;
+    } else if (chain.includes("goerli")) {
+      return `https://blockscout.com/optimism/goerli/tx/${hash}`;
+    }
     return `https://optimistic.etherscan.io/tx/${hash}`;
   } else if (chain.includes("arbitrum")) {
+    if (chain.includes("goerli")) {
+      return `https://goerli-rollup-explorer.arbitrum.io/tx/${hash}`;
+    }
     return `https://arbiscan.io/tx/${hash}`;
   }
   return "";

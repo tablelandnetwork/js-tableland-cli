@@ -6,23 +6,23 @@ import getChains from "../chains";
 
 type Options = {
   // Local
-  name: string;
+  hash: string;
 
   // Global
   chain: ChainName;
 };
 
-export const command = "info <name>";
-export const desc = "Get info about a given table by name";
+export const command = "structure <hash>";
+export const desc = "Get table name(s) by schema structure hash";
 
 export const builder: CommandBuilder = (yargs) =>
-  yargs.positional("name", {
+  yargs.positional("hash", {
     type: "string",
-    description: "The target table name",
+    description: "The schema structure hash",
   }) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  const { name, chain } = argv;
+  const { hash, chain } = argv;
 
   const network = getChains()[chain];
   if (!network) {
@@ -30,26 +30,9 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     process.exit(1);
   }
 
-  const parts = name.split("_");
-  if (parts.length < 3) {
-    console.error(
-      "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)\n"
-    );
-    process.exit(1);
-  }
-
-  const id = parts.pop();
-  const chainId = parts.pop();
-  if (chainId !== (network.chainId as number).toString()) {
-    console.error(
-      "table `chainId` does not match selected chain (see `chains` command for details)\n"
-    );
-    process.exit(1);
-  }
-
   try {
     const res = await fetch(
-      `${network.host}/chain/${network.chainId}/tables/${id}`
+      `${network.host}/chain/${network.chainId}/tables/structure/${hash}`
     );
     const out = JSON.stringify(await res.json(), null, 2);
     console.log(out);

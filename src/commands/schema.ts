@@ -8,12 +8,11 @@ type Options = {
   // Local
   name: string;
 
-  // Global
   chain: ChainName;
 };
 
-export const command = "info <name>";
-export const desc = "Get info about a given table by name";
+export const command = "schema <name>";
+export const desc = "Get info about a given table schema";
 
 export const builder: CommandBuilder = (yargs) =>
   yargs.positional("name", {
@@ -24,6 +23,8 @@ export const builder: CommandBuilder = (yargs) =>
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   const { name, chain } = argv;
 
+  // This isn't strictly required, because this REST API is chain agnostic.
+  // But this is how we determine which host string to use.
   const network = getChains()[chain];
   if (!network) {
     console.error("unsupported chain (see `chains` command for details)\n");
@@ -38,7 +39,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     process.exit(1);
   }
 
-  const id = parts.pop();
+  // This check isn't strictly required, because this REST API is chain agnostic.
   const chainId = parts.pop();
   if (chainId !== (network.chainId as number).toString()) {
     console.error(
@@ -48,9 +49,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   }
 
   try {
-    const res = await fetch(
-      `${network.host}/chain/${network.chainId}/tables/${id}`
-    );
+    const res = await fetch(`${network.host}/schema/${name}`);
     const out = JSON.stringify(await res.json(), null, 2);
     console.log(out);
     process.exit(0);

@@ -1,7 +1,6 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
 import fetch from "node-fetch";
-import getChains from "../chains";
 import { SUPPORTED_CHAINS } from "@tableland/sdk";
 
 type Options = {

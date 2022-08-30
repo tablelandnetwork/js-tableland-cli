@@ -1,15 +1,12 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
 import fetch from "node-fetch";
-import { ChainName } from "@tableland/sdk";
 import getChains from "../chains";
+import { SUPPORTED_CHAINS } from "@tableland/sdk";
 
 type Options = {
   // Local
   name: string;
-
-  // Global
-  chain: ChainName;
 };
 
 export const command = "info <name>";
@@ -22,13 +19,7 @@ export const builder: CommandBuilder = (yargs) =>
   }) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  const { name, chain } = argv;
-
-  const network = getChains()[chain];
-  if (!network) {
-    console.error("unsupported chain (see `chains` command for details)\n");
-    process.exit(1);
-  }
+  const { name } = argv;
 
   const parts = name.split("_");
   if (parts.length < 3) {
@@ -38,19 +29,18 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     process.exit(1);
   }
 
-  const id = parts.pop();
-  const chainId = parts.pop();
-  if (chainId !== (network.chainId as number).toString()) {
-    console.error(
-      "table `chainId` does not match selected chain (see `chains` command for details)\n"
-    );
+  const id = parts.pop()!;
+  const chainId = parseInt(parts.pop()!);
+  const network = Object.values(SUPPORTED_CHAINS).find(
+    (v) => v.chainId === chainId
+  );
+  if (!network) {
+    console.error("unsupported chain (see `chains` command for details)\n");
     process.exit(1);
   }
 
   try {
-    const res = await fetch(
-      `${network.host}/chain/${network.chainId}/tables/${id}`
-    );
+    const res = await fetch(`${network.host}/chain/${chainId}/tables/${id}`);
     const out = JSON.stringify(await res.json(), null, 2);
     console.log(out);
     process.exit(0);

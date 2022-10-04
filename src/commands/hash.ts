@@ -14,7 +14,7 @@ type Options = {
   chain: ChainName;
 };
 
-export const command = "hash <schema> [prefix]";
+export const command = "hash <schema>";
 export const desc = "Validate a table schema and get the structure hash";
 
 export const builder: CommandBuilder<Options, Options> = (yargs) =>

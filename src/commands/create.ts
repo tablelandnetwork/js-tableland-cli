@@ -15,7 +15,7 @@ type Options = {
   providerUrl: string | undefined;
 };
 
-export const command = "create <schema> [prefix]";
+export const command = "create <schema>";
 export const desc = "Create a new table";
 
 export const builder: CommandBuilder<Options, Options> = (yargs) =>

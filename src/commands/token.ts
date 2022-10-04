@@ -13,7 +13,7 @@ type Options = {
   chain: ChainName;
 };
 
-export const command = "token [uri]";
+export const command = "token";
 export const desc = "Create a SIWE token";
 
 export const builder: CommandBuilder<Options, Options> = (yargs) =>

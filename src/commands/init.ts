@@ -20,24 +20,25 @@ const defaults = {
 
 const moduleName = "tableland";
 
-export const command = "init [format, path, yes]";
+export const command = "init";
 export const desc = "Create config file";
+export const aliases = ["i"];
 
 export const builder: CommandBuilder<Options, Options> = (yargs) => {
   return yargs
     .option("yes", {
       type: "boolean",
       alias: "y",
-      description: "Skip the interactive prompts and use default values.",
+      description: "Skip the interactive prompts and use default values",
       default: false,
     })
     .option("path", {
       type: "string",
-      description: "The path at which to create the config file.",
+      description: "The path at which to create the config file",
     })
     .option("format", {
       type: "string",
-      description: "The output config file format.",
+      description: "The output config file format",
       choices: ["json", "yaml"],
     }) as yargs.Argv<Options>;
 };

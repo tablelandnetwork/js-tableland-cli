@@ -14,14 +14,22 @@ type Options = {
   providerUrl: string | undefined;
 };
 
-export const command = "write <statement>";
+export const command = "write [statement]";
 export const desc = "Run a mutating SQL statement against a remote table";
+export const aliases = ["w", "run", "r"];
 
 export const builder: CommandBuilder<Options, Options> = (yargs) =>
-  yargs.positional("statement", {
-    type: "string",
-    description: "SQL write statement",
-  }) as yargs.Argv<Options>;
+  yargs
+    .positional("statement", {
+      type: "string",
+      description: "SQL write statement",
+    })
+    .option("file", {
+      alias: "f",
+      description:
+        "Read write statement from input file. Use '-' to read from stdin",
+      default: "table",
+    }) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   const { statement, privateKey, chain, providerUrl, rpcRelay } = argv;

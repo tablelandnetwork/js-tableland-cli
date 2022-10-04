@@ -17,8 +17,9 @@ type Options = {
   chain: ChainName;
 };
 
-export const command = "read <query>";
+export const command = "read [query]";
 export const desc = "Run a read-only query against a remote table";
+export const aliases = ["r", "query", "q"];
 
 export const builder: CommandBuilder<Options, Options> = (yargs) =>
   yargs
@@ -29,6 +30,12 @@ export const builder: CommandBuilder<Options, Options> = (yargs) =>
     .option("format", {
       choices: ["pretty", "table", "objects"] as const,
       description: "Output format. One of 'pretty', 'table', or 'objects'.",
+      default: "table",
+    })
+    .option("file", {
+      alias: "f",
+      description:
+        "Read query statement from input file. Use '-' to read from stdin",
       default: "table",
     }) as yargs.Argv<Options>;
 

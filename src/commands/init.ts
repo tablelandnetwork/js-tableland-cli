@@ -6,7 +6,7 @@ import { mkdirSync, createWriteStream, WriteStream } from "fs";
 import inquirer from "inquirer";
 import { getChains } from "../utils.js";
 
-type Options = {
+export type Options = {
   // Local
   yes: boolean;
   format: "json" | "yaml" | "yml";

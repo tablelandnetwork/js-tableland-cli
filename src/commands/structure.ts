@@ -4,7 +4,7 @@ import fetch from "node-fetch";
 import { ChainName } from "@tableland/sdk";
 import { getChains } from "../utils.js";
 
-type Options = {
+export type Options = {
   // Local
   hash: string;
 

@@ -5,7 +5,7 @@ import { getWalletWithProvider, getLink } from "../utils.js";
 import { createInterface } from "readline";
 import { promises } from "fs";
 
-type Options = {
+export type Options = {
   // Local
   schema?: string;
   prefix?: string;

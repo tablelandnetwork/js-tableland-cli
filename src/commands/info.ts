@@ -3,7 +3,7 @@ import type { Arguments, CommandBuilder } from "yargs";
 import fetch from "node-fetch";
 import { getChains } from "../utils.js";
 
-type Options = {
+export type Options = {
   // Local
   name: string;
 };

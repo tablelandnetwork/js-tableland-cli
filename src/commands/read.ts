@@ -10,7 +10,7 @@ import { promises } from "fs";
 import { createInterface } from "readline";
 import { getChains } from "../utils.js";
 
-type Options = {
+export type Options = {
   // Local
   statement?: string;
   format: "pretty" | "table" | "objects";

@@ -3,7 +3,7 @@ import type { Arguments, CommandBuilder } from "yargs";
 import { connect, ConnectOptions, ChainName } from "@tableland/sdk";
 import { getSignerOnly } from "../utils.js";
 
-type Options = {
+export type Options = {
   // Local
   schema: string;
   prefix: string | undefined;

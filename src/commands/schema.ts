@@ -3,7 +3,7 @@ import type { Arguments, CommandBuilder } from "yargs";
 import fetch from "node-fetch";
 import { SUPPORTED_CHAINS } from "@tableland/sdk";
 
-type Options = {
+export type Options = {
   // Local
   name: string;
 };

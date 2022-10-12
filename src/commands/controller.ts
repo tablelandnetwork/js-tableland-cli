@@ -3,7 +3,7 @@ import type { Arguments, CommandBuilder } from "yargs";
 import { connect, ConnectOptions, ChainName } from "@tableland/sdk";
 import { getWalletWithProvider, getLink } from "../utils.js";
 
-type Options = {
+export type Options = {
   // Local
   name: string;
   controller: string;

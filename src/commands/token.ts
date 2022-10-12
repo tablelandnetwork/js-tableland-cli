@@ -4,7 +4,7 @@ import { Wallet } from "ethers";
 import { userCreatesToken, ChainName } from "@tableland/sdk";
 import { getChains } from "../utils.js";
 
-type Options = {
+export type Options = {
   // Local
   uri: string;
 

@@ -17,7 +17,7 @@ export const command = "receipt <hash>";
 export const desc =
   "Get the receipt of a chain transaction to know if it was executed, and the execution details";
 
-export const builder: CommandBuilder<Options, Options> = (yargs) =>
+export const builder: CommandBuilder<{}, Options> = (yargs) =>
   yargs.positional("hash", {
     type: "string",
     description: "Transaction hash",
@@ -43,9 +43,8 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       out = JSON.stringify({ ...res, link }, null, 2);
     }
     console.log(out);
-    process.exit(0);
+    /* c8 ignore next 3 */
   } catch (err: any) {
     console.error(err.message);
-    process.exit(1);
   }
 };

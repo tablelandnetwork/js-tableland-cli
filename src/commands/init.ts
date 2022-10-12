@@ -4,7 +4,7 @@ import yaml from "js-yaml";
 import { resolve, dirname } from "path";
 import { mkdirSync, createWriteStream, WriteStream } from "fs";
 import inquirer from "inquirer";
-import getChains from "../chains.js";
+import { getChains } from "../utils.js";
 
 type Options = {
   // Local
@@ -121,7 +121,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     }
   } catch (err: any) {
     console.error(err.message);
-    process.exit(1);
+    return;
   } finally {
     stream.end("\n");
   }

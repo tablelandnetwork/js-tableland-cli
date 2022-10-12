@@ -41,10 +41,10 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       rpcRelay,
       signer,
     };
-    console.log(schema, prefix);
     const res = await connect(options).hash(schema, { prefix });
     const out = JSON.stringify(res, null, 2);
     console.log(out);
+    /* c8 ignore next 3 */
   } catch (err: any) {
     console.error(err.message);
   }

@@ -14,6 +14,9 @@ export interface Options {
   providerUrl: string | undefined;
 }
 
+export const wait = (timeout: number) =>
+  new Promise((resolve) => setTimeout(resolve, timeout));
+
 export function getLink(chain: ChainName, hash: string): string {
   /* c8 ignore start */
   if (chain.includes("ethereum")) {

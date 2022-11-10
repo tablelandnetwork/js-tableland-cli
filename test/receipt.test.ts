@@ -2,23 +2,15 @@ import { getAccounts } from "@tableland/local";
 import { describe, test, afterEach, before } from "mocha";
 import { spy, restore, assert } from "sinon";
 import yargs from "yargs/yargs";
-import fetch, { Headers, Request, Response } from "node-fetch";
 import { connect, ConnectOptions } from "@tableland/sdk";
-import { getWalletWithProvider } from "../src/utils.js";
+import { getWalletWithProvider, wait } from "../src/utils.js";
 import * as mod from "../src/commands/receipt.js";
 
 describe("commands/receipt", function () {
   this.timeout("10s");
 
   before(async function () {
-    if (!globalThis.fetch) {
-      (globalThis as any).fetch = fetch;
-      (globalThis as any).Headers = Headers;
-      (globalThis as any).Request = Request;
-      (globalThis as any).Response = Response;
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await wait(500);
   });
 
   afterEach(function () {

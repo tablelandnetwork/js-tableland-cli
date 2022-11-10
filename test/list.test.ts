@@ -40,10 +40,7 @@ describe("commands/list", function () {
     await yargs(["list", "--chain", "custom", "--privateKey", privateKey])
       .command(mod)
       .parse();
-    assert.calledWith(
-      consoleError,
-      "Invalid URL: /chain/31337/tables/controller/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
-    );
+    assert.calledWith(consoleError, "Invalid URL");
   });
 
   test("passes with local-tableland", async function () {

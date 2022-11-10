@@ -2,20 +2,14 @@ import { getAccounts } from "@tableland/local";
 import { describe, test, afterEach, before } from "mocha";
 import { spy, restore, assert } from "sinon";
 import yargs from "yargs/yargs";
-import fetch, { Headers, Request, Response } from "node-fetch";
 import * as mod from "../src/commands/hash.js";
+import { wait } from "../src/utils.js";
 
 describe("commands/hash", function () {
   before(async function () {
-    if (!globalThis.fetch) {
-      (globalThis as any).fetch = fetch;
-      (globalThis as any).Headers = Headers;
-      (globalThis as any).Request = Request;
-      (globalThis as any).Response = Response;
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await wait(500);
   });
+
   afterEach(function () {
     restore();
   });

@@ -63,12 +63,6 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
         message: "Enter your private key (optional)",
       },
       {
-        type: "confirm",
-        name: "rpcRelay",
-        message: "Should writes be relayed via a validator?",
-        default: false,
-      },
-      {
         type: "input",
         name: "providerUrl",
         message: "Enter a default JSON RPC API provider URL (optional)",

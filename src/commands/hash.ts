@@ -9,7 +9,6 @@ export type Options = {
   prefix: string | undefined;
 
   // Global
-  rpcRelay: boolean;
   privateKey: string;
   chain: ChainName;
 };
@@ -29,7 +28,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
     }) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  const { schema, prefix, privateKey, chain, rpcRelay } = argv;
+  const { schema, prefix, privateKey, chain } = argv;
 
   try {
     const signer = getSignerOnly({
@@ -38,8 +37,8 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     });
     const options: ConnectOptions = {
       chain,
-      rpcRelay,
       signer,
+      rpcRelay: false,
     };
     const res = await connect(options).hash(schema, { prefix });
     const out = JSON.stringify(res, null, 2);

@@ -11,7 +11,6 @@ export type Options = {
   file?: string;
 
   // Global
-  rpcRelay: boolean;
   privateKey: string;
   chain: ChainName;
   providerUrl: string | undefined;
@@ -34,7 +33,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   let { statement } = argv;
-  const { privateKey, chain, providerUrl, rpcRelay, file } = argv;
+  const { privateKey, chain, providerUrl, file } = argv;
 
   try {
     const signer = getWalletWithProvider({
@@ -62,7 +61,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     }
     const res = await connect(options).write(statement, {
       skipConfirm: false,
-      rpcRelay,
+      rpcRelay: false,
     });
     const link = getLink(chain, res.hash);
     const out = JSON.stringify({ ...res, link }, null, 2);

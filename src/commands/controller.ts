@@ -9,7 +9,6 @@ export type Options = {
   controller: string;
 
   // Global
-  rpcRelay: boolean;
   privateKey: string;
   chain: ChainName;
   providerUrl: string | undefined;
@@ -30,7 +29,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
           description: "The target table name",
         }) as yargs.Argv<Options>,
       async (argv) => {
-        const { name, chain, privateKey, providerUrl, rpcRelay } = argv;
+        const { name, chain, privateKey, providerUrl } = argv;
 
         try {
           const signer = getWalletWithProvider({
@@ -41,7 +40,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
           const options: ConnectOptions = {
             chain,
             signer,
-            rpcRelay,
+            rpcRelay: false,
           };
           const res = await connect(options).getController(name);
           const out = JSON.stringify(res, null, 2);
@@ -66,8 +65,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
             description: "The target table name",
           }) as yargs.Argv<Options>,
       async (argv) => {
-        const { name, controller, chain, privateKey, providerUrl, rpcRelay } =
-          argv;
+        const { name, controller, chain, privateKey, providerUrl } = argv;
 
         try {
           const signer = getWalletWithProvider({
@@ -78,10 +76,10 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
           const options: ConnectOptions = {
             chain,
             signer,
-            rpcRelay,
+            rpcRelay: false,
           };
           const res = await connect(options).setController(controller, name, {
-            rpcRelay,
+            rpcRelay: false,
           });
           const link = getLink(chain, res.hash);
           const out = JSON.stringify({ ...res, link }, null, 2);
@@ -101,12 +99,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
           description: "The target table name",
         }) as yargs.Argv<Options>,
       async (argv) => {
-        const { name, chain, privateKey, providerUrl, rpcRelay } = argv;
-
-        if (rpcRelay) {
-          console.error("Cannot relay controller calls via RPC");
-          return;
-        }
+        const { name, chain, privateKey, providerUrl } = argv;
 
         try {
           const signer = getWalletWithProvider({

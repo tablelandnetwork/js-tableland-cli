@@ -56,7 +56,6 @@ describe("commands/write", function () {
       "local-tableland",
       "--privateKey",
       privateKey,
-      "--no-rpcRelay",
     ])
       .command(mod)
       .parse();
@@ -121,7 +120,6 @@ describe("commands/write", function () {
       "local-tableland",
       "--privateKey",
       privateKey,
-      "--no-rpcRelay",
     ])
       .command(mod)
       .parse();
@@ -149,7 +147,6 @@ describe("commands/write", function () {
       path,
       "--privateKey",
       privateKey,
-      "--no-rpcRelay",
     ])
       .command(mod)
       .parse();
@@ -178,7 +175,6 @@ describe("commands/write", function () {
       privateKey,
       "--providerUrl",
       "http://localhost:8545", // Also test providerUrl
-      "--no-rpcRelay", // The default for local-tableland is true here
     ])
       .command(mod)
       .parse();

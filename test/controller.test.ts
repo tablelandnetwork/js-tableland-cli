@@ -79,10 +79,7 @@ describe("commands/controller", function () {
     ])
       .command(mod)
       .parse();
-    assert.calledWith(
-      consoleError,
-      "parsing token ID: parsing stringified id failed"
-    );
+    assert.calledWith(consoleError, "invalid tableId was provided");
   });
 
   test("passes when setting a controller", async function () {
@@ -99,7 +96,6 @@ describe("commands/controller", function () {
       privateKey,
       "--chain",
       "local-tableland",
-      "--no-rpcRelay",
     ])
       .command(mod)
       .parse();

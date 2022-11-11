@@ -29,8 +29,7 @@
     "prettier:fix": "npm run prettier -- --write",
     "format": "npm run prettier:fix && npm run lint:fix",
     "prepublishOnly": "npm run build",
-    "test": "mocha",
-    "test:cov": "c8 mocha",
+    "test": "c8 mocha",
     "clean": "rm -rf dist",
     "build": "npx tsc && chmod +x dist/cli.js"
   },

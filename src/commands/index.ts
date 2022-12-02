@@ -11,6 +11,7 @@ import * as schema from "./schema.js";
 import * as structure from "./structure.js";
 import * as token from "./token.js";
 import * as write from "./write.js";
+import * as shell from './shell.js';
 
 export const commands = [
   chains,
@@ -26,4 +27,5 @@ export const commands = [
   structure,
   token,
   write,
+  shell
 ];

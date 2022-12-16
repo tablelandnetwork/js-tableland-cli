@@ -36,7 +36,7 @@
   },
   "license": "MIT AND Apache-2.0",
   "devDependencies": {
-    "@tableland/local": "^0.0.0-pre13.9",
+    "@tableland/local": "^0.0.4",
     "@types/cosmiconfig": "^6.0.0",
     "@types/inquirer": "^9.0.2",
     "@types/js-yaml": "^4.0.5",

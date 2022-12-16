@@ -57,5 +57,10 @@ const _argv = yargs(hideBin(process.argv))
     description:
       "JSON RPC API provider URL. (e.g., https://eth-rinkeby.alchemyapi.io/v2/123abc123a...)",
   })
+  .option("namespaces", {
+    alias: "n",
+    type: "string",
+    description: "List of namespaces to use"
+  })
   .demandCommand(1, "")
   .strict().argv;

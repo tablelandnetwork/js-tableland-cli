@@ -9,6 +9,8 @@ import yargs from "yargs";
 import { promises } from "fs";
 import { createInterface } from "readline";
 import { getChains } from "../utils.js";
+import init from '@tableland/sqlparser';
+import { resolveTables } from "../utils/ensResolver.js";
 
 export type Options = {
   // Local
@@ -43,6 +45,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
     }) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
+  await init(); 
   let { statement } = argv;
   const { format, chain, file } = argv;
 
@@ -51,6 +54,8 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     console.error("unsupported chain (see `chains` command for details)");
     return;
   }
+
+  
 
   const options: ConnectOptions = {
     chain,
@@ -70,7 +75,16 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       );
       return;
     }
-    const res = await connect(options).read(statement);
+
+    
+    const uniqueTablenames = await globalThis.sqlparser.getUniqueTableNames(statement);
+    const namespacedTablenames = await resolveTables(uniqueTablenames)
+    console.log(namespacedTablenames);
+    // @ts-ignore
+    const statements = await globalThis.sqlparser.normalize(statement, namespacedTablenames);
+    console.log(statements);
+    const res = await connect(options).read(statements.statements[0]);
+
     // Defaults to "table" output format
     // After we upgrade the SDK to version 4.x, we can drop some of this formatting code
     const formatted = format === "table" ? res : resultsToObjects(res);

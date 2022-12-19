@@ -1,30 +1,52 @@
-import { describe, test, afterEach, before } from "mocha";
-import { spy, restore, assert } from "sinon";
+import { describe, test } from "mocha";
+import { spy, assert } from "sinon";
 import yargs from "yargs/yargs";
-import { temporaryWrite } from "tempy";
 import mockStd from "mock-stdin";
+import { getAccounts } from "@tableland/local";
 import * as mod from "../src/commands/shell.js";
-import { wait } from "../src/utils.js";
 
 describe("commands/read", function () {
-
   test("Something", async function () {
     const consoleLog = spy(console, "log");
     const stdin = mockStd.stdin();
-    process.nextTick(() => {
-      stdin.send("select * from\n").send("healtbot_31337_1;").end();
-    });
-    await yargs(["shell", "--chain", "local-tableland", "--format", "objects"])
+
+    setTimeout(() => {
+      stdin.send("select * from\n").send("healthbot_31337_1;").end();
+    }, 1000);
+
+    const [account] = getAccounts();
+    const privateKey = account.privateKey.slice(2);
+    await yargs([
+      "shell",
+      "--chain",
+      "local-tableland",
+      "--format",
+      "objects",
+      "--privateKey",
+      privateKey,
+    ])
       .command(mod)
       .parse();
-    assert.calledWith(
-      consoleLog,
-      `[
-  {
-    "counter": 1
-  }
-]`
+
+    // console.log(consoleLog.getCall(0))
+    // console.log(consoleLog.getCall(1))
+    // console.log(consoleLog.getCall(2))
+    // console.error("\n\nLOGGGSsss", consoleLog.getCall(4).args[0], "\n\n")
+
+    assert.match(
+      consoleLog.getCall(4).args[0],
+      `{
+  "columns": [
+    {
+      "name": "counter"
+    }
+  ],
+  "rows": [
+    [
+      1
+    ]
+  ]
+}`
     );
   });
-
 });

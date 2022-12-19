@@ -1,17 +1,12 @@
 import type { Arguments, CommandBuilder } from "yargs";
-import cliSelect from 'cli-select';
-import {
-  connect,
-  ConnectOptions,
-  ChainName,
-  Connection,
-} from "@tableland/sdk";
-// @ts-ignore 
-import chalk from 'chalk';
+import cliSelect from "cli-select";
+import { connect, ConnectOptions, ChainName, Connection } from "@tableland/sdk";
+// @ts-ignore
+import chalk from "chalk";
 import yargs from "yargs";
 import { createInterface } from "readline";
 import { getChains, getWalletWithProvider } from "../utils.js";
-// @ts-ignore 
+// @ts-ignore
 import init from "@tableland/sqlparser";
 import { table } from "table";
 
@@ -19,17 +14,16 @@ function formatForDisplay(table: any): (string | number | unknown)[][] {
   const result = table.rows;
 
   const columns: string[] = [];
-  table.columns.forEach((column:any) => {
+  table.columns.forEach((column: any) => {
     columns.push(column.name);
   });
   result.unshift(columns);
 
-  
   return result;
 }
 
-function sleep(ms:any) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+function sleep(ms: any) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export type Options = {
@@ -47,7 +41,7 @@ export const command = "shell [statement]";
 export const desc = "Run a read-only query against a remote table";
 export const aliases = ["r", "query", "q"];
 
-process.on('SIGINT', function() {
+process.on("SIGINT", function () {
   console.log("Caught interrupt signal");
 
   process.exit();
@@ -56,132 +50,139 @@ process.on('SIGINT', function() {
 async function confirmQuery() {
   const selected = await cliSelect({
     values: {
-      confirm: "Confirm: Send this transaction to the network", 
+      confirm: "Confirm: Send this transaction to the network",
       deny: "Oops. No, don't send that transaction.",
-      fireAndForget: "Fire and forget: Send, but don't want for confirmation. DO NOT RECOMMEND."
+      fireAndForget:
+        "Fire and forget: Send, but don't want for confirmation. DO NOT RECOMMEND.",
     },
     valueRenderer: (value, selected) => {
       if (selected) {
         return chalk.underline(value);
       }
       return value;
-    }
+    },
   });
 
   console.log(chalk.bgBlue(selected.id));
-  if(selected.id ==="confirm") {
-    console.log(chalk.underline("Committing to network. This will take a few moments."));
+  if (selected.id === "confirm") {
+    console.log(
+      chalk.underline("Committing to network. This will take a few moments.")
+    );
     return false;
   }
 
   return selected.id;
 }
 
-async function fireFullQuery(statement: string, argv: any, tablelandConnection: Connection ) {
+async function fireFullQuery(
+  statement: string,
+  argv: any,
+  tablelandConnection: Connection
+) {
   const { format } = argv;
 
-  switch(true) {
-    case statement.trim().endsWith(".help"): 
+  switch (true) {
+    case statement.trim().endsWith(".help"):
       console.log("Uh, I didn't think I'd get this far");
       break;
-    case statement.trim().endsWith(";"): 
+    case statement.trim().endsWith(";"):
       // Parse query for read, write, or create;
       // If write or create, confrm with cliSelect
       // If read, return response in Tabular form
-      break;        
+      break;
   }
 
   try {
     // @ts-ignore
-    const { type } = await globalThis.sqlparser.normalize(statement);    
+    const { type } = await globalThis.sqlparser.normalize(statement);
 
     let res;
-    if(type==="write") {
+    if (type === "write") {
       const confirm = await confirmQuery();
-      if(confirm!=="deny") {
+      if (confirm !== "deny") {
         try {
-          res = tablelandConnection.write(statement).catch(e => {
+          res = tablelandConnection.write(statement).catch((e) => {
             console.error(e);
           });
-  
-          if(confirm==="confirm") {
+
+          if (confirm === "confirm") {
             console.log(await res);
-          }  else {
+          } else {
             await sleep(100);
             // Why? Incase the write statement errors out immediately
-          }          
-  
-
+          }
         } catch (e) {
           console.error(e);
         }
-      
       }
-  
     } else {
       res = await tablelandConnection.read(statement);
-    
+
       // Defaults to "table" output format
       // After we upgrade the SDK to version 4.x, we can drop some of this formatting code
       if (format === "pretty") {
         const formatted = formatForDisplay(res);
-        console.log(table(formatted, {
-          columns: [{
-            alignment: "center"
-          }]
-        }));
+        console.log(
+          table(formatted, {
+            columns: [
+              {
+                alignment: "center",
+              },
+            ],
+          })
+        );
       } else {
         const out = JSON.stringify(res, null, 2);
         console.log(out);
       }
       /* c8 ignore next 3 */
-  
     }
   } catch (e) {
     console.error(e);
   }
-
-
-
 }
 
-
-async function shellYeah(argv:any, tablelandConnection: Connection, history: string[] = []) {
-  
+async function shellYeah(
+  argv: any,
+  tablelandConnection: Connection,
+  history: string[] = []
+) {
   try {
-      let statement = "";
-      const rl = createInterface({ history, input: process.stdin, output: process.stdout, prompt: "tableland>", terminal: true });
-      rl.prompt();
-      rl.on('history', (newHistory) => {
-        history = newHistory;
-      });
-      rl.on('SIGINT', () => {
-          process.exit();
-      });
+    let statement = "";
+    const rl = createInterface({
+      history,
+      input: process.stdin,
+      output: process.stdout,
+      prompt: "tableland>",
+      terminal: true,
+    });
+    rl.prompt();
+    rl.on("history", (newHistory) => {
+      history = newHistory;
+    });
+    rl.on("SIGINT", () => {
+      process.exit();
+    });
 
-      for await (const enter of rl) {    
+    for await (const enter of rl) {
+      const state = enter;
+      // @ts-ignore
+      statement += "\r\n";
+      statement += state;
+      rl.setPrompt("      ...>");
 
-        const state = enter;
-        // @ts-ignore
-        statement += '\r\n';
-        statement += state;
-        rl.setPrompt('      ...>');
-        
-        if(state.trim().endsWith(";")) {
-          break;
-        }
-        rl.prompt(); 
+      if (state.trim().endsWith(";")) {
+        break;
       }
-      await fireFullQuery(statement, argv, tablelandConnection);
-  
-      shellYeah(argv, tablelandConnection, history);
+      rl.prompt();
+    }
+    await fireFullQuery(statement, argv, tablelandConnection);
+
+    shellYeah(argv, tablelandConnection, history);
   } catch (err: any) {
     console.error(err.message);
   }
-
-  
 }
-
 
 export const builder: CommandBuilder<{}, Options> = (yargs) =>
   yargs

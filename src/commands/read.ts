@@ -10,7 +10,8 @@ import { promises } from "fs";
 import { createInterface } from "readline";
 import { getChains } from "../utils.js";
 import init from '@tableland/sqlparser';
-import { resolveTables } from "../utils/ensResolver.js";
+import { ethers } from "ethers";
+import EnsResolver from "../utils/ensResolver.js";
 
 export type Options = {
   // Local
@@ -76,14 +77,13 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       return;
     }
 
+
+    const provider = new ethers.providers.JsonRpcProvider(
+      "https://goerli.infura.io/v3/92f6902cf1214401ae5b08a1e117eb91"
+    );
+
     
-    const uniqueTablenames = await globalThis.sqlparser.getUniqueTableNames(statement);
-    const namespacedTablenames = await resolveTables(uniqueTablenames)
-    console.log(namespacedTablenames);
-    // @ts-ignore
-    const statements = await globalThis.sqlparser.normalize(statement, namespacedTablenames);
-    console.log(statements);
-    const res = await connect(options).read(statements.statements[0]);
+    const res = await connect(options).read(await new EnsResolver({provider}).resolve(statement));
 
     // Defaults to "table" output format
     // After we upgrade the SDK to version 4.x, we can drop some of this formatting code

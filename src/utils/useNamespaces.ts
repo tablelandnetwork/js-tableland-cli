@@ -1,9 +1,16 @@
+export function mergeNamespaces(maps: Record<string, string>[]): Record<string, string> {
+  const final: Record<string, string> = {};
 
+  maps.forEach(map => {
+    for (const name in map) {
+      if(final[name]) {
+        throw new Error(`Namespace conflict: ${name} exists on multiple namespaces. Please full qualifiy.`);
+      } else {
+        final[name] = map[name];
+      }
+    }
+  })
 
-export default async function useNamespaces(statement: string): Promise<string> {
-
-  // What are my namespaces?
-  // Reso
-
-  return "";
+  return final;
 }
+

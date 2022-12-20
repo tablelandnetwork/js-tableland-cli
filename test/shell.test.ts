@@ -28,11 +28,6 @@ describe("commands/read", function () {
       .command(mod)
       .parse();
 
-    // console.log(consoleLog.getCall(0))
-    // console.log(consoleLog.getCall(1))
-    // console.log(consoleLog.getCall(2))
-    // console.error("\n\nLOGGGSsss", consoleLog.getCall(4).args[0], "\n\n")
-
     assert.match(
       consoleLog.getCall(4).args[0],
       `{

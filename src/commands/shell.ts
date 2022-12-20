@@ -54,8 +54,8 @@ async function confirmQuery() {
     values: {
       confirm: "Confirm: Send this transaction to the network",
       deny: "Oops. No, don't send that transaction.",
-      fireAndForget:
-        "Fire and forget: Send, but don't want for confirmation. DO NOT RECOMMEND.",
+      // fireAndForget:
+      //   "Fire and forget: Send, but don't want for confirmation. DO NOT RECOMMEND.",
     },
     valueRenderer: (value, selected) => {
       if (selected) {
@@ -189,7 +189,9 @@ async function shellYeah(
       }
       rl.prompt();
     }
+    rl.close();
     await fireFullQuery(statement, argv, tablelandConnection);
+
 
     shellYeah(argv, tablelandConnection, history);
   } catch (err: any) {

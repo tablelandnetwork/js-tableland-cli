@@ -6,7 +6,7 @@ import { getAccounts } from "@tableland/local";
 import * as mod from "../src/commands/shell.js";
 
 describe("commands/read", function () {
-  test("Something", async function () {
+  test("Shell Works", async function () {
     const consoleLog = spy(console, "log");
     const stdin = mockStd.stdin();
 

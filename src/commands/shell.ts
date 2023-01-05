@@ -9,10 +9,6 @@ import { getChains, getWalletWithProvider } from "../utils.js";
 // @ts-ignore
 import init from "@tableland/sqlparser";
 
-import EnsResolver from "../lib/ensResolver.js";
-import { JsonRpcProvider } from "@ethersproject/providers";
-
-
 // function formatForDisplay(table: any): (string | number | unknown)[][] {
 //   const result = table.rows;
 
@@ -79,8 +75,6 @@ async function fireFullQuery(
   argv: any,
   tablelandConnection: Database
 ) {
-  const { privateKey, chain, providerUrl } = argv;
-  // const { format } = argv;
 
   switch (true) {
     
@@ -95,19 +89,6 @@ async function fireFullQuery(
   }
 
   try {
-
-    if(argv.enableEns) {
-      // TODO: Using same wallet as tableland instead of just provider
-      const signer = getWalletWithProvider({
-        privateKey,
-        chain,
-        providerUrl,
-      });
-
-      const provider = new JsonRpcProvider(argv.providerUrl);
-      const ensConnect = await new EnsResolver({provider, signer});
-      statement = await ensConnect.resolve(statement);
-    }
 
 
     // @ts-ignore

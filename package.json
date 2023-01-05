@@ -17,7 +17,7 @@
   "main": "./dist/cli.js",
   "module": "./dist/cli.js",
   "bin": {
-    "tableland": "./entry.sh"
+    "tableland": "./dist/cli.js"
   },
   "files": [
     "dist/**/*.js"

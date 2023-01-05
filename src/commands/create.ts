@@ -1,6 +1,6 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
-import { connect, ConnectOptions, ChainName } from "@tableland/sdk";
+import { Database, ChainName } from "@tableland/sdk";
 import { getWalletWithProvider, getLink } from "../utils.js";
 import { createInterface } from "readline";
 import { promises } from "fs";
@@ -20,7 +20,7 @@ export type Options = {
 export const command = "create [schema]";
 export const desc = "Create a new table";
 
-const regex = /^\s*CREATE\s+TABLE\s+([\w\d]+)\s*\((.*)\)\s*;?\s*/gim;
+// const regex = /^\s*CREATE\s+TABLE\s+([\w\d]+)\s*\((.*)\)\s*;?\s*/gim;
 
 export const builder: CommandBuilder<{}, Options> = (yargs) =>
   yargs
@@ -40,7 +40,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
     }) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  let { schema, prefix } = argv;
+  let { schema } = argv;
   const { privateKey, chain, providerUrl, file } = argv;
 
   try {
@@ -49,11 +49,6 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       chain,
       providerUrl,
     });
-    const options: ConnectOptions = {
-      chain,
-      signer,
-      rpcRelay: false,
-    };
 
     if (file != null) {
       schema = await promises.readFile(file, { encoding: "utf-8" });
@@ -70,17 +65,12 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       return;
     }
 
-    // If we find a name in a full create statement, this will be used instead
-    const check = regex.exec(schema.toString());
-    if (check != null) {
-      schema = check[2];
-      prefix = check[1];
-    }
 
-    const res = await connect(options).create(schema, { prefix });
-    const link = getLink(chain, res.txnHash);
+    const db = new Database({signer});
+    const res = await db.prepare(schema).bind().all();
+    const link = getLink(chain, res.meta.txn?.transactionHash || "");
     const out = JSON.stringify(
-      { ...res, link, tableId: (res.tableId ?? "").toString() },
+      { ...res, link },
       null,
       2
     );

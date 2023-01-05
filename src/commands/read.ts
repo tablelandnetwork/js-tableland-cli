@@ -1,8 +1,6 @@
 import type { Arguments, CommandBuilder } from "yargs";
 import {
-  connect,
-  resultsToObjects,
-  ConnectOptions,
+  Database,
   ChainName,
 } from "@tableland/sdk";
 import yargs from "yargs";
@@ -44,7 +42,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   let { statement } = argv;
-  const { format, chain, file } = argv;
+  const { chain, format, file } = argv;
 
   const network = getChains()[chain];
   if (!network) {
@@ -52,9 +50,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     return;
   }
 
-  const options: ConnectOptions = {
-    chain,
-  };
+
   try {
     if (file != null) {
       statement = await promises.readFile(file, { encoding: "utf-8" });
@@ -70,15 +66,13 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       );
       return;
     }
-    const res = await connect(options).read(statement);
-    // Defaults to "table" output format
-    // After we upgrade the SDK to version 4.x, we can drop some of this formatting code
-    const formatted = format === "table" ? res : resultsToObjects(res);
+    const db = await Database.readOnly(chain);
+    const res = await db.prepare(statement).bind().all();
 
     if (format === "pretty") {
-      console.table(formatted);
+      console.table(res.results);
     } else {
-      const out = JSON.stringify(formatted, null, 2);
+      const out = JSON.stringify(res, null, 2);
       console.log(out);
     }
     /* c8 ignore next 3 */

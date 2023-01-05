@@ -1,6 +1,6 @@
 import type { Arguments, CommandBuilder } from "yargs";
 import cliSelect from "cli-select";
-import { connect, ConnectOptions, ChainName, Connection } from "@tableland/sdk";
+import { ChainName, Database, Config } from "@tableland/sdk";
 // @ts-ignore
 import chalk from "chalk";
 import yargs from "yargs";
@@ -8,25 +8,23 @@ import { createInterface } from "readline";
 import { getChains, getWalletWithProvider } from "../utils.js";
 // @ts-ignore
 import init from "@tableland/sqlparser";
-import { table } from "table";
+
 import EnsResolver from "../lib/ensResolver.js";
 import { JsonRpcProvider } from "@ethersproject/providers";
 
-function formatForDisplay(table: any): (string | number | unknown)[][] {
-  const result = table.rows;
 
-  const columns: string[] = [];
-  table.columns.forEach((column: any) => {
-    columns.push(column.name);
-  });
-  result.unshift(columns);
+// function formatForDisplay(table: any): (string | number | unknown)[][] {
+//   const result = table.rows;
 
-  return result;
-}
+//   const columns: string[] = [];
+//   table.columns.forEach((column: any) => {
+//     columns.push(column.name);
+//   });
+//   result.unshift(columns);
 
-function sleep(ms: any) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+//   return result;
+// }
+
 
 export type Options = {
   // Local
@@ -79,9 +77,10 @@ async function confirmQuery() {
 async function fireFullQuery(
   statement: string,
   argv: any,
-  tablelandConnection: Connection
+  tablelandConnection: Database
 ) {
-  const { format } = argv;
+  const { privateKey, chain, providerUrl } = argv;
+  // const { format } = argv;
 
   switch (true) {
     
@@ -99,8 +98,14 @@ async function fireFullQuery(
 
     if(argv.enableEns) {
       // TODO: Using same wallet as tableland instead of just provider
+      const signer = getWalletWithProvider({
+        privateKey,
+        chain,
+        providerUrl,
+      });
+
       const provider = new JsonRpcProvider(argv.providerUrl);
-      const ensConnect = await new EnsResolver({provider});
+      const ensConnect = await new EnsResolver({provider, signer});
       statement = await ensConnect.resolve(statement);
     }
 
@@ -108,55 +113,28 @@ async function fireFullQuery(
     // @ts-ignore
     const { type } = await globalThis.sqlparser.normalize(statement);
 
-    let res;
+    let stmt;
+    let confirm: any = true;
+
     if (type === "write") {
-      const confirm = await confirmQuery();
-      if (confirm !== "deny") {
-        try {
-          res = tablelandConnection.write(statement).catch((e) => {
-            console.error(e);
-          });
-
-          if (confirm === "confirm") {
-            console.log(await res);
-          } else {
-            await sleep(100);
-            // Why? Incase the write statement errors out immediately
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    } else {
-      res = await tablelandConnection.read(statement);
-
-      // Defaults to "table" output format
-      // After we upgrade the SDK to version 4.x, we can drop some of this formatting code
-      if (format === "pretty") {
-        const formatted = formatForDisplay(res);
-        console.log(
-          table(formatted, {
-            columns: [
-              {
-                alignment: "center",
-              },
-            ],
-          })
-        );
-      } else {
-        const out = JSON.stringify(res, null, 2);
-        console.log(out);
-      }
-      /* c8 ignore next 3 */
+      confirm = (await confirmQuery()) === "confirm";
+    }
+    if(!confirm) return;
+    try {
+      stmt = tablelandConnection.prepare(statement).bind();
+      const { results } = await stmt.all();
+      console.log(results);
+    } catch (e) {
+      console.error(e);
     }
   } catch (e) {
-    console.error(e);
+    
   }
 }
 
 async function shellYeah(
   argv: any,
-  tablelandConnection: Connection,
+  tablelandConnection: Database,
   history: string[] = []
 ) {
   
@@ -221,14 +199,14 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     chain,
     providerUrl,
   });
-  const options: ConnectOptions = {
-    chain,
+  const options: Config = {
     signer,
   };
 
-  const tablelandConnection = await connect(options);
 
-  const network = getChains()[chain];
+  const tablelandConnection = new Database(options);
+
+  const network:any = getChains()[chain];
   if (!network) {
     console.error("unsupported chain (see `chains` command for details)");
   }

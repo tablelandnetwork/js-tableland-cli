@@ -1,7 +1,7 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
-import { connect, ConnectOptions, ChainName } from "@tableland/sdk";
-import { getLink, getSignerOnly } from "../utils.js";
+import { ChainName, Validator, supportedChains } from "@tableland/sdk";
+import { getLink } from "../utils.js";
 
 export type Options = {
   // Local
@@ -23,22 +23,16 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
   }) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  const { hash, privateKey, chain } = argv;
+  const { hash, chain } = argv;
 
   try {
-    const signer = getSignerOnly({
-      privateKey,
-      chain,
-    });
-    const options: ConnectOptions = {
-      chain,
-      signer,
-      rpcRelay: false,
-    };
-    const res = await connect(options).receipt(hash);
+
+    const v = Validator.forChain(chain);
+    const res = await v.receiptByTransactionHash({chainId: supportedChains[chain].chainId, transactionHash: hash});    
+    console.log(res);
     let out = "";
     if (res) {
-      const link = getLink(chain, res.txnHash);
+      const link = getLink(chain, res.transactionHash);
       out = JSON.stringify({ ...res, link }, null, 2);
     }
     console.log(out);

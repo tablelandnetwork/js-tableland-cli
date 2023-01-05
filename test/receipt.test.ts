@@ -2,7 +2,7 @@ import { getAccounts } from "@tableland/local";
 import { describe, test, afterEach, before } from "mocha";
 import { spy, restore, assert } from "sinon";
 import yargs from "yargs/yargs";
-import { connect, ConnectOptions } from "@tableland/sdk";
+import { Database } from "@tableland/sdk";
 import { getWalletWithProvider, wait } from "../src/utils.js";
 import * as mod from "../src/commands/receipt.js";
 
@@ -10,7 +10,7 @@ describe("commands/receipt", function () {
   this.timeout("10s");
 
   before(async function () {
-    await wait(500);
+    await wait(2000);
   });
 
   afterEach(function () {
@@ -69,22 +69,22 @@ describe("commands/receipt", function () {
       chain: "local-tableland",
       providerUrl: undefined,
     });
-    const options: ConnectOptions = {
-      chain: "local-tableland",
-      rpcRelay: false,
-      signer,
-    };
 
-    const { hash } = await connect(options).write(
-      "update healthbot_31337_1 set counter=1;"
-    );
+
+    const db = await new Database({signer})
+      .prepare("update healthbot_31337_1 set counter=1;")
+      .bind()
+      .all();
+
+    
+
     await yargs([
       "receipt",
       "--privateKey",
       privateKey,
       "--chain",
       "local-tableland",
-      hash,
+      db.meta.txn?.transactionHash || "",
     ])
       .command(mod)
       .parse();

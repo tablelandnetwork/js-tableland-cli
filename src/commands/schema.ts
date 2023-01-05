@@ -1,7 +1,6 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
-import fetch from "node-fetch";
-import { SUPPORTED_CHAINS } from "@tableland/sdk";
+import { supportedChains, Validator } from "@tableland/sdk";
 
 export type Options = {
   // Local
@@ -30,8 +29,8 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
 
   parts.pop()!;
   const chainId = parseInt(parts.pop()!);
-  const network = Object.values(SUPPORTED_CHAINS).find(
-    (v) => v.chainId === chainId
+  const network = Object.values(supportedChains).find(
+    (v:any) => v.chainId === chainId
   );
   if (!network) {
     console.error("unsupported chain (see `chains` command for details)");
@@ -39,14 +38,11 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   }
 
   try {
-    const res = await fetch(`${network.host}/schema/${name}`);
-    const body: any = await res.json();
-    if (body.message) {
-      console.error(body.message);
-    } else {
-      const out = JSON.stringify(body, null, 2);
-      console.log(out);
-    }
+
+    const [tableId, chainId] = name.split("_").reverse();
+    const validator = Validator.forChain(parseInt(chainId));    
+    const res = await validator.getTableById({tableId, chainId: parseInt(chainId)});
+    console.log(res);
     /* c8 ignore next 3 */
   } catch (err: any) {
     console.error(err.message);

@@ -1,7 +1,10 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
-import { connect, ConnectOptions, ChainName } from "@tableland/sdk";
+import { ChainName } from "@tableland/sdk";
 import { getWalletWithProvider, getLink } from "../utils.js";
+
+// @ts-ignore 
+import { Registry } from "@tableland/sdk/registry";
 
 export type Options = {
   // Local
@@ -37,12 +40,10 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
             chain,
             providerUrl,
           });
-          const options: ConnectOptions = {
-            chain,
-            signer,
-            rpcRelay: false,
-          };
-          const res = await connect(options).getController(name);
+          const reg = new Registry({signer});
+          
+          const res = await reg.getController(name);
+          
           const out = JSON.stringify(res, null, 2);
           console.log(out);
           /* c8 ignore next 3 */
@@ -73,14 +74,10 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
             chain,
             providerUrl,
           });
-          const options: ConnectOptions = {
-            chain,
-            signer,
-            rpcRelay: false,
-          };
-          const res = await connect(options).setController(controller, name, {
-            rpcRelay: false,
-          });
+
+          const reg = new Registry({signer});
+          const res = await reg.setController({tableName: name, controller});
+
           const link = getLink(chain, res.hash);
           const out = JSON.stringify({ ...res, link }, null, 2);
           console.log(out);
@@ -107,11 +104,11 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
             chain,
             providerUrl,
           });
-          const options: ConnectOptions = {
-            chain,
-            signer,
-          };
-          const res = await connect(options).lockController(name);
+
+          const reg = new Registry({signer});
+
+          const res = await reg.lockController(name);
+          
           const link = getLink(chain, res.hash);
           const out = JSON.stringify({ ...res, link }, null, 2);
           console.log(out);

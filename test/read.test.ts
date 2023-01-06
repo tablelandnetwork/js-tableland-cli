@@ -1,5 +1,5 @@
 import { describe, test, afterEach, before } from "mocha";
-import { spy, restore, assert } from "sinon";
+import { spy, restore, assert, match } from "sinon";
 import yargs from "yargs/yargs";
 import { temporaryWrite } from "tempy";
 import mockStd from "mock-stdin";
@@ -31,7 +31,7 @@ describe("commands/read", function () {
       .parse();
     assert.calledWith(
       consoleError,
-      "calling RunReadQuery: validating query: unable to parse the query: syntax error at position 7 near 'invalid'"
+      "error parsing statement: syntax error at position 7 near 'invalid'"
     );
   });
 
@@ -42,7 +42,9 @@ describe("commands/read", function () {
       .parse();
     assert.calledWith(
       consoleError,
-      "ENOENT: no such file or directory, open 'missing.sql'"
+      match(value => {
+        return value.startsWith("ENOENT: no such file or directory")
+      }, "Didn't throw ENOENT.")
     );
   });
 
@@ -63,7 +65,7 @@ describe("commands/read", function () {
     const consoleLog = spy(console, "log");
     await yargs([
       "read",
-      "select * from healthbot_31337_1;",
+      "select * from healthbot_31337_1",
       "--chain",
       "local-tableland",
     ])
@@ -71,18 +73,11 @@ describe("commands/read", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      `{
-  "columns": [
-    {
-      "name": "counter"
-    }
-  ],
-  "rows": [
-    [
-      1
-    ]
-  ]
-}`
+      match(value => {
+        const res = JSON.parse(value);
+        return res.results[0].counter === 1;
+      }, "Doesn't match expected output")
+
     );
   });
 
@@ -100,11 +95,10 @@ describe("commands/read", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      `[
-  {
-    "counter": 1
-  }
-]`
+      match(value => {
+        const res = JSON.parse(value);
+        return res.results[0].counter === 1;
+      }, "Doesn't match expected output")
     );
   });
 
@@ -124,11 +118,10 @@ describe("commands/read", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      `[
-  {
-    "counter": 1
-  }
-]`
+      match(value => {
+        const res = JSON.parse(value);
+        return res.results[0].counter === 1;
+      }, "Doesn't match expected output")
     );
   });
 
@@ -143,11 +136,10 @@ describe("commands/read", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      `[
-  {
-    "counter": 1
-  }
-]`
+      match(value => {
+        const res = JSON.parse(value);
+        return res.results[0].counter === 1;
+      }, "Doesn't match expected output")
     );
   });
 

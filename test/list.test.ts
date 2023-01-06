@@ -40,7 +40,7 @@ describe("commands/list", function () {
     await yargs(["list", "--chain", "custom", "--privateKey", privateKey])
       .command(mod)
       .parse();
-    assert.calledWith(consoleError, "Invalid URL");
+    assert.calledWith(consoleError, "unsupported chain (see `chains` command for details)");
   });
 
   test("passes with local-tableland", async function () {
@@ -63,7 +63,8 @@ describe("commands/list", function () {
         return (
           Array.isArray(array) &&
           array.length > 0 &&
-          array.shift().name === "healthbot_31337_1"
+          array[0].tableId === "1" &&
+          array[0].chainId === 31337
         );
       }, "does not match")
     );

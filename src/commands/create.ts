@@ -3,7 +3,7 @@ import type { Arguments, CommandBuilder } from "yargs";
 import { Database, ChainName } from "@tableland/sdk";
 import { getWalletWithProvider, getLink } from "../utils.js";
 import { createInterface } from "readline";
-import { promises } from "fs";
+import { promises, stat } from "fs";
 
 export type Options = {
   // Local
@@ -20,7 +20,7 @@ export type Options = {
 export const command = "create [schema]";
 export const desc = "Create a new table";
 
-// const regex = /^\s*CREATE\s+TABLE\s+([\w\d]+)\s*\((.*)\)\s*;?\s*/gim;
+const regex = /^\s*CREATE\s+TABLE\s+([\w\d]+)\s*\((.*)\)\s*;?\s*/gim;
 
 export const builder: CommandBuilder<{}, Options> = (yargs) =>
   yargs
@@ -41,7 +41,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   let { schema } = argv;
-  const { privateKey, chain, providerUrl, file } = argv;
+  const { privateKey, chain, providerUrl, file, prefix } = argv;
 
   try {
     const signer = getWalletWithProvider({
@@ -66,8 +66,17 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     }
 
 
+
+    
+    let statement = `CREATE TABLE ${prefix} (${schema})`;
+
+    const check = /CREATE TABLE/gim.exec(schema.toString());
+    if(check) {
+      statement = schema
+    } 
+
     const db = new Database({signer});
-    const res = await db.prepare(schema).bind().all();
+    const res = await db.prepare(statement).bind().all();
     const link = getLink(chain, res.meta.txn?.transactionHash || "");
     const out = JSON.stringify(
       { ...res, link },
@@ -77,6 +86,6 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     console.log(out);
     /* c8 ignore next 3 */
   } catch (err: any) {
-    console.error(err.message);
+    console.error(err?.cause?.message || err.message);
   }
 };

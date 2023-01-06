@@ -172,9 +172,7 @@ describe("commands/write", function () {
       "--chain",
       "local-tableland",
       "--privateKey",
-      privateKey,
-      "--providerUrl",
-      "http://localhost:8545", // Also test providerUrl
+      privateKey
     ])
       .command(mod)
       .parse();

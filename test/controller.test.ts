@@ -60,7 +60,7 @@ describe("commands/controller", function () {
     ])
       .command(mod)
       .parse();
-    assert.calledWith(consoleError, "invalid tableId was provided");
+    assert.calledWith(consoleError, "error validating name: table name has wrong format: invalid");
   });
 
   test("throws with invalid set arguments", async function () {
@@ -79,7 +79,7 @@ describe("commands/controller", function () {
     ])
       .command(mod)
       .parse();
-    assert.calledWith(consoleError, "invalid tableId was provided");
+    assert.calledWith(consoleError, "error validating name: table name has wrong format: ");
   });
 
   test("passes when setting a controller", async function () {

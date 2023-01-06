@@ -65,6 +65,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     console.log(out);
     /* c8 ignore next 3 */
   } catch (err: any) {
-    console.error(err.message);
+    console.error(err?.cause?.message || err?.message);
+    console.error(err);
   }
 };

@@ -1,8 +1,7 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
 import { Wallet } from "ethers";
-import fetch from "node-fetch";
-import { ChainName, Registry, Validator } from "@tableland/sdk";
+import { ChainName, Registry } from "@tableland/sdk";
 import { getChains, getWalletWithProvider } from "../utils.js";
 
 export type Options = {

@@ -1,7 +1,6 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
 import { ChainName, Validator, supportedChains } from "@tableland/sdk";
-import { getLink } from "../utils.js";
 
 export type Options = {
   // Local
@@ -30,12 +29,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     const v = Validator.forChain(chain);
     const res = await v.receiptByTransactionHash({chainId: supportedChains[chain].chainId, transactionHash: hash});    
     console.log(res);
-    let out = "";
-    if (res) {
-      const link = getLink(chain, res.transactionHash);
-      out = JSON.stringify({ ...res, link }, null, 2);
-    }
-    console.log(out);
+
     /* c8 ignore next 3 */
   } catch (err: any) {
     console.error(err.message);

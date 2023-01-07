@@ -30,27 +30,31 @@ describe("commands/info", function () {
     );
   });
 
-  test("throws with missing table", async function () {
-    const consoleError = spy(console, "error");
-    await yargs(["info", "ignored_31337_99"]).command(mod).parse();
-    assert.calledWith(consoleError, "Table not found");
-  });
 
   test("passes with local-tableland", async function () {
     const consoleLog = spy(console, "log");
     await yargs(["info", "healthbot_31337_1"]).command(mod).parse();
+    
     assert.calledWith(
       consoleLog,
       match(function (value: string) {
         // eslint-disable-next-line camelcase
-        const { name, attributes, external_url } = JSON.parse(value);
+        const { name, attributes, externalUrl } = JSON.parse(value);
         return (
           name === "healthbot_31337_1" &&
           // eslint-disable-next-line camelcase
-          external_url === "http://localhost:8080/chain/31337/tables/1" &&
+          externalUrl === "http://localhost:8080/chain/31337/tables/1" &&
           Array.isArray(attributes)
         );
       }, "does not match")
     );
   });
+
+  test("throws with missing table", async function () {
+    const consoleError = spy(console, "error");
+    await yargs(["info", "ignored_31337_99"]).command(mod).parse();
+    assert.calledWith(consoleError, "Not found");
+  });
+
+
 });

@@ -75,7 +75,6 @@ describe("commands/receipt", function () {
       .prepare("update healthbot_31337_1 set counter=1;")
       .bind()
       .all();
-
     
 
     await yargs([
@@ -84,7 +83,8 @@ describe("commands/receipt", function () {
       privateKey,
       "--chain",
       "local-tableland",
-      db.meta.txn?.transactionHash || "",
+      // @ts-ignore
+      db.transactionHash,
     ])
       .command(mod)
       .parse();

@@ -61,7 +61,7 @@
     "typescript": "^4.8.4"
   },
   "dependencies": {
-    "@tableland/sdk": "github:tablelandnetwork/js-tableland#carson/refactor",
+    "@tableland/sdk": "4.0.0-pre.1",
     "@tableland/sqlparser": "github:tablelandnetwork/wasm-sqlparser",
     "camelize-ts": "^2.2.0",
     "chalk": "^5.1.2",

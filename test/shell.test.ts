@@ -12,7 +12,7 @@ describe("commands/shell", function () {
 
 
   before(async function () {
-    await wait(500);
+    await wait(4000);
   });
 
   afterEach(function () {
@@ -42,7 +42,7 @@ describe("commands/shell", function () {
       .parse();
 
     assert.match(
-      consoleLog.getCall(4).args[0],
+      consoleLog.getCall(3).args[0],
       [ { counter: 1 } ]
     );
   });
@@ -70,7 +70,7 @@ describe("commands/shell", function () {
       .parse();
 
     assert.match(
-      consoleLog.getCall(4).args[0],
+      consoleLog.getCall(3).args[0],
       [ { counter: 1 } ]
     );
   });

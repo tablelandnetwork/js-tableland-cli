@@ -9,18 +9,6 @@ import { getChains, getWalletWithProvider } from "../utils.js";
 // @ts-ignore
 import init from "@tableland/sqlparser";
 
-// function formatForDisplay(table: any): (string | number | unknown)[][] {
-//   const result = table.rows;
-
-//   const columns: string[] = [];
-//   table.columns.forEach((column: any) => {
-//     columns.push(column.name);
-//   });
-//   result.unshift(columns);
-
-//   return result;
-// }
-
 
 export type Options = {
   // Local
@@ -194,8 +182,8 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
 
   console.log("Welcome to Tableland");
   console.log(`Tableland CLI shell`);
-  console.log(`Enter ".help" for usage hints`);
-  console.log(`Connected to ${network.phrase} using ${signer.address}`);
+  // console.log(`Enter ".help" for usage hints`);
+  console.log(`Connected to ${network.chainName} using ${signer.address}`);
 
   await shellYeah(argv, tablelandConnection);
 };

@@ -111,7 +111,7 @@ describe("commands/create", function () {
     );
   });
 
-  test("passes with local-tableland", async function () {
+  test("Create passes with local-tableland", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
     const consoleLog = spy(console, "log");

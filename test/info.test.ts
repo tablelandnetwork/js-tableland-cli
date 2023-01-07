@@ -5,7 +5,7 @@ import * as mod from "../src/commands/info.js";
 
 describe("commands/info", function () {
   before(async function () {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
   });
 
   afterEach(function () {
@@ -31,7 +31,7 @@ describe("commands/info", function () {
   });
 
 
-  test("passes with local-tableland", async function () {
+  test("Info passes with local-tableland", async function () {
     const consoleLog = spy(console, "log");
     await yargs(["info", "healthbot_31337_1"]).command(mod).parse();
     

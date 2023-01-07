@@ -36,7 +36,7 @@ describe("commands/schema", function () {
     assert.calledWith(consoleError, "Failed to get schema from table");
   });
 
-  test("passes with local-tableland", async function () {
+  test("Schema passes with local-tableland", async function () {
     const consoleLog = spy(console, "log");
     await yargs(["schema", "healthbot_31337_1"]).command(mod).parse();
     assert.calledWith(

@@ -61,7 +61,7 @@ describe("commands/read", function () {
     );
   });
 
-  test("passes with local-tableland (defaults to table format)", async function () {
+  test("Read passes with local-tableland (defaults to table format)", async function () {
     const consoleLog = spy(console, "log");
     await yargs([
       "read",

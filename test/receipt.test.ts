@@ -10,7 +10,7 @@ describe("commands/receipt", function () {
   this.timeout("10s");
 
   before(async function () {
-    await wait(2000);
+    await wait(3000);
   });
 
   afterEach(function () {
@@ -26,7 +26,7 @@ describe("commands/receipt", function () {
     );
   });
 
-  test("throws without chain", async function () {
+  test("Receipt throws without chain", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
     const consoleError = spy(console, "error");
@@ -59,7 +59,7 @@ describe("commands/receipt", function () {
     );
   });
 
-  test("passes with local-tableland", async function () {
+  test("Receipt passes with local-tableland", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
     const consoleLog = spy(console, "log");
@@ -75,7 +75,7 @@ describe("commands/receipt", function () {
       .prepare("update healthbot_31337_1 set counter=1;")
       .bind()
       .all();
-    
+  
 
     await yargs([
       "receipt",

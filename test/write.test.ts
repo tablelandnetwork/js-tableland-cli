@@ -109,7 +109,7 @@ describe("commands/write", function () {
     );
   });
 
-  test("passes with local-tableland", async function () {
+  test("Write passes with local-tableland", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
     const consoleLog = spy(console, "log");

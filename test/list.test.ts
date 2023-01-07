@@ -22,7 +22,7 @@ describe("commands/list", function () {
     );
   });
 
-  test("throws without chain", async function () {
+  test("List throws without chain", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
     const consoleError = spy(console, "error");
@@ -43,7 +43,7 @@ describe("commands/list", function () {
     assert.calledWith(consoleError, "unsupported chain (see `chains` command for details)");
   });
 
-  test("passes with local-tableland", async function () {
+  test("List passes with local-tableland", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
     const consoleLog = spy(console, "log");

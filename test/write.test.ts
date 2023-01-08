@@ -61,7 +61,7 @@ describe("commands/write", function () {
       .parse();
     assert.calledWith(
       consoleError,
-      "calling ValidateWriteQuery: validating query: unable to parse the query: syntax error at position 7 near 'invalid'"
+      'error parsing statement: syntax error at position 7 near \'invalid\''
     );
   });
 
@@ -82,7 +82,9 @@ describe("commands/write", function () {
       .parse();
     assert.calledWith(
       consoleError,
-      "ENOENT: no such file or directory, open 'missing.sql'"
+      match(value => {
+        return value.startsWith("ENOENT: no such file or directory")
+      }, "Didn't throw ENOENT.")
     );
   });
 
@@ -126,8 +128,8 @@ describe("commands/write", function () {
     assert.calledWith(
       consoleLog,
       match(function (value: string) {
-        const { hash, link } = JSON.parse(value);
-        return typeof hash === "string" && hash.startsWith("0x") && !link;
+        const { transactionHash, link } = JSON.parse(value).meta.txn;
+        return typeof transactionHash === "string" && transactionHash.startsWith("0x") && !link;
       }, "does not match")
     );
   });
@@ -153,8 +155,8 @@ describe("commands/write", function () {
     assert.calledWith(
       consoleLog,
       match(function (value: string) {
-        const { hash, link } = JSON.parse(value);
-        return typeof hash === "string" && hash.startsWith("0x") && !link;
+        const { transactionHash, link } = JSON.parse(value).meta.txn;
+        return typeof transactionHash === "string" && transactionHash.startsWith("0x") && !link;
       }, "does not match")
     );
   });
@@ -179,8 +181,8 @@ describe("commands/write", function () {
     assert.calledWith(
       consoleLog,
       match(function (value: string) {
-        const { hash, link } = JSON.parse(value);
-        return typeof hash === "string" && hash.startsWith("0x") && !link;
+        const { transactionHash, link } = JSON.parse(value).meta.txn;
+        return typeof transactionHash === "string" && transactionHash.startsWith("0x") && !link;
       }, "does not match")
     );
   });

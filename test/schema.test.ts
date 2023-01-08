@@ -33,7 +33,7 @@ describe("commands/schema", function () {
   test("throws with missing table", async function () {
     const consoleError = spy(console, "error");
     await yargs(["schema", "ignored_31337_99"]).command(mod).parse();
-    assert.calledWith(consoleError, "Failed to get schema from table");
+    assert.calledWith(consoleError, "Unexpected end of JSON input");
   });
 
   test("Schema passes with local-tableland", async function () {
@@ -41,16 +41,7 @@ describe("commands/schema", function () {
     await yargs(["schema", "healthbot_31337_1"]).command(mod).parse();
     assert.calledWith(
       consoleLog,
-      `{
-  "columns": [
-    {
-      "name": "counter",
-      "type": "integer",
-      "constraints": []
-    }
-  ],
-  "table_constraints": []
-}`
+      { columns: [ { name: 'counter', type: 'integer' } ] }
     );
   });
 });

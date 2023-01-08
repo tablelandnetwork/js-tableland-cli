@@ -52,9 +52,6 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     const reg = new Registry({signer});
           
     const res = await reg.listTables(address);
-
-    // const validator = new Validator({baseUrl: "https://testnets.tableland.network/api/v1"});
-    // validator.getTableById(table);
     
     const out = JSON.stringify(res, null, 2);
     console.log(out);

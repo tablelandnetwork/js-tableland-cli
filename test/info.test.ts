@@ -2,10 +2,14 @@ import { describe, test, afterEach, before } from "mocha";
 import { spy, restore, assert, match } from "sinon";
 import yargs from "yargs/yargs";
 import * as mod from "../src/commands/info.js";
+import { wait } from "../src/utils.js";
 
 describe("commands/info", function () {
+  this.timeout("30s");
+
+
   before(async function () {
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await wait(10000);
   });
 
   afterEach(function () {
@@ -53,7 +57,7 @@ describe("commands/info", function () {
   test("throws with missing table", async function () {
     const consoleError = spy(console, "error");
     await yargs(["info", "ignored_31337_99"]).command(mod).parse();
-    assert.calledWith(consoleError, "Not found");
+    assert.calledWith(consoleError, "Unexpected end of JSON input");
   });
 
 

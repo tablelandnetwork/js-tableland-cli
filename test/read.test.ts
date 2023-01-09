@@ -130,7 +130,15 @@ describe("commands/read", function () {
     process.nextTick(() => {
       stdin.send("select * from healthbot_31337_1;\n").end();
     });
-    await yargs(["read", "--chain", "local-tableland", "--format", "objects"])
+    await yargs([
+      "read", 
+      "--chain", 
+      "local-tableland", 
+      "--format", 
+      "objects",
+      "--providerUrl",
+      "http://127.0.0.1:8545"
+    ])
       .command(mod)
       .parse();
     assert.calledWith(

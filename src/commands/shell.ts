@@ -22,7 +22,7 @@ export type Options = {
 
 export const command = "shell";
 export const desc = "Run consecutive queries against tableland";
-export const aliases = ["r", "query", "q"];
+export const aliases = ["s", "sh"];
 
 process.on("SIGINT", function () {
   console.log("Caught interrupt signal");

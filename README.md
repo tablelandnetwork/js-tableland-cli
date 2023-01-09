@@ -45,7 +45,7 @@ Commands:
   tableland write [statement]  Run a mutating SQL statement against a remote 
                          table                     [aliases: w, run, r]
   tableland shell              Run consecutive queries against tableland     
-                                                 [aliases: r, query, q]
+                                                 [aliases: s, sh]
 
 Options:
       --help         Show help                                [boolean]

@@ -17,7 +17,6 @@ describe("commands/receipt", function () {
     restore();
   });
 
-
   test("Receipt throws without chain", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
@@ -27,7 +26,7 @@ describe("commands/receipt", function () {
       .parse();
     assert.calledWith(
       consoleError,
-      'Cannot read properties of undefined (reading \'baseUrl\')'
+      "Cannot read properties of undefined (reading 'baseUrl')"
     );
   });
 
@@ -45,10 +44,7 @@ describe("commands/receipt", function () {
     ])
       .command(mod)
       .parse();
-    assert.calledWith(
-      consoleError,
-      "Not Found"
-    );
+    assert.calledWith(consoleError, "Not Found");
   });
 
   test("Receipt passes with local-tableland", async function () {
@@ -62,13 +58,11 @@ describe("commands/receipt", function () {
       providerUrl: undefined,
     });
 
-
-    const db = new Database({signer})
+    const db = new Database({ signer })
       .prepare("update healthbot_31337_1 set counter=1;")
       .bind()
       .all();
 
-    
     db.then(async () => {
       await yargs([
         "receipt",
@@ -84,7 +78,5 @@ describe("commands/receipt", function () {
       // TODO: Ideally, we check the response here, but the hashes aren't deterministic
       assert.calledOnce(consoleLog);
     });
-
-
   });
 });

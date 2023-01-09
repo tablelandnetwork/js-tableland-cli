@@ -40,7 +40,10 @@ describe("commands/list", function () {
     await yargs(["list", "--chain", "custom", "--privateKey", privateKey])
       .command(mod)
       .parse();
-    assert.calledWith(consoleError, "unsupported chain (see `chains` command for details)");
+    assert.calledWith(
+      consoleError,
+      "unsupported chain (see `chains` command for details)"
+    );
   });
 
   test("List passes with local-tableland", async function () {

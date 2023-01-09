@@ -61,7 +61,7 @@ describe("commands/write", function () {
       .parse();
     assert.calledWith(
       consoleError,
-      'error parsing statement: syntax error at position 7 near \'invalid\''
+      "error parsing statement: syntax error at position 7 near 'invalid'"
     );
   });
 
@@ -82,8 +82,8 @@ describe("commands/write", function () {
       .parse();
     assert.calledWith(
       consoleError,
-      match(value => {
-        return value.startsWith("ENOENT: no such file or directory")
+      match((value) => {
+        return value.startsWith("ENOENT: no such file or directory");
       }, "Didn't throw ENOENT.")
     );
   });
@@ -129,7 +129,11 @@ describe("commands/write", function () {
       consoleLog,
       match(function (value: string) {
         const { transactionHash, link } = JSON.parse(value).meta.txn;
-        return typeof transactionHash === "string" && transactionHash.startsWith("0x") && !link;
+        return (
+          typeof transactionHash === "string" &&
+          transactionHash.startsWith("0x") &&
+          !link
+        );
       }, "does not match")
     );
   });
@@ -156,7 +160,11 @@ describe("commands/write", function () {
       consoleLog,
       match(function (value: string) {
         const { transactionHash, link } = JSON.parse(value).meta.txn;
-        return typeof transactionHash === "string" && transactionHash.startsWith("0x") && !link;
+        return (
+          typeof transactionHash === "string" &&
+          transactionHash.startsWith("0x") &&
+          !link
+        );
       }, "does not match")
     );
   });
@@ -174,7 +182,7 @@ describe("commands/write", function () {
       "--chain",
       "local-tableland",
       "--privateKey",
-      privateKey
+      privateKey,
     ])
       .command(mod)
       .parse();
@@ -182,7 +190,11 @@ describe("commands/write", function () {
       consoleLog,
       match(function (value: string) {
         const { transactionHash, link } = JSON.parse(value).meta.txn;
-        return typeof transactionHash === "string" && transactionHash.startsWith("0x") && !link;
+        return (
+          typeof transactionHash === "string" &&
+          transactionHash.startsWith("0x") &&
+          !link
+        );
       }, "does not match")
     );
   });

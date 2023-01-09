@@ -7,7 +7,6 @@ import { wait } from "../src/utils.js";
 describe("commands/info", function () {
   this.timeout("30s");
 
-
   before(async function () {
     await wait(10000);
   });
@@ -34,11 +33,10 @@ describe("commands/info", function () {
     );
   });
 
-
   test("Info passes with local-tableland", async function () {
     const consoleLog = spy(console, "log");
     await yargs(["info", "healthbot_31337_1"]).command(mod).parse();
-    
+
     assert.calledWith(
       consoleLog,
       match(function (value: string) {
@@ -59,6 +57,4 @@ describe("commands/info", function () {
     await yargs(["info", "ignored_31337_99"]).command(mod).parse();
     assert.calledWith(consoleError, "Not Found");
   });
-
-
 });

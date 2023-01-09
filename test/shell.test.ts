@@ -7,9 +7,7 @@ import * as mod from "../src/commands/shell.js";
 import { wait } from "../src/utils.js";
 
 describe("commands/shell", function () {
-
   this.timeout("30s");
-
 
   before(async function () {
     await wait(4000);
@@ -41,10 +39,7 @@ describe("commands/shell", function () {
       .command(mod)
       .parse();
 
-    assert.match(
-      consoleLog.getCall(3).args[0],
-      [ { counter: 1 } ]
-    );
+    assert.match(consoleLog.getCall(3).args[0], [{ counter: 1 }]);
   });
 
   test("Shell Works with multi-line", async function () {
@@ -69,10 +64,6 @@ describe("commands/shell", function () {
       .command(mod)
       .parse();
 
-    assert.match(
-      consoleLog.getCall(3).args[0],
-      [ { counter: 1 } ]
-    );
+    assert.match(consoleLog.getCall(3).args[0], [{ counter: 1 }]);
   });
-
 });

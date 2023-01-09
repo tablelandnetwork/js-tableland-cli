@@ -42,7 +42,6 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     return;
   }
 
-
   try {
     const signer = getWalletWithProvider({
       privateKey,

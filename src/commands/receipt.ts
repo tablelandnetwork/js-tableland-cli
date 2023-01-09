@@ -25,9 +25,11 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   const { hash, chain } = argv;
 
   try {
-
     const v = Validator.forChain(chain);
-    const res = await v.receiptByTransactionHash({ chainId: supportedChains[chain].chainId, transactionHash: hash });
+    const res = await v.receiptByTransactionHash({
+      chainId: supportedChains[chain].chainId,
+      transactionHash: hash,
+    });
     console.log(res);
 
     /* c8 ignore next 3 */

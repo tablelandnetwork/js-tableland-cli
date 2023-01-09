@@ -9,7 +9,6 @@ import { getChains, getWalletWithProvider } from "../utils.js";
 // @ts-ignore
 import init from "@tableland/sqlparser";
 
-
 export type Options = {
   // Local
   statement?: string;
@@ -63,9 +62,7 @@ async function fireFullQuery(
   argv: any,
   tablelandConnection: Database
 ) {
-
   switch (true) {
-
     case statement.trim().endsWith(".help"):
       console.log("Uh, I didn't think I'd get this far");
       break;
@@ -77,8 +74,6 @@ async function fireFullQuery(
   }
 
   try {
-
-
     // @ts-ignore
     const { type } = await globalThis.sqlparser.normalize(statement);
 
@@ -106,7 +101,6 @@ async function shellYeah(
   tablelandConnection: Database,
   history: string[] = []
 ) {
-
   try {
     let statement = "";
     const rl = createInterface({
@@ -139,7 +133,6 @@ async function shellYeah(
     rl.close();
     await fireFullQuery(statement, argv, tablelandConnection);
 
-
     shellYeah(argv, tablelandConnection, history);
   } catch (err: any) {
     console.error(err.message);
@@ -171,7 +164,6 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   const options: Config = {
     signer,
   };
-
 
   const tablelandConnection = new Database(options);
 

@@ -3,7 +3,7 @@ import type { Arguments, CommandBuilder } from "yargs";
 import { Database, ChainName } from "@tableland/sdk";
 import { getWalletWithProvider, getLink } from "../utils.js";
 import { createInterface } from "readline";
-import { promises, stat } from "fs";
+import { promises } from "fs";
 
 export type Options = {
   // Local
@@ -19,8 +19,6 @@ export type Options = {
 
 export const command = "create [schema]";
 export const desc = "Create a new table";
-
-const regex = /^\s*CREATE\s+TABLE\s+([\w\d]+)\s*\((.*)\)\s*;?\s*/gim;
 
 export const builder: CommandBuilder<{}, Options> = (yargs) =>
   yargs
@@ -65,24 +63,17 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       return;
     }
 
-
-
-
     let statement = `CREATE TABLE ${prefix} (${schema})`;
 
     const check = /CREATE TABLE/gim.exec(schema.toString());
     if (check) {
-      statement = schema
+      statement = schema;
     }
 
     const db = new Database({ signer });
     const res = await db.prepare(statement).bind().all();
     const link = getLink(chain, res.meta.txn?.transactionHash || "");
-    const out = JSON.stringify(
-      { ...res, link },
-      null,
-      2
-    );
+    const out = JSON.stringify({ ...res, link }, null, 2);
     console.log(out);
     /* c8 ignore next 3 */
   } catch (err: any) {

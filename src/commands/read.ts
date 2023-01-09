@@ -1,8 +1,5 @@
 import type { Arguments, CommandBuilder } from "yargs";
-import {
-  Database,
-  ChainName,
-} from "@tableland/sdk";
+import { Database, ChainName } from "@tableland/sdk";
 import yargs from "yargs";
 import { promises } from "fs";
 import { createInterface } from "readline";
@@ -49,7 +46,6 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     console.error("unsupported chain (see `chains` command for details)");
     return;
   }
-
 
   try {
     if (file != null) {

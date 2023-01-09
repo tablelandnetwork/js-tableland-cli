@@ -42,8 +42,8 @@ describe("commands/read", function () {
       .parse();
     assert.calledWith(
       consoleError,
-      match(value => {
-        return value.startsWith("ENOENT: no such file or directory")
+      match((value) => {
+        return value.startsWith("ENOENT: no such file or directory");
       }, "Didn't throw ENOENT.")
     );
   });
@@ -73,11 +73,10 @@ describe("commands/read", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      match(value => {
+      match((value) => {
         const res = JSON.parse(value);
         return res.results[0].counter === 1;
       }, "Doesn't match expected output")
-
     );
   });
 
@@ -95,7 +94,7 @@ describe("commands/read", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      match(value => {
+      match((value) => {
         const res = JSON.parse(value);
         return res.results[0].counter === 1;
       }, "Doesn't match expected output")
@@ -118,7 +117,7 @@ describe("commands/read", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      match(value => {
+      match((value) => {
         const res = JSON.parse(value);
         return res.results[0].counter === 1;
       }, "Doesn't match expected output")
@@ -136,7 +135,7 @@ describe("commands/read", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      match(value => {
+      match((value) => {
         const res = JSON.parse(value);
         return res.results[0].counter === 1;
       }, "Doesn't match expected output")

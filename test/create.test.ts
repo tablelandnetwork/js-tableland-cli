@@ -82,8 +82,8 @@ describe("commands/create", function () {
       .parse();
     assert.calledWith(
       consoleError,
-      match(value => {
-        return value.startsWith("ENOENT: no such file or directory")
+      match((value) => {
+        return value.startsWith("ENOENT: no such file or directory");
       }, "Didn't throw ENOENT.")
     );
   });
@@ -130,7 +130,8 @@ describe("commands/create", function () {
     assert.calledWith(
       consoleLog,
       match(function (value: string) {
-        const { prefix, name, chainId, tableId, transactionHash } = JSON.parse(value).meta.txn;
+        const { prefix, name, chainId, tableId, transactionHash } =
+          JSON.parse(value).meta.txn;
         return (
           prefix === "first_table" &&
           chainId === 31337 &&
@@ -162,7 +163,8 @@ describe("commands/create", function () {
     assert.calledWith(
       consoleLog,
       match(function (value: string) {
-        const { prefix, name, chainId, tableId, transactionHash } = JSON.parse(value).meta.txn;
+        const { prefix, name, chainId, tableId, transactionHash } =
+          JSON.parse(value).meta.txn;
         return (
           prefix === "second_table" &&
           chainId === 31337 &&
@@ -196,7 +198,8 @@ describe("commands/create", function () {
     assert.calledWith(
       consoleLog,
       match(function (value: string) {
-        const { prefix, name, chainId, tableId, transactionHash } = JSON.parse(value).meta.txn;
+        const { prefix, name, chainId, tableId, transactionHash } =
+          JSON.parse(value).meta.txn;
         return (
           prefix === "file_test" &&
           chainId === 31337 &&
@@ -231,7 +234,8 @@ describe("commands/create", function () {
     assert.calledWith(
       consoleLog,
       match(function (value: string) {
-        const { prefix, name, chainId, tableId, transactionHash } = JSON.parse(value).meta.txn;
+        const { prefix, name, chainId, tableId, transactionHash } =
+          JSON.parse(value).meta.txn;
         return (
           prefix === "stdin_test" &&
           chainId === 31337 &&

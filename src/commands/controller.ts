@@ -3,7 +3,7 @@ import type { Arguments, CommandBuilder } from "yargs";
 import { ChainName } from "@tableland/sdk";
 import { getWalletWithProvider, getLink } from "../utils.js";
 
-// @ts-ignore 
+// @ts-ignore
 import { Registry } from "@tableland/sdk/registry";
 
 export type Options = {

@@ -59,7 +59,7 @@ const _argv = yargs(hideBin(process.argv))
   })
   .option("enableEns", {
     type: "boolean",
-    description: "Enable ENS names in shell queries"
+    description: "Enable ENS names in shell queries",
   })
   .demandCommand(1, "")
   .strict().argv;

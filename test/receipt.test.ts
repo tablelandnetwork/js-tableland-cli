@@ -26,7 +26,7 @@ describe("commands/receipt", function () {
       .parse();
     assert.calledWith(
       consoleError,
-      "Cannot read properties of undefined (reading 'baseUrl')"
+      "unsupported chain (see `chains` command for details)"
     );
   });
 

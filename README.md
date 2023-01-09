@@ -30,21 +30,21 @@ An experimental Tableland command line tool.
 tableland <command>
 
 Commands:
-  tableland chains             List information about supported chains       
+  tableland chains             List information about supported chains
   tableland controller <sub>   Get, set, and lock the controller contract for
                           a given table
   tableland create [schema]    Create a new table
   tableland info <name>        Get info about a given table by name
   tableland init               Create config file                [aliases: i]
   tableland list [address]     List tables by address
-  tableland read [statement]   Run a read-only query against a remote table  
+  tableland read [statement]   Run a read-only query against a remote table
                                                  [aliases: r, query, q]
   tableland receipt <hash>     Get the receipt of a chain transaction to know
                           if it was executed, and the execution details
   tableland schema <name>      Get info about a given table schema
-  tableland write [statement]  Run a mutating SQL statement against a remote 
+  tableland write [statement]  Run a mutating SQL statement against a remote
                          table                     [aliases: w, run, r]
-  tableland shell              Run consecutive queries against tableland     
+  tableland shell              Run consecutive queries against tableland
                                                  [aliases: s, sh]
 
 Options:

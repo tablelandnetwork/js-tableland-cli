@@ -10,7 +10,7 @@ describe("commands/shell", function () {
   this.timeout("30s");
 
   before(async function () {
-    await wait(4000);
+    await wait(10000);
   });
 
   afterEach(function () {
@@ -40,6 +40,24 @@ describe("commands/shell", function () {
       .parse();
 
     assert.match(consoleLog.getCall(3).args[0], [{ counter: 1 }]);
+  });
+
+  test("Shell throws without network", async function() {
+
+    const [account] = getAccounts();
+    const privateKey = account.privateKey.slice(2);
+    const consoleError = spy(console, "error");
+    await yargs([
+      "shell",
+      "--privateKey",
+      privateKey,
+    ])
+      .command(mod)
+      .parse();
+    assert.calledWith(
+      consoleError,
+      "unsupported chain (see `chains` command for details)"
+    );    
   });
 
   test("Shell Works with multi-line", async function () {

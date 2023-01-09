@@ -142,10 +142,6 @@ async function shellYeah(
 
 export const builder: CommandBuilder<{}, Options> = (yargs) =>
   yargs
-    .positional("statement", {
-      type: "string",
-      description: "Input SQL statement (skip to read from stdin)",
-    })
     .option("format", {
       type: "string",
       choices: ["pretty", "table", "objects"] as const,
@@ -157,26 +153,32 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   await init();
   const { privateKey, chain, providerUrl } = argv;
 
-  const signer = getWalletWithProvider({
-    privateKey,
-    chain,
-    providerUrl,
-  });
-  const options: Config = {
-    signer,
-  };
-
-  const tablelandConnection = new Database(options);
-
-  const network: any = getChains()[chain];
-  if (!network) {
-    console.error("unsupported chain (see `chains` command for details)");
+  try {
+    const signer = getWalletWithProvider({
+      privateKey,
+      chain,
+      providerUrl,
+    });
+    const options: Config = {
+      signer,
+    };
+  
+    const tablelandConnection = new Database(options);
+  
+    const network: any = getChains()[chain];
+    if (!network) {
+      console.error("unsupported chain (see `chains` command for details)");
+    }
+  
+    console.log("Welcome to Tableland");
+    console.log(`Tableland CLI shell`);
+    // console.log(`Enter ".help" for usage hints`);
+    console.log(`Connected to ${network.chainName} using ${signer.address}`);
+  
+    await shellYeah(argv, tablelandConnection);
+  } catch (e:any) {
+    console.error(e.message);
   }
 
-  console.log("Welcome to Tableland");
-  console.log(`Tableland CLI shell`);
-  // console.log(`Enter ".help" for usage hints`);
-  console.log(`Connected to ${network.chainName} using ${signer.address}`);
 
-  await shellYeah(argv, tablelandConnection);
 };

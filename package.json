@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "@tableland/sdk": "4.0.0-pre.1",
-    "@tableland/sqlparser": "github:tablelandnetwork/wasm-sqlparser",
+    "@tableland/sqlparser": "1.0.0-pre.0",
     "camelize-ts": "^2.2.0",
     "chalk": "^5.1.2",
     "cli-select": "^1.1.2",

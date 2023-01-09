@@ -40,6 +40,6 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     console.log(res);
     /* c8 ignore next 3 */
   } catch (err: any) {
-    console.error(err);
+    console.error(err.message);
   }
 };

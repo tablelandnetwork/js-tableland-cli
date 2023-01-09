@@ -107,8 +107,8 @@ describe("commands/controller", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      match(function (value: string) {
-        const { hash, link } = JSON.parse(value);
+      match(function (value: any) {
+        const { hash, link } = value;
         return typeof hash === "string" && hash.startsWith("0x") && !link;
       }, "does not match")
     );
@@ -131,7 +131,7 @@ describe("commands/controller", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      `"0x0000000000000000000000000000000000000000"`
+      `0x0000000000000000000000000000000000000000`
     );
   });
 

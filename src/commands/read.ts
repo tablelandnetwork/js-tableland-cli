@@ -63,12 +63,12 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       return;
     }
     const db = await Database.readOnly(chain);
-    const res = await db.prepare(statement).bind().all();
+    const res = await db.prepare(statement).all();
 
     if (format === "pretty") {
       console.table(res.results);
     } else {
-      const out = JSON.stringify(res, null, 2);
+      const out = res;
       console.log(out);
     }
     /* c8 ignore next 3 */

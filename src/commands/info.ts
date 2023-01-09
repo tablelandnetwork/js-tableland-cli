@@ -1,7 +1,6 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
-import { getChains } from "../utils.js";
-import { Validator } from "@tableland/sdk";
+import { getChainInfo, Validator } from "@tableland/sdk";
 
 export type Options = {
   // Local
@@ -30,9 +29,8 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   }
 
   const chain = parseInt(chainId);
-  const network = Object.values(getChains()).find(
-    ({ chainId }) => chainId === chain
-  );
+  const network = getChainInfo(chain);
+
   if (!network) {
     console.error("unsupported chain (see `chains` command for details)");
     return;
@@ -44,7 +42,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       tableId,
       chainId: parseInt(chainId),
     });
-    console.log(JSON.stringify(res));
+    console.log(res);
     /* c8 ignore next 3 */
   } catch (err: any) {
     console.error(err?.cause?.message || err.message);

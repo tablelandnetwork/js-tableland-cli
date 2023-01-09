@@ -1,11 +1,7 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
-import { ChainName } from "@tableland/sdk";
+import { ChainName, Registry } from "@tableland/sdk";
 import { getWalletWithProvider, getLink } from "../utils.js";
-
-// @ts-ignore
-import { Registry } from "@tableland/sdk/registry";
-
 export type Options = {
   // Local
   name: string;
@@ -44,8 +40,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
 
           const res = await reg.getController(name);
 
-          const out = JSON.stringify(res, null, 2);
-          console.log(out);
+          console.log(res);
           /* c8 ignore next 3 */
         } catch (err: any) {
           console.error(err.message);
@@ -79,7 +74,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
           const res = await reg.setController({ tableName: name, controller });
 
           const link = getLink(chain, res.hash);
-          const out = JSON.stringify({ ...res, link }, null, 2);
+          const out = { ...res, link };
           console.log(out);
           /* c8 ignore next 3 */
         } catch (err: any) {
@@ -110,7 +105,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
           const res = await reg.lockController(name);
 
           const link = getLink(chain, res.hash);
-          const out = JSON.stringify({ ...res, link }, null, 2);
+          const out = { ...res, link };
           console.log(out);
           /* c8 ignore next 3 */
         } catch (err: any) {

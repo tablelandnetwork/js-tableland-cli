@@ -58,10 +58,10 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     }
     const db = new Database({ signer });
 
-    const res = await db.prepare(statement).bind().all();
+    const res = await db.prepare(statement).all();
 
     const link = getLink(chain, res?.meta?.txn?.transactionHash as string);
-    const out = JSON.stringify({ ...res, link }, null, 2);
+    const out = { ...res, link };
     console.log(out);
     /* c8 ignore next 3 */
   } catch (err: any) {

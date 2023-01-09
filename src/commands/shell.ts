@@ -1,12 +1,10 @@
 import type { Arguments, CommandBuilder } from "yargs";
 import cliSelect from "cli-select";
 import { ChainName, Database, Config } from "@tableland/sdk";
-// @ts-ignore
 import chalk from "chalk";
 import yargs from "yargs";
 import { createInterface } from "readline";
 import { getChains, getWalletWithProvider } from "../utils.js";
-// @ts-ignore
 import init from "@tableland/sqlparser";
 
 export type Options = {
@@ -20,8 +18,8 @@ export type Options = {
   providerUrl: string | undefined;
 };
 
-export const command = "shell";
-export const desc = "Run consecutive queries against tableland";
+export const command = "shell [statement]";
+export const desc = "Interact with tableland via an interactive shell environment";
 export const aliases = ["s", "sh"];
 
 process.on("SIGINT", function () {
@@ -74,7 +72,6 @@ async function fireFullQuery(
   }
 
   try {
-    // @ts-ignore
     const { type } = await globalThis.sqlparser.normalize(statement);
 
     let stmt;
@@ -85,7 +82,7 @@ async function fireFullQuery(
     }
     if (!confirm) return;
     try {
-      stmt = tablelandConnection.prepare(statement).bind();
+      stmt = tablelandConnection.prepare(statement);
       const { results } = await stmt.all();
       console.log(results);
     } catch (e) {
@@ -103,36 +100,41 @@ async function shellYeah(
   history: string[] = []
 ) {
   try {
-    let statement = "";
-    const rl = createInterface({
-      history,
-      input: process.stdin,
-      output: process.stdout,
-      prompt: "tableland>",
-      terminal: true,
-    });
-    rl.prompt();
-    rl.on("history", (newHistory) => {
-      history = newHistory;
-    });
-    rl.on("SIGINT", () => {
-      process.exit();
-    });
-
-    for await (const enter of rl) {
-      const state = enter;
-      // @ts-ignore
-      statement += "\r\n";
-      statement += state;
-      rl.setPrompt("      ...>");
-
-      if (state.trim().endsWith(";")) {
-        break;
-      }
+    if(argv.statement) {
+      await fireFullQuery(argv.statement, argv, tablelandConnection);
+      delete argv.statement;
+    } else {
+      let statement = "";
+      const rl = createInterface({
+        history,
+        input: process.stdin,
+        output: process.stdout,
+        prompt: "tableland>",
+        terminal: true,
+      });
       rl.prompt();
+      rl.on("history", (newHistory) => {
+        history = newHistory;
+      });
+      rl.on("SIGINT", () => {
+        process.exit();
+      });
+  
+      for await (const enter of rl) {
+        const state = enter;
+        statement += "\r\n";
+        statement += state;
+        rl.setPrompt("      ...>");
+  
+        if (state.trim().endsWith(";")) {
+          break;
+        }
+        rl.prompt();
+      }
+      rl.close();
+      await fireFullQuery(statement, argv, tablelandConnection);
     }
-    rl.close();
-    await fireFullQuery(statement, argv, tablelandConnection);
+
 
     shellYeah(argv, tablelandConnection, history);
   } catch (err: any) {
@@ -142,6 +144,10 @@ async function shellYeah(
 
 export const builder: CommandBuilder<{}, Options> = (yargs) =>
   yargs
+    .positional("statement", {
+      type: "string",
+      description: "Initial query (optional)",      
+    })
     .option("format", {
       type: "string",
       choices: ["pretty", "table", "objects"] as const,

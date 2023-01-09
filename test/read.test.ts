@@ -74,7 +74,7 @@ describe("commands/read", function () {
     assert.calledWith(
       consoleLog,
       match((value) => {
-        const res = JSON.parse(value);
+        const res = value;
         return res.results[0].counter === 1;
       }, "Doesn't match expected output")
     );
@@ -95,7 +95,7 @@ describe("commands/read", function () {
     assert.calledWith(
       consoleLog,
       match((value) => {
-        const res = JSON.parse(value);
+        const res = value;
         return res.results[0].counter === 1;
       }, "Doesn't match expected output")
     );
@@ -118,7 +118,7 @@ describe("commands/read", function () {
     assert.calledWith(
       consoleLog,
       match((value) => {
-        const res = JSON.parse(value);
+        const res = value;
         return res.results[0].counter === 1;
       }, "Doesn't match expected output")
     );
@@ -144,7 +144,7 @@ describe("commands/read", function () {
     assert.calledWith(
       consoleLog,
       match((value) => {
-        const res = JSON.parse(value);
+        const res = value;
         return res.results[0].counter === 1;
       }, "Doesn't match expected output")
     );

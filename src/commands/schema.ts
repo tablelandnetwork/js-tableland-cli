@@ -1,6 +1,6 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
-import { supportedChains, Validator } from "@tableland/sdk";
+import { getChainInfo, Validator } from "@tableland/sdk";
 
 export type Options = {
   // Local
@@ -28,10 +28,9 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   }
 
   parts.pop()!;
-  const chainId = parseInt(parts.pop()!);
-  const network = Object.values(supportedChains).find(
-    (v: any) => v.chainId === chainId
-  );
+  const chain = parseInt(parts.pop()!);
+  const network = getChainInfo(chain);
+  
   if (!network) {
     console.error("unsupported chain (see `chains` command for details)");
     return;

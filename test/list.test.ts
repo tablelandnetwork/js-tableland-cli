@@ -61,8 +61,8 @@ describe("commands/list", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      match(function (value: string) {
-        const array = JSON.parse(value);
+      match(function (value: any) {
+        const array = value;
         return (
           Array.isArray(array) &&
           array.length > 0 &&

@@ -52,8 +52,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
 
     const res = await reg.listTables(address);
 
-    const out = JSON.stringify(res, null, 2);
-    console.log(out);
+    console.log(res);
     /* c8 ignore next 3 */
   } catch (err: any) {
     console.error(err.message);

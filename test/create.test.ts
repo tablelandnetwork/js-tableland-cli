@@ -129,9 +129,9 @@ describe("commands/create", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      match(function (value: string) {
+      match(function (value: any) {
         const { prefix, name, chainId, tableId, transactionHash } =
-          JSON.parse(value).meta.txn;
+          value.meta.txn;
         return (
           prefix === "first_table" &&
           chainId === 31337 &&
@@ -162,9 +162,9 @@ describe("commands/create", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      match(function (value: string) {
+      match(function (value: any) {
         const { prefix, name, chainId, tableId, transactionHash } =
-          JSON.parse(value).meta.txn;
+          value.meta.txn;
         return (
           prefix === "second_table" &&
           chainId === 31337 &&
@@ -197,9 +197,9 @@ describe("commands/create", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      match(function (value: string) {
+      match(function (value: any) {
         const { prefix, name, chainId, tableId, transactionHash } =
-          JSON.parse(value).meta.txn;
+          value.meta.txn;
         return (
           prefix === "file_test" &&
           chainId === 31337 &&
@@ -233,9 +233,9 @@ describe("commands/create", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      match(function (value: string) {
+      match(function (value: any) {
         const { prefix, name, chainId, tableId, transactionHash } =
-          JSON.parse(value).meta.txn;
+          value.meta.txn;
         return (
           prefix === "stdin_test" &&
           chainId === 31337 &&

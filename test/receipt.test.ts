@@ -60,8 +60,7 @@ describe("commands/receipt", function () {
 
     const db = new Database({ signer })
       .prepare("update healthbot_31337_1 set counter=1;")
-      .bind()
-      .all();
+      .all() as any;
 
     db.then(async () => {
       await yargs([
@@ -70,7 +69,7 @@ describe("commands/receipt", function () {
         privateKey,
         "--chain",
         "local-tableland",
-        // @ts-ignore
+
         db.transactionHash,
       ])
         .command(mod)

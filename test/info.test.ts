@@ -39,12 +39,10 @@ describe("commands/info", function () {
 
     assert.calledWith(
       consoleLog,
-      match(function (value: string) {
-        // eslint-disable-next-line camelcase
-        const { name, attributes, externalUrl } = JSON.parse(value);
+      match(function (value: any) {
+        const { name, attributes, externalUrl } = value;
         return (
           name === "healthbot_31337_1" &&
-          // eslint-disable-next-line camelcase
           externalUrl === "http://localhost:8080/chain/31337/tables/1" &&
           Array.isArray(attributes)
         );

@@ -127,8 +127,8 @@ describe("commands/write", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      match(function (value: string) {
-        const { transactionHash, link } = JSON.parse(value).meta.txn;
+      match(function (value: any) {
+        const { transactionHash, link } = value.meta.txn;
         return (
           typeof transactionHash === "string" &&
           transactionHash.startsWith("0x") &&
@@ -158,8 +158,8 @@ describe("commands/write", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      match(function (value: string) {
-        const { transactionHash, link } = JSON.parse(value).meta.txn;
+      match(function (value: any) {
+        const { transactionHash, link } = value.meta.txn;
         return (
           typeof transactionHash === "string" &&
           transactionHash.startsWith("0x") &&
@@ -188,8 +188,8 @@ describe("commands/write", function () {
       .parse();
     assert.calledWith(
       consoleLog,
-      match(function (value: string) {
-        const { transactionHash, link } = JSON.parse(value).meta.txn;
+      match(function (value: any) {
+        const { transactionHash, link } = value.meta.txn;
         return (
           typeof transactionHash === "string" &&
           transactionHash.startsWith("0x") &&

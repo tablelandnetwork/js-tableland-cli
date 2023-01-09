@@ -33,7 +33,7 @@ describe("commands/schema", function () {
   test("throws with missing table", async function () {
     const consoleError = spy(console, "error");
     await yargs(["schema", "ignored_31337_99"]).command(mod).parse();
-    assert.calledWith(consoleError, "Unexpected end of JSON input");
+    assert.calledWith(consoleError, "Not Found");
   });
 
   test("Schema passes with local-tableland", async function () {

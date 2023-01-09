@@ -57,7 +57,7 @@ describe("commands/info", function () {
   test("throws with missing table", async function () {
     const consoleError = spy(console, "error");
     await yargs(["info", "ignored_31337_99"]).command(mod).parse();
-    assert.calledWith(consoleError, "Unexpected end of JSON input");
+    assert.calledWith(consoleError, "Not Found");
   });
 
 

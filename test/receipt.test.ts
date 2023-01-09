@@ -47,7 +47,7 @@ describe("commands/receipt", function () {
       .parse();
     assert.calledWith(
       consoleError,
-      "Unexpected end of JSON input"
+      "Not Found"
     );
   });
 

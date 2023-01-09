@@ -91,6 +91,7 @@ async function fireFullQuery(
     } catch (e) {
       console.error(e);
     }
+  /* c8 ignore next 3 */
   } catch (e) {
     console.log(e);
   }

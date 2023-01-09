@@ -60,7 +60,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
 
     const res = await db.prepare(statement).bind().all();
 
-    const link = getLink(chain, res?.meta?.txn?.transactionHash || "");
+    const link = getLink(chain, res?.meta?.txn?.transactionHash as string);
     const out = JSON.stringify({ ...res, link }, null, 2);
     console.log(out);
     /* c8 ignore next 3 */

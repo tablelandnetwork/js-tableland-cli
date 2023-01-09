@@ -56,8 +56,8 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       );
       return;
     }
-    const db = new Database({signer});
-    
+    const db = new Database({ signer });
+
     const res = await db.prepare(statement).bind().all();
 
     const link = getLink(chain, res?.meta?.txn?.transactionHash || "");

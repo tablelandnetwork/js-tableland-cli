@@ -67,15 +67,15 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
 
 
 
-    
+
     let statement = `CREATE TABLE ${prefix} (${schema})`;
 
     const check = /CREATE TABLE/gim.exec(schema.toString());
-    if(check) {
+    if (check) {
       statement = schema
-    } 
+    }
 
-    const db = new Database({signer});
+    const db = new Database({ signer });
     const res = await db.prepare(statement).bind().all();
     const link = getLink(chain, res.meta.txn?.transactionHash || "");
     const out = JSON.stringify(

@@ -65,7 +65,7 @@ async function fireFullQuery(
 ) {
 
   switch (true) {
-    
+
     case statement.trim().endsWith(".help"):
       console.log("Uh, I didn't think I'd get this far");
       break;
@@ -88,7 +88,7 @@ async function fireFullQuery(
     if (type === "write") {
       confirm = (await confirmQuery()) === "confirm";
     }
-    if(!confirm) return;
+    if (!confirm) return;
     try {
       stmt = tablelandConnection.prepare(statement).bind();
       const { results } = await stmt.all();
@@ -97,7 +97,7 @@ async function fireFullQuery(
       console.error(e);
     }
   } catch (e) {
-    
+    console.log(e);
   }
 }
 
@@ -106,7 +106,7 @@ async function shellYeah(
   tablelandConnection: Database,
   history: string[] = []
 ) {
-  
+
   try {
     let statement = "";
     const rl = createInterface({
@@ -175,7 +175,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
 
   const tablelandConnection = new Database(options);
 
-  const network:any = getChains()[chain];
+  const network: any = getChains()[chain];
   if (!network) {
     console.error("unsupported chain (see `chains` command for details)");
   }

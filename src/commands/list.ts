@@ -49,10 +49,10 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       chain,
       providerUrl,
     });
-    const reg = new Registry({signer});
-          
+    const reg = new Registry({ signer });
+
     const res = await reg.listTables(address);
-    
+
     const out = JSON.stringify(res, null, 2);
     console.log(out);
     /* c8 ignore next 3 */

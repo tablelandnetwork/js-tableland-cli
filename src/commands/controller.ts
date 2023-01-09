@@ -40,10 +40,10 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
             chain,
             providerUrl,
           });
-          const reg = new Registry({signer});
-          
+          const reg = new Registry({ signer });
+
           const res = await reg.getController(name);
-          
+
           const out = JSON.stringify(res, null, 2);
           console.log(out);
           /* c8 ignore next 3 */
@@ -75,8 +75,8 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
             providerUrl,
           });
 
-          const reg = new Registry({signer});
-          const res = await reg.setController({tableName: name, controller});
+          const reg = new Registry({ signer });
+          const res = await reg.setController({ tableName: name, controller });
 
           const link = getLink(chain, res.hash);
           const out = JSON.stringify({ ...res, link }, null, 2);
@@ -105,10 +105,10 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
             providerUrl,
           });
 
-          const reg = new Registry({signer});
+          const reg = new Registry({ signer });
 
           const res = await reg.lockController(name);
-          
+
           const link = getLink(chain, res.hash);
           const out = JSON.stringify({ ...res, link }, null, 2);
           console.log(out);

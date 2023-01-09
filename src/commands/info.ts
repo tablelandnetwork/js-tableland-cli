@@ -40,8 +40,8 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
 
   try {
 
-    const validator = Validator.forChain(parseInt(chainId));    
-    const res = await validator.getTableById({tableId, chainId: parseInt(chainId)});
+    const validator = Validator.forChain(parseInt(chainId));
+    const res = await validator.getTableById({ tableId, chainId: parseInt(chainId) });
     console.log(JSON.stringify(res));
     /* c8 ignore next 3 */
   } catch (err: any) {

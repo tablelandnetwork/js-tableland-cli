@@ -20,8 +20,8 @@ export type Options = {
   providerUrl: string | undefined;
 };
 
-export const command = "shell [statement]";
-export const desc = "Run a read-only query against a remote table";
+export const command = "shell";
+export const desc = "Run consecutive queries against tableland";
 export const aliases = ["r", "query", "q"];
 
 process.on("SIGINT", function () {

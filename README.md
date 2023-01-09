@@ -15,6 +15,7 @@
 - [Background](#background)
 - [Usage](#usage)
 - [Install](#install)
+- [Config](#config)
 - [Development](#development)
 - [Contributing](#contributing)
 - [License](#license)
@@ -29,32 +30,32 @@ An experimental Tableland command line tool.
 tableland <command>
 
 Commands:
-  tableland chains             List information about supported chains
-  tableland controller <sub>   Get, set, and lock the controller contract for a giv
-                               en table
+  tableland chains             List information about supported chains       
+  tableland controller <sub>   Get, set, and lock the controller contract for
+                          a given table
   tableland create [schema]    Create a new table
-  tableland hash <schema>      Validate a table schema and get the structure hash
   tableland info <name>        Get info about a given table by name
-  tableland init               Create config file                      [aliases: i]
+  tableland init               Create config file                [aliases: i]
   tableland list [address]     List tables by address
-  tableland read [statement]   Run a read-only query against a remote table
-                                                          [aliases: r, query, q]
-  tableland receipt <hash>     Get the receipt of a chain transaction to know if it
-                               was executed, and the execution details
+  tableland read [statement]   Run a read-only query against a remote table  
+                                                 [aliases: r, query, q]
+  tableland receipt <hash>     Get the receipt of a chain transaction to know
+                          if it was executed, and the execution details
   tableland schema <name>      Get info about a given table schema
-  tableland structure <hash>   Get table name(s) by schema structure hash
-  tableland token              Create a SIWE token
-  tableland write [statement]  Run a mutating SQL statement against a remote table
-                                                            [aliases: w, run, r]
+  tableland write [statement]  Run a mutating SQL statement against a remote 
+                         table                     [aliases: w, run, r]
+  tableland shell              Run consecutive queries against tableland     
+                                                 [aliases: r, query, q]
 
 Options:
-      --help         Show help                                         [boolean]
-      --version      Show version number                               [boolean]
+      --help         Show help                                [boolean]
+      --version      Show version number                      [boolean]
       --config       Path to JSON config file
-  -k, --privateKey   Private key string                                 [string]
-  -c, --chain        The EVM chain to target[string] [default: "polygon-mumbai"]
-  -p, --providerUrl  JSON RPC API provider URL. (e.g., https://eth-rinkeby.alche
-                     myapi.io/v2/123abc123a...)                         [string]
+  -k, --privateKey   Private key string                        [string]
+  -c, --chain        The EVM chain to target
+                                   [string] [default: "polygon-mumbai"]
+  -p, --providerUrl  JSON RPC API provider URL. (e.g., https://eth-rink
+                     eby.alchemyapi.io/v2/123abc123a...)       [string]
 ```
 
 # Install

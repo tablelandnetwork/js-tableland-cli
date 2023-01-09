@@ -7,7 +7,6 @@ import * as list from "./list.js";
 import * as read from "./read.js";
 import * as receipt from "./receipt.js";
 import * as schema from "./schema.js";
-// import * as structure from "./structure.js";
 import * as write from "./write.js";
 import * as shell from "./shell.js";
 

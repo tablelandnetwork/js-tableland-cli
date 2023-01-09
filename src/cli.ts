@@ -57,9 +57,5 @@ const _argv = yargs(hideBin(process.argv))
     description:
       "JSON RPC API provider URL. (e.g., https://eth-rinkeby.alchemyapi.io/v2/123abc123a...)",
   })
-  .option("enableEns", {
-    type: "boolean",
-    description: "Enable ENS names in shell queries",
-  })
   .demandCommand(1, "")
   .strict().argv;

@@ -14,9 +14,7 @@ describe("commands/chains", function () {
   });
 
   test("chains returns correct output", async function () {
-    const chains = Object.fromEntries(
-      Object.entries(getChains())
-    );
+    const chains = Object.fromEntries(Object.entries(getChains()));
     const consoleLog = spy(console, "log");
     await yargs(["chains"]).command(mod).parse();
     assert.calledWith(consoleLog, chains);

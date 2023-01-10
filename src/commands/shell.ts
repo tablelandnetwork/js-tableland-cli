@@ -19,7 +19,8 @@ export type Options = {
 };
 
 export const command = "shell [statement]";
-export const desc = "Interact with tableland via an interactive shell environment";
+export const desc =
+  "Interact with tableland via an interactive shell environment";
 export const aliases = ["s", "sh"];
 
 process.on("SIGINT", function () {
@@ -88,7 +89,7 @@ async function fireFullQuery(
     } catch (e) {
       console.error(e);
     }
-  /* c8 ignore next 3 */
+    /* c8 ignore next 3 */
   } catch (e) {
     console.log(e);
   }
@@ -100,7 +101,7 @@ async function shellYeah(
   history: string[] = []
 ) {
   try {
-    if(argv.statement) {
+    if (argv.statement) {
       await fireFullQuery(argv.statement, argv, tablelandConnection);
       delete argv.statement;
     } else {
@@ -119,13 +120,13 @@ async function shellYeah(
       rl.on("SIGINT", () => {
         process.exit();
       });
-  
+
       for await (const enter of rl) {
         const state = enter;
         statement += "\r\n";
         statement += state;
         rl.setPrompt("      ...>");
-  
+
         if (state.trim().endsWith(";")) {
           break;
         }
@@ -134,7 +135,6 @@ async function shellYeah(
       rl.close();
       await fireFullQuery(statement, argv, tablelandConnection);
     }
-
 
     shellYeah(argv, tablelandConnection, history);
   } catch (err: any) {
@@ -146,7 +146,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
   yargs
     .positional("statement", {
       type: "string",
-      description: "Initial query (optional)",      
+      description: "Initial query (optional)",
     })
     .option("format", {
       type: "string",
@@ -168,23 +168,21 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     const options: Config = {
       signer,
     };
-  
+
     const tablelandConnection = new Database(options);
-  
+
     const network: any = getChains()[chain];
     if (!network) {
       console.error("unsupported chain (see `chains` command for details)");
     }
-  
+
     console.log("Welcome to Tableland");
     console.log(`Tableland CLI shell`);
     // console.log(`Enter ".help" for usage hints`);
     console.log(`Connected to ${network.chainName} using ${signer.address}`);
-  
+
     await shellYeah(argv, tablelandConnection);
-  } catch (e:any) {
+  } catch (e: any) {
     console.error(e.message);
   }
-
-
 };

@@ -30,7 +30,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   parts.pop()!;
   const chain = parseInt(parts.pop()!);
   const network = getChainInfo(chain);
-  
+
   if (!network) {
     console.error("unsupported chain (see `chains` command for details)");
     return;

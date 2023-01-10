@@ -131,13 +131,13 @@ describe("commands/read", function () {
       stdin.send("select * from healthbot_31337_1;\n").end();
     });
     await yargs([
-      "read", 
-      "--chain", 
-      "local-tableland", 
-      "--format", 
+      "read",
+      "--chain",
+      "local-tableland",
+      "--format",
       "objects",
       "--providerUrl",
-      "http://127.0.0.1:8545"
+      "http://127.0.0.1:8545",
     ])
       .command(mod)
       .parse();

@@ -129,10 +129,7 @@ describe("commands/controller", function () {
     ])
       .command(mod)
       .parse();
-    assert.calledWith(
-      consoleLog,
-      `0x0000000000000000000000000000000000000000`
-    );
+    assert.calledWith(consoleLog, `0x0000000000000000000000000000000000000000`);
   });
 
   // TODO: Create tests for locking a controller

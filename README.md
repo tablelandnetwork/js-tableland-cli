@@ -40,10 +40,10 @@ Commands:
   tableland read [statement]   Run a read-only query against a remote table
                                                           [aliases: r, query, q]
   tableland receipt <hash>     Get the receipt of a chain transaction to know if
-                                it was executed, and the execution details
+                               it was executed, and the execution details
   tableland schema <name>      Get info about a given table schema
-  tableland write [statement]  Run a mutating SQL statement against a remote tab
-                               le                           [aliases: w, run, r]
+  tableland write [statement]  Run a mutating SQL statement against a remote
+                               table                        [aliases: w, run, r]
   tableland shell [statement]  Interact with tableland via an interactive shell
                                environment                      [aliases: s, sh]
 

@@ -10,7 +10,7 @@ export const desc = "List information about supported chains";
 
 export const builder: CommandBuilder<{}, Options> = (yargs) => yargs;
 
-const chains = Object.fromEntries(Object.entries(getChains()));
+const chains = getChains();
 
 export const handler = async (_argv: Arguments<Options>): Promise<void> => {
   console.log(chains);

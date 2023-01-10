@@ -1,5 +1,5 @@
 import { Wallet, providers, getDefaultProvider } from "ethers";
-import { ChainName, supportedChains } from "@tableland/sdk";
+import { ChainName, getChainInfo, supportedChains } from "@tableland/sdk";
 
 export const getChains = () =>
   Object.fromEntries(
@@ -52,7 +52,7 @@ export function getWalletWithProvider({
   if (privateKey == null) {
     throw new Error("missing required flag (`-k` or `--privateKey`)");
   }
-  const network: any = getChains()[chain];
+  const network: any = getChainInfo(chain);
   if (network == null) {
     throw new Error("unsupported chain (see `chains` command for details)");
   }

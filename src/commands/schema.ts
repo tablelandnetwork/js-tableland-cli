@@ -27,9 +27,9 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     return;
   }
 
-  parts.pop()!;
-  const chain = parseInt(parts.pop()!);
-  const network = getChainInfo(chain);
+  const tableId = parts.pop() as string;
+  const chainId = parseInt(parts.pop()!);
+  const network = getChainInfo(chainId);
 
   if (!network) {
     console.error("unsupported chain (see `chains` command for details)");
@@ -37,11 +37,10 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   }
 
   try {
-    const [tableId, chainId] = name.split("_").reverse();
-    const validator = Validator.forChain(parseInt(chainId));
+    const validator = Validator.forChain(chainId);
     const res = await validator.getTableById({
       tableId,
-      chainId: parseInt(chainId),
+      chainId,
     });
     console.log(res.schema);
     /* c8 ignore next 3 */

@@ -6,11 +6,14 @@ import yargs from "yargs";
 import { createInterface } from "readline";
 import { getChains, getWalletWithProvider } from "../utils.js";
 import init from "@tableland/sqlparser";
+import { JsonRpcProvider } from "@ethersproject/providers";
+import EnsResolver from "../lib/EnsResolver.js";
 
 export type Options = {
   // Local
   statement?: string;
   format: "pretty" | "table" | "objects";
+  enableEnsExperiment: boolean;
 
   // Global
   chain: ChainName;
@@ -61,6 +64,8 @@ async function fireFullQuery(
   argv: any,
   tablelandConnection: Database
 ) {
+  const { privateKey, chain, providerUrl } = argv;
+
   switch (true) {
     case statement.trim().endsWith(".help"):
       console.log("Uh, I didn't think I'd get this far");
@@ -74,6 +79,19 @@ async function fireFullQuery(
 
   try {
     const { type } = await globalThis.sqlparser.normalize(statement);
+
+    if (argv.enableEnsExperiment) {
+      // TODO: Using same wallet as tableland instead of just provider
+      const signer = getWalletWithProvider({
+        privateKey,
+        chain,
+        providerUrl,
+      });
+
+      const provider = new JsonRpcProvider(argv.providerUrl);
+      const ensConnect = await new EnsResolver({ provider, signer });
+      statement = await ensConnect.resolve(statement);
+    }
 
     let stmt;
     let confirm: any = true;
@@ -148,6 +166,10 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
       type: "string",
       description: "Initial query (optional)",
     })
+    .option("enableEnsExperiment", {
+      type: "boolean",
+      description: "Enable ENS experiment",
+    })
     .option("format", {
       type: "string",
       choices: ["pretty", "table", "objects"] as const,
@@ -180,6 +202,11 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     console.log(`Tableland CLI shell`);
     // console.log(`Enter ".help" for usage hints`);
     console.log(`Connected to ${network.chainName} using ${signer.address}`);
+    if (argv.enableEnsExperiment) {
+      console.log(
+        "ENS namespace is experimental, no promises that it will exist in future builds"
+      );
+    }
 
     await shellYeah(argv, tablelandConnection);
   } catch (e: any) {

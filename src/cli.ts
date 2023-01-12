@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --experimental-specifier-resolution=node
 
 import * as dotenv from "dotenv";
 import fetch, { Headers, Request, Response } from "node-fetch";

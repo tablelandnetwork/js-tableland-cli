@@ -13,7 +13,6 @@ export type Options = {
   // Local
   statement?: string;
   format: "pretty" | "table" | "objects";
-  enableEnsExperiment: boolean;
 
   // Global
   chain: ChainName;
@@ -165,10 +164,6 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
     .positional("statement", {
       type: "string",
       description: "Initial query (optional)",
-    })
-    .option("enableEnsExperiment", {
-      type: "boolean",
-      description: "Enable ENS experiment",
     })
     .option("format", {
       type: "string",

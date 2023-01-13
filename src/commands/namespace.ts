@@ -13,41 +13,32 @@ export type Options = {
   privateKey: string;
   providerUrl: string;
   chain: ChainName;
+  get: boolean;
+  set: boolean;
 };
 
 export const command = "namespace <domain> [mappings..]";
 export const desc = "Get info about a given table by name";
 
 export const builder: CommandBuilder<{}, Options> = (yargs) =>
-  yargs.positional("domain", {
-    type: "string",
-    description: "The root domain of the namespace",
-  }) as yargs.Argv<Options>;
+  yargs
+    .positional("domain", {
+      type: "string",
+      description: "The root domain of the namespace",
+    })
+    .option("set", {
+      type: "boolean",
+      description: "Set text records for a namespace",
+    })
+    .option("get", {
+      type: "boolean",
+      description: "Pass in a record to find it's table name",
+    })
+    .usage(``) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  const { domain, mappings, privateKey, providerUrl, chain } = argv;
+  const { domain, mappings, privateKey, providerUrl, chain, get, set } = argv;
   await init();
-
-  const records = mappings.map((entry) => {
-    const [key, value] = entry.split("=");
-    console.log(entry);
-    const keyRegex = /^[a-zA-Z0-9_]*$/;
-    const valueRegex = /^[a-zA-Z_][a-zA-Z0-9_]*_[0-9]+_[0-9]+$/;
-
-    if (keyRegex.exec(key) === null) {
-      throw new Error("Only letters or underscores in key name");
-    }
-    if (valueRegex.exec(value) === null) {
-      throw new Error("Tablename should be a valid tableland table name");
-    }
-    return {
-      key,
-      value,
-    };
-  });
-
-  console.log("Domain", domain);
-  console.log("Records", records);
 
   const signer = getWalletWithProvider({
     privateKey,
@@ -61,5 +52,40 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     provider,
   });
 
-  ensResolver.addTableRecords(domain, records);
+  if (get) {
+    console.log(await ensResolver.resolveTable(domain));
+  }
+
+  if (set) {
+    if (!(await ensResolver.isOwner(domain))) {
+      throw new Error("You don't own that ENS domain");
+    }
+    const records = mappings.map((entry: any) => {
+      const [key, value] = entry.split("=");
+      console.log(entry);
+      const keyRegex = /^[a-zA-Z0-9_]*$/;
+      const valueRegex = /^[a-zA-Z_][a-zA-Z0-9_]*_[0-9]+_[0-9]+$/;
+
+      if (keyRegex.exec(key) === null) {
+        throw new Error("Only letters or underscores in key name");
+      }
+      if (valueRegex.exec(value) === null) {
+        throw new Error("Tablename should be a valid tableland table name");
+      }
+      return {
+        key,
+        value,
+      };
+    });
+
+    console.log("Domain", domain);
+    console.log("Records", records);
+
+    if (await ensResolver.addTableRecords(domain, records)) {
+      console.log("Successfully added table mapppings to ens");
+      mappings.forEach((mapping) => {
+        console.log(mapping);
+      });
+    }
+  }
 };

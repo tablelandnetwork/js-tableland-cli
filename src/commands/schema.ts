@@ -42,7 +42,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       tableId,
       chainId,
     });
-    console.log(res.schema);
+    console.dir(res.schema, { depth: null });
     /* c8 ignore next 3 */
   } catch (err: any) {
     console.error(err.message);

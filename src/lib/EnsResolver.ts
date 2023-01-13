@@ -3,7 +3,7 @@ import { ENS } from "@ensdomains/ensjs";
 
 interface EnsResolverOptions {
   provider: ethers.providers.JsonRpcProvider;
-  signer: Signer;
+  signer?: Signer;
 }
 
 interface TableMap {
@@ -13,14 +13,19 @@ interface TableMap {
 
 export default class EnsResolver {
   provider: ethers.providers.JsonRpcProvider;
-  signer: Signer;
+  signer: Signer | undefined;
   ENS: ENS;
+  ready: Promise<boolean>;
 
   constructor(options: EnsResolverOptions) {
     this.signer = options.signer;
     this.provider = options.provider;
     this.ENS = new ENS();
-    this.ENS.setProvider(this.provider);
+    const getReady = async () => {
+      this.ENS.setProvider(this.provider);
+      return true;
+    };
+    this.ready = getReady();
   }
 
   async resolveTable(tablename: string): Promise<string> {
@@ -33,16 +38,36 @@ export default class EnsResolver {
     return (await address?.getText(textRecord)) || tablename;
   }
 
+  async isOwner(domain: string) {
+    await this.ready;
+    if (this.signer === undefined) throw new Error("No signer");
+    try {
+      const record = await this.ENS.getOwner(domain);
+      if (record?.owner === (await this.signer.getAddress())) {
+        return true;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+
   async addTableRecords(domain: string, maps: TableMap[]) {
-    console.log(
+    try {
+      await this.ready;
+
       await this.ENS.setRecords(domain, {
         records: {
           texts: maps,
         },
         // @ts-ignore
         signer: this.signer,
-      })
-    );
+      });
+      return true;
+    } catch (e: any) {
+      console.log("Adding table to ENS failed");
+      console.error(e.message);
+    }
+    return false;
   }
 
   async resolve(statement: string): Promise<string> {

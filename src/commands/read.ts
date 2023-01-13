@@ -4,15 +4,21 @@ import yargs from "yargs";
 import { promises } from "fs";
 import { createInterface } from "readline";
 import { getChains } from "../utils.js";
+import EnsResolver from "../lib/EnsResolver.js";
+import { JsonRpcProvider } from "@ethersproject/providers";
+import init from "@tableland/sqlparser";
 
 export type Options = {
   // Local
   statement?: string;
   format: "pretty" | "table" | "objects";
   file?: string;
+  providerUrl: string;
+  privateKey?: string;
 
   // Global
   chain: ChainName;
+  enableEnsExperiment: boolean;
 };
 
 export const command = "read [statement]";
@@ -40,6 +46,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   let { statement } = argv;
   const { chain, format, file } = argv;
+  await init();
 
   const network = getChains()[chain];
   if (!network) {
@@ -63,6 +70,13 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       return;
     }
     const db = await Database.readOnly(chain);
+
+    if (argv.enableEnsExperiment) {
+      const provider = new JsonRpcProvider(argv.providerUrl);
+      const ensConnect = await new EnsResolver({ provider });
+      statement = await ensConnect.resolve(statement);
+    }
+
     const res = await db.prepare(statement).all();
 
     if (format === "pretty") {

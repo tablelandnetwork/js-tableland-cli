@@ -4,6 +4,9 @@ import { ChainName, Database } from "@tableland/sdk";
 import { getWalletWithProvider, getLink } from "../utils.js";
 import { promises } from "fs";
 import { createInterface } from "readline";
+import EnsResolver from "../lib/EnsResolver.js";
+import { JsonRpcProvider } from "@ethersproject/providers";
+import init from "@tableland/sqlparser";
 
 export type Options = {
   // Local
@@ -34,6 +37,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   let { statement } = argv;
   const { privateKey, chain, providerUrl, file } = argv;
+  await init();
 
   try {
     const signer = getWalletWithProvider({
@@ -57,6 +61,12 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       return;
     }
     const db = new Database({ signer });
+
+    if (argv.enableEnsExperiment) {
+      const provider = new JsonRpcProvider(argv.providerUrl);
+      const ensConnect = await new EnsResolver({ provider });
+      statement = await ensConnect.resolve(statement);
+    }
 
     const res = await db.prepare(statement).all();
 

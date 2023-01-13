@@ -30,6 +30,13 @@ const config = explorer.search();
 // If a dotenv file (or exported env vars) are provided, these override any config values
 dotenv.config();
 
+export interface GlobalOptions {
+  privateKey: string;
+  chain: string;
+  enableEnsExperiment: boolean;
+  providerUrl: string;
+}
+
 // eslint-disable-next-line no-unused-vars
 const _argv = yargs(hideBin(process.argv))
   .parserConfiguration({

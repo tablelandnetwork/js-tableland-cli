@@ -1,11 +1,15 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
 import { getChainInfo, Validator } from "@tableland/sdk";
+import EnsResolver from "../lib/EnsResolver";
+import { JsonRpcProvider } from "@ethersproject/providers";
+import { GlobalOptions } from "../cli";
 
-export type Options = {
-  // Local
+type LocalOptions = {
   name: string;
 };
+
+export type Options = LocalOptions & GlobalOptions;
 
 export const command = "schema <name>";
 export const desc = "Get info about a given table schema";
@@ -17,7 +21,14 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
   }) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  const { name } = argv;
+  let { name, providerUrl } = argv;
+
+  if (argv.enableEnsExperiment) {
+    const ensRes = new EnsResolver({
+      provider: new JsonRpcProvider(providerUrl),
+    });
+    name = await ensRes.resolveTable(name);
+  }
 
   const parts = name.split("_");
   if (parts.length < 3) {

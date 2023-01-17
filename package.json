@@ -6,6 +6,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "overrides": {
+    "ethereum-waffle": "../_EXCLUDED_"
+  },
   "keywords": [
     "tableland",
     "sql",

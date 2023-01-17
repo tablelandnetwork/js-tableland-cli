@@ -7,7 +7,7 @@
     "access": "public"
   },
   "overrides": {
-    "ethereum-waffle": "../_EXCLUDED_"
+    "ethereum-waffle": "../@nomicfoundation/hardhat-chai-matchers"
   },
   "keywords": [
     "tableland",

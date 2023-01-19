@@ -64,9 +64,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       return;
     }
 
-    const db = baseUrl
-      ? await new Database({ baseUrl })
-      : await Database.readOnly(chain);
+    const db = baseUrl ? new Database({ baseUrl }) : Database.readOnly(chain);
     const res = await db.prepare(statement).all();
 
     if (format === "pretty") {

@@ -16,6 +16,7 @@ export type Options = {
   privateKey: string;
   providerUrl: string | undefined;
   verbose: boolean;
+  baseUrl: string | undefined;
 };
 
 export const command = "shell [statement]";
@@ -180,7 +181,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   await init();
-  const { privateKey, chain, providerUrl } = argv;
+  const { privateKey, chain, providerUrl, baseUrl } = argv;
 
   try {
     const signer = getWalletWithProvider({
@@ -190,6 +191,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     });
     const options: Config = {
       signer,
+      baseUrl,
     };
 
     const tablelandConnection = new Database(options);

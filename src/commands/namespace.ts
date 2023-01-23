@@ -15,6 +15,7 @@ export type Options = {
   chain: ChainName;
   get: boolean;
   set: boolean;
+  enableNamespaceExperiment: boolean;
 };
 
 export const command = "namespace <domain> [mappings..]";
@@ -37,7 +38,21 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
     .usage(``) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  const { domain, mappings, privateKey, providerUrl, chain, get, set } = argv;
+  const {
+    domain,
+    mappings,
+    privateKey,
+    providerUrl,
+    chain,
+    get,
+    set,
+    enableEnsExperiment,
+  } = argv;
+  if (!enableEnsExperiment) {
+    console.error(
+      'Namespace is an experimental command. You must add the "enableEnsExperiment" flag to use it.'
+    );
+  }
   await init();
 
   const signer = getWalletWithProvider({

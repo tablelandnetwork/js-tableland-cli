@@ -1,8 +1,8 @@
 import { Provider } from "@ethersproject/abstract-provider";
 import { ChainInfo, Database } from "@tableland/sdk";
 import { Signer, Wallet } from "ethers";
-import { GlobalOptions } from "../cli";
-import EnsResolver from "./EnsResolver";
+import { GlobalOptions } from "../cli.js";
+import EnsResolver from "./EnsResolver.js";
 
 interface CliConnectors {
   signer?: Signer;

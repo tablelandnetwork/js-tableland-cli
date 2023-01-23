@@ -3,8 +3,8 @@ import { ChainName } from "@tableland/sdk";
 import init from "@tableland/sqlparser";
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
-import EnsResolver from "../lib/EnsResolver";
-import { getWalletWithProvider } from "../utils";
+import EnsResolver from "../lib/EnsResolver.js";
+import { getWalletWithProvider } from "../utils.js";
 
 export type Options = {
   // Local

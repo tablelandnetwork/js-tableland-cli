@@ -1,9 +1,9 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
 import { getChainInfo, Validator } from "@tableland/sdk";
-import EnsResolver from "../lib/EnsResolver";
+import EnsResolver from "../lib/EnsResolver.js";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { GlobalOptions } from "../cli";
+import { GlobalOptions } from "../cli.js";
 
 type LocalOptions = {
   name: string;

@@ -1,8 +1,7 @@
-import type { Arguments, CommandBuilder } from "yargs";
+import yargs, { Arguments, CommandBuilder } from "yargs";
 import cliSelect from "cli-select";
 import { ChainName, Database, Config } from "@tableland/sdk";
 import chalk from "chalk";
-import yargs from "yargs";
 import { createInterface } from "readline";
 import { getChains, getWalletWithProvider } from "../utils.js";
 import init from "@tableland/sqlparser";
@@ -18,6 +17,8 @@ export type Options = {
   chain: ChainName;
   privateKey: string;
   providerUrl: string | undefined;
+  verbose: boolean;
+  baseUrl: string | undefined;
 };
 
 export const command = "shell [statement]";
@@ -52,7 +53,6 @@ async function confirmQuery() {
     console.log(
       chalk.underline("Committing to network. This will take a few moments.")
     );
-    return false;
   }
 
   return selected.id;
@@ -95,14 +95,31 @@ async function fireFullQuery(
     let stmt;
     let confirm: any = true;
 
-    if (type === "write") {
+    if (type === "write" || type === "create") {
       confirm = (await confirmQuery()) === "confirm";
     }
     if (!confirm) return;
     try {
       stmt = tablelandConnection.prepare(statement);
-      const { results } = await stmt.all();
-      console.log(results);
+      const response = await stmt.all();
+      const { results } = response;
+
+      switch (type) {
+        case "create":
+          console.log(`Created table: ${response.meta.txn?.name}`);
+          break;
+        case "write":
+          console.log(`Updated table: ${response.meta.txn?.name}`);
+          break;
+        case "read":
+          console.log(results);
+          break;
+        default:
+          console.log(response);
+      }
+      if (argv.verbose) {
+        console.log(response);
+      }
     } catch (e) {
       console.error(e);
     }
@@ -156,6 +173,9 @@ async function shellYeah(
     shellYeah(argv, tablelandConnection, history);
   } catch (err: any) {
     console.error(err.message);
+    if (argv.verbose) {
+      console.log(err);
+    }
   }
 }
 
@@ -164,6 +184,10 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
     .positional("statement", {
       type: "string",
       description: "Initial query (optional)",
+    })
+    .option("verbose", {
+      type: "boolean",
+      description: "Results show more data",
     })
     .option("format", {
       type: "string",
@@ -174,7 +198,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   await init();
-  const { privateKey, chain, providerUrl } = argv;
+  const { privateKey, chain, providerUrl, baseUrl } = argv;
 
   try {
     const signer = getWalletWithProvider({
@@ -184,6 +208,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     });
     const options: Config = {
       signer,
+      baseUrl,
     };
 
     const tablelandConnection = new Database(options);

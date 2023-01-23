@@ -7,6 +7,7 @@ import { GlobalOptions } from "../cli.js";
 
 type LocalOptions = {
   name: string;
+  baseUrl: string | undefined;
 };
 
 export type Options = LocalOptions & GlobalOptions;
@@ -21,7 +22,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
   }) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  let { name, providerUrl } = argv;
+  let { name, providerUrl, baseUrl } = argv;
 
   if (argv.enableEnsExperiment) {
     const ensRes = new EnsResolver({
@@ -48,7 +49,9 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   }
 
   try {
-    const validator = Validator.forChain(chainId);
+    const validator = baseUrl
+      ? new Validator({ baseUrl })
+      : Validator.forChain(chainId);
     const res = await validator.getTableById({
       tableId,
       chainId,

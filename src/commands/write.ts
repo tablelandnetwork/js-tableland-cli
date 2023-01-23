@@ -17,6 +17,7 @@ export type Options = {
   privateKey: string;
   chain: ChainName;
   providerUrl: string | undefined;
+  baseUrl: string | undefined;
 };
 
 export const command = "write [statement]";
@@ -36,7 +37,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   let { statement } = argv;
-  const { privateKey, chain, providerUrl, file } = argv;
+  const { privateKey, chain, providerUrl, file, baseUrl } = argv;
   await init();
 
   try {
@@ -60,7 +61,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       );
       return;
     }
-    const db = new Database({ signer });
+    const db = new Database({ signer, baseUrl });
 
     if (argv.enableEnsExperiment) {
       const provider = new JsonRpcProvider(argv.providerUrl);

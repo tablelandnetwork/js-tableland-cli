@@ -1,25 +1,16 @@
 import type { Arguments, CommandBuilder } from "yargs";
-import { Database, ChainName } from "@tableland/sdk";
 import yargs from "yargs";
 import { promises } from "fs";
 import { createInterface } from "readline";
-import { getChains } from "../utils.js";
-import EnsResolver from "../lib/EnsResolver.js";
-import { JsonRpcProvider } from "@ethersproject/providers";
-import init from "@tableland/sqlparser";
+import { GlobalOptions } from "../cli.js";
+import { setupCommand } from "../lib/commandSetup.js";
 
-export type Options = {
-  // Local
+export type Options = GlobalOptions & {
   statement?: string;
   format: "pretty" | "table" | "objects";
   file?: string;
   providerUrl: string;
   privateKey?: string;
-
-  // Global
-  chain: ChainName;
-  enableEnsExperiment: boolean;
-  baseUrl: string | undefined;
 };
 
 export const command = "read [statement]";
@@ -46,16 +37,10 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   let { statement } = argv;
-  const { chain, format, file, baseUrl } = argv;
-  await init();
-
-  const network = getChains()[chain];
-  if (!network) {
-    console.error("unsupported chain (see `chains` command for details)");
-    return;
-  }
+  const { format, file } = argv;
 
   try {
+    const { database, ens } = await setupCommand(argv, { readOnly: true });
     if (file != null) {
       statement = await promises.readFile(file, { encoding: "utf-8" });
     } else if (statement == null) {
@@ -70,12 +55,10 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       );
       return;
     }
-    const db = baseUrl ? new Database({ baseUrl }) : Database.readOnly(chain);
+    const db = database;
 
-    if (argv.enableEnsExperiment) {
-      const provider = new JsonRpcProvider(argv.providerUrl);
-      const ensConnect = await new EnsResolver({ provider });
-      statement = await ensConnect.resolve(statement);
+    if (argv.enableEnsExperiment && ens) {
+      statement = await ens.resolve(statement);
     }
 
     const res = await db.prepare(statement).all();

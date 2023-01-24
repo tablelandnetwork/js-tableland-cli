@@ -5,12 +5,10 @@ import EnsResolver from "../lib/EnsResolver.js";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { GlobalOptions } from "../cli.js";
 
-type LocalOptions = {
+export type Options = GlobalOptions & {
   name: string;
   baseUrl: string | undefined;
 };
-
-export type Options = LocalOptions & GlobalOptions;
 
 export const command = "schema <name>";
 export const desc = "Get info about a given table schema";
@@ -22,14 +20,14 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
   }) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  let { name, providerUrl, baseUrl } = argv;
+  const { name, providerUrl, baseUrl } = argv;
 
-  if (argv.enableEnsExperiment) {
-    const ensRes = new EnsResolver({
-      provider: new JsonRpcProvider(providerUrl),
-    });
-    name = await ensRes.resolveTable(name);
-  }
+  // if (argv.enableEnsExperiment) {
+  //   const ensRes = new EnsResolver({
+  //     provider: new JsonRpcProvider(providerUrl),
+  //   });
+  //   name = await ensRes.resolveTable(name);
+  // }
 
   const parts = name.split("_");
   if (parts.length < 3) {

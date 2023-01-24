@@ -6,6 +6,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { commands } from "./commands/index.js";
 import { cosmiconfigSync } from "cosmiconfig";
+import { ChainName } from "@tableland/sdk";
 
 if (!globalThis.fetch) {
   (globalThis as any).fetch = fetch;
@@ -30,12 +31,15 @@ const config = explorer.search();
 // If a dotenv file (or exported env vars) are provided, these override any config values
 dotenv.config();
 
-export interface GlobalOptions {
+export type GlobalOptions = {
   privateKey: string;
-  chain: string;
-  enableEnsExperiment: boolean;
+  chain: ChainName;
   providerUrl: string;
-}
+  baseUrl: string;
+  verbose: boolean;
+  ensProviderUrl?: string;
+  enableEnsExperiment?: boolean;
+};
 
 // eslint-disable-next-line no-unused-vars
 const _argv = yargs(hideBin(process.argv))

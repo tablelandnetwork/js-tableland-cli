@@ -1,16 +1,11 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
-import { ChainName, Validator, getChainId } from "@tableland/sdk";
+import { Validator, getChainId } from "@tableland/sdk";
 import { getChains } from "../utils.js";
+import { GlobalOptions } from "../cli.js";
 
-export type Options = {
-  // Local
+export type Options = GlobalOptions & {
   hash: string;
-
-  // Global
-  privateKey: string;
-  chain: ChainName;
-  baseUrl: string | undefined;
 };
 
 export const command = "receipt <hash>";

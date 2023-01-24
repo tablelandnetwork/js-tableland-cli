@@ -1,9 +1,7 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
-import { getChainInfo, Validator } from "@tableland/sdk";
-import EnsResolver from "../lib/EnsResolver.js";
-import { JsonRpcProvider } from "@ethersproject/providers";
 import { GlobalOptions } from "../cli.js";
+import { setupCommand } from "../lib/commandSetup.js";
 
 type LocalOptions = {
   name: string;
@@ -22,13 +20,13 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
   }) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  let { name, providerUrl, baseUrl } = argv;
+  let { name } = argv;
+  const [tableId, chainId] = name.split("_").reverse();
 
-  if (argv.enableEnsExperiment) {
-    const ensRes = new EnsResolver({
-      provider: new JsonRpcProvider(providerUrl),
-    });
-    name = await ensRes.resolveTable(name);
+  const { ens, validator } = await setupCommand(argv, { readOnly: true });
+
+  if (argv.enableEnsExperiment && ens) {
+    name = await ens.resolveTable(name);
   }
 
   const parts = name.split("_");
@@ -40,20 +38,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     return;
   }
 
-  const [tableId, chainId] = name.split("_").reverse();
-
-  const chain = parseInt(chainId);
-  const network = getChainInfo(chain);
-
-  if (!network) {
-    console.error("unsupported chain (see `chains` command for details)");
-    return;
-  }
-
   try {
-    const validator = baseUrl
-      ? new Validator({ baseUrl })
-      : Validator.forChain(parseInt(chainId));
     const res = await validator.getTableById({
       tableId,
       chainId: parseInt(chainId),

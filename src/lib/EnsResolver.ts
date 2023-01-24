@@ -1,8 +1,9 @@
 import ethers, { Signer } from "ethers";
 import { ENS } from "@ensdomains/ensjs";
+import { JsonRpcProvider } from "@ethersproject/providers";
 
 interface EnsResolverOptions {
-  provider: ethers.providers.JsonRpcProvider;
+  ensProviderUrl: string;
   signer?: Signer;
 }
 
@@ -15,17 +16,14 @@ export default class EnsResolver {
   provider: ethers.providers.JsonRpcProvider;
   signer: Signer | undefined;
   ENS: ENS;
-  ready: Promise<boolean>;
 
   constructor(options: EnsResolverOptions) {
-    this.signer = options.signer;
-    this.provider = options.provider;
-    this.ENS = new ENS();
-    const getReady = async () => {
-      this.ENS.setProvider(this.provider);
-      return true;
-    };
-    this.ready = getReady();
+    const { signer, ensProviderUrl } = options;
+    if (!ensProviderUrl) throw new Error("No ensProviderUrl given");
+    this.signer = signer;
+    this.provider = new JsonRpcProvider(ensProviderUrl);
+
+    this.ENS = new ENS().withProvider(this.provider);
   }
 
   async resolveTable(tablename: string): Promise<string> {
@@ -39,11 +37,11 @@ export default class EnsResolver {
   }
 
   async isOwner(domain: string) {
-    await this.ready;
-    if (this.signer === undefined) throw new Error("No signer");
+    const signer = this.provider.getSigner();
+    if (signer === undefined) throw new Error("No signer");
     try {
       const record = await this.ENS.getOwner(domain);
-      if (record?.owner === (await this.signer.getAddress())) {
+      if (record?.owner === (await signer.getAddress())) {
         return true;
       }
     } catch (e) {
@@ -52,9 +50,10 @@ export default class EnsResolver {
   }
 
   async addTableRecords(domain: string, maps: TableMap[]) {
+    if (!(await this.isOwner(domain))) {
+      throw new Error("You don't own that ENS domain");
+    }
     try {
-      await this.ready;
-
       await this.ENS.setRecords(domain, {
         records: {
           texts: maps,

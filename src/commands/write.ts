@@ -1,23 +1,18 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
-import { ChainName, Database } from "@tableland/sdk";
+import { Database } from "@tableland/sdk";
 import { getWalletWithProvider, getLink } from "../utils.js";
 import { promises } from "fs";
 import { createInterface } from "readline";
 import EnsResolver from "../lib/EnsResolver.js";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import init from "@tableland/sqlparser";
+import { GlobalOptions } from "../cli.js";
 
-export type Options = {
+export type Options = GlobalOptions & {
   // Local
   statement?: string;
   file?: string;
-
-  // Global
-  privateKey: string;
-  chain: ChainName;
-  providerUrl: string | undefined;
-  baseUrl: string | undefined;
 };
 
 export const command = "write [statement]";
@@ -63,11 +58,11 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     }
     const db = new Database({ signer, baseUrl });
 
-    if (argv.enableEnsExperiment) {
-      const provider = new JsonRpcProvider(argv.providerUrl);
-      const ensConnect = await new EnsResolver({ provider });
-      statement = await ensConnect.resolve(statement);
-    }
+    // if (argv.enableEnsExperiment) {
+    //   const provider = new JsonRpcProvider(argv.providerUrl);
+    //   const ensConnect = await new EnsResolver({ provider });
+    //   statement = await ensConnect.resolve(statement);
+    // }
 
     const res = await db.prepare(statement).all();
 

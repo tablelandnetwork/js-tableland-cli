@@ -1,24 +1,17 @@
 import yargs, { Arguments, CommandBuilder } from "yargs";
 import cliSelect from "cli-select";
-import { ChainName, Database, Config } from "@tableland/sdk";
+import { Database, Config } from "@tableland/sdk";
 import chalk from "chalk";
 import { createInterface } from "readline";
 import { getChains, getWalletWithProvider } from "../utils.js";
 import init from "@tableland/sqlparser";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import EnsResolver from "../lib/EnsResolver.js";
+import { GlobalOptions } from "../cli.js";
 
-export type Options = {
-  // Local
+export type Options = GlobalOptions & {
   statement?: string;
   format: "pretty" | "table" | "objects";
-
-  // Global
-  chain: ChainName;
-  privateKey: string;
-  providerUrl: string | undefined;
-  verbose: boolean;
-  baseUrl: string | undefined;
 };
 
 export const command = "shell [statement]";
@@ -79,18 +72,18 @@ async function fireFullQuery(
   try {
     const { type } = await globalThis.sqlparser.normalize(statement);
 
-    if (argv.enableEnsExperiment) {
-      // TODO: Using same wallet as tableland instead of just provider
-      const signer = getWalletWithProvider({
-        privateKey,
-        chain,
-        providerUrl,
-      });
+    // if (argv.enableEnsExperiment) {
+    //   // TODO: Using same wallet as tableland instead of just provider
+    //   const signer = getWalletWithProvider({
+    //     privateKey,
+    //     chain,
+    //     providerUrl,
+    //   });
 
-      const provider = new JsonRpcProvider(argv.providerUrl);
-      const ensConnect = await new EnsResolver({ provider, signer });
-      statement = await ensConnect.resolve(statement);
-    }
+    //   const provider = new JsonRpcProvider(argv.providerUrl);
+    //   const ensConnect = await new EnsResolver({ provider, signer });
+    //   statement = await ensConnect.resolve(statement);
+    // }
 
     let stmt;
     let confirm: any = true;

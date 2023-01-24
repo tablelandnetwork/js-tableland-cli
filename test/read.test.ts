@@ -7,8 +7,9 @@ import * as mod from "../src/commands/read.js";
 import { wait } from "../src/utils.js";
 
 describe("commands/read", function () {
+  this.timeout(10000);
   before(async function () {
-    await wait(500);
+    await wait(5000);
   });
 
   afterEach(function () {

@@ -1,17 +1,12 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
-import { ChainName, Registry } from "@tableland/sdk";
+import { Registry } from "@tableland/sdk";
 import { getWalletWithProvider, getLink } from "../utils.js";
-export type Options = {
-  // Local
+import { GlobalOptions } from "../cli.js";
+
+export type Options = GlobalOptions & {
   name: string;
   controller: string;
-
-  // Global
-  privateKey: string;
-  chain: ChainName;
-  providerUrl: string | undefined;
-  baseUrl: string | undefined;
 };
 
 export const command = "controller <sub>";

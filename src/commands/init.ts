@@ -5,8 +5,9 @@ import { resolve, dirname } from "path";
 import { mkdirSync, createWriteStream, WriteStream } from "fs";
 import inquirer from "inquirer";
 import { getChains } from "../utils.js";
+import { GlobalOptions } from "../cli.js";
 
-export type Options = {
+export type Options = GlobalOptions & {
   // Local
   yes: boolean;
   format: "json" | "yaml" | "yml";

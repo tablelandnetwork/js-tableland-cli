@@ -20,10 +20,10 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
   }) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
+  const { ens, validator } = await setupCommand(argv, { readOnly: true });
+
   let { name } = argv;
   const [tableId, chainId] = name.split("_").reverse();
-
-  const { ens, validator } = await setupCommand(argv, { readOnly: true });
 
   if (argv.enableEnsExperiment && ens) {
     name = await ens.resolveTable(name);

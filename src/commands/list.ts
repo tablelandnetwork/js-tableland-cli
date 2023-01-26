@@ -19,20 +19,21 @@ export const builder: CommandBuilder<{}, Options> = (yargs) => {
 };
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  const { registry } = await setupCommand(argv);
-  const { privateKey } = argv;
-  let { address } = argv;
-
-  if (!address) {
-    if (privateKey) {
-      address = new Wallet(privateKey).address;
-    } else {
-      console.error("must supply `--privateKey` or `address` positional");
-      return;
-    }
-  }
-
   try {
+    const { privateKey } = argv;
+    let { address } = argv;
+
+    if (!address) {
+      if (privateKey) {
+        address = new Wallet(privateKey).address;
+      } else {
+        console.error("must supply `--privateKey` or `address` positional");
+        return;
+      }
+    }
+
+    const { registry } = await setupCommand(argv);
+
     const res = await registry.listTables(address);
 
     console.log(res);

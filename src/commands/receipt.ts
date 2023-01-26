@@ -1,8 +1,8 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
-import { Validator, getChainId } from "@tableland/sdk";
-import { getChains } from "../utils.js";
+import { getChainId } from "@tableland/sdk";
 import { GlobalOptions } from "../cli.js";
+import { setupCommand } from "../lib/commandSetup.js";
 
 export type Options = GlobalOptions & {
   hash: string;
@@ -19,17 +19,10 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
   }) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  const { hash, chain, baseUrl } = argv;
-
-  const network = getChains()[chain];
-  if (!network) {
-    console.error("unsupported chain (see `chains` command for details)");
-    return;
-  }
-
   try {
-    const v = baseUrl ? new Validator({ baseUrl }) : Validator.forChain(chain);
-    const res = await v.receiptByTransactionHash({
+    const { hash, chain } = argv;
+    const { validator } = await setupCommand(argv);
+    const res = await validator.receiptByTransactionHash({
       chainId: getChainId(chain),
       transactionHash: hash,
     });

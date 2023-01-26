@@ -1,13 +1,10 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
-import { Database } from "@tableland/sdk";
-import { getWalletWithProvider, getLink } from "../utils.js";
+import { getLink } from "../utils.js";
 import { promises } from "fs";
 import { createInterface } from "readline";
-import EnsResolver from "../lib/EnsResolver.js";
-import { JsonRpcProvider } from "@ethersproject/providers";
-import init from "@tableland/sqlparser";
 import { GlobalOptions } from "../cli.js";
+import { setupCommand } from "../lib/commandSetup.js";
 
 export type Options = GlobalOptions & {
   // Local
@@ -32,16 +29,10 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   let { statement } = argv;
-  const { privateKey, chain, providerUrl, file, baseUrl } = argv;
-  await init();
+  const { chain, file } = argv;
 
   try {
-    const signer = getWalletWithProvider({
-      privateKey,
-      chain,
-      providerUrl,
-    });
-
+    const { database, ens } = await setupCommand(argv);
     if (file != null) {
       statement = await promises.readFile(file, { encoding: "utf-8" });
     } else if (statement == null) {
@@ -56,15 +47,12 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       );
       return;
     }
-    const db = new Database({ signer, baseUrl });
 
-    // if (argv.enableEnsExperiment) {
-    //   const provider = new JsonRpcProvider(argv.providerUrl);
-    //   const ensConnect = await new EnsResolver({ provider });
-    //   statement = await ensConnect.resolve(statement);
-    // }
+    if (argv.enableEnsExperiment && ens) {
+      statement = await ens.resolve(statement);
+    }
 
-    const res = await db.prepare(statement).all();
+    const res = await database.prepare(statement).all();
 
     const link = getLink(chain, res?.meta?.txn?.transactionHash as string);
     const out = { ...res, link };

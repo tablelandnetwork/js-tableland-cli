@@ -1,9 +1,8 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
 import { Wallet } from "ethers";
-import { Registry } from "@tableland/sdk";
-import { getChains, getWalletWithProvider } from "../utils.js";
 import { GlobalOptions } from "../cli.js";
+import { setupCommand } from "../lib/commandSetup.js";
 
 export type Options = GlobalOptions & {
   address: string;
@@ -20,7 +19,8 @@ export const builder: CommandBuilder<{}, Options> = (yargs) => {
 };
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  const { privateKey, chain, providerUrl } = argv;
+  const { registry } = await setupCommand(argv);
+  const { privateKey } = argv;
   let { address } = argv;
 
   if (!address) {
@@ -31,21 +31,9 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       return;
     }
   }
-  const network = getChains()[chain];
-  if (!network) {
-    console.error("unsupported chain (see `chains` command for details)");
-    return;
-  }
 
   try {
-    const signer = getWalletWithProvider({
-      privateKey,
-      chain,
-      providerUrl,
-    });
-    const reg = new Registry({ signer });
-
-    const res = await reg.listTables(address);
+    const res = await registry.listTables(address);
 
     console.log(res);
     /* c8 ignore next 3 */

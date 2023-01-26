@@ -1,9 +1,9 @@
-import { Database, Registry, Validator } from "@tableland/sdk";
+import { ChainInfo, Database, Registry, Validator } from "@tableland/sdk";
 import init from "@tableland/sqlparser";
 import { Signer } from "ethers";
-import { GlobalOptions } from "../cli";
-import { getChains, getWalletWithProvider } from "../utils";
-import EnsResolver from "./EnsResolver";
+import { GlobalOptions } from "../cli.js";
+import { getChains, getWalletWithProvider } from "../utils.js";
+import EnsResolver from "./EnsResolver.js";
 
 export type ConnectionsOptions = { readOnly: boolean };
 
@@ -13,9 +13,15 @@ export class Connections {
   _signer: Signer | undefined;
   _registry: Registry | undefined;
   _ens: EnsResolver | undefined;
+  _network: ChainInfo;
 
   get ens(): EnsResolver | undefined {
     return this._ens;
+  }
+
+  get registry(): Registry {
+    if (!this._registry) throw new Error("No registry");
+    return this._registry;
   }
 
   get validator(): Validator {
@@ -37,6 +43,10 @@ export class Connections {
         "No database defined. You must specify a providerUrl or chain."
       );
     return this._database;
+  }
+
+  get network(): ChainInfo {
+    return this._network;
   }
 
   constructor(
@@ -70,10 +80,11 @@ export class Connections {
       });
     }
 
-    const network = getChains()[chain];
-    if (!network) {
+    this._network = getChains()[chain];
+    if (!this._network) {
       console.error("unsupported chain (see `chains` command for details)");
     }
+    if (signer) this._registry = new Registry({ signer });
 
     this._database =
       readOnly && !baseUrl

@@ -1,7 +1,7 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
 import { Wallet } from "ethers";
-import { ChainName, Registry } from "@tableland/sdk";
+import { helpers, Registry } from "@tableland/sdk";
 import { getChains, getWalletWithProvider } from "../utils.js";
 
 export type Options = {
@@ -10,7 +10,7 @@ export type Options = {
 
   // Global
   privateKey: string;
-  chain: ChainName;
+  chain: helpers.ChainName;
   providerUrl: string;
 };
 

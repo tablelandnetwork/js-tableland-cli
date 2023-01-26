@@ -1,6 +1,6 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
-import { ChainName, Validator, getChainId } from "@tableland/sdk";
+import { helpers, Validator } from "@tableland/sdk";
 import { getChains } from "../utils.js";
 
 export type Options = {
@@ -9,7 +9,7 @@ export type Options = {
 
   // Global
   privateKey: string;
-  chain: ChainName;
+  chain: helpers.ChainName;
   baseUrl: string | undefined;
 };
 
@@ -35,7 +35,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   try {
     const v = baseUrl ? new Validator({ baseUrl }) : Validator.forChain(chain);
     const res = await v.receiptByTransactionHash({
-      chainId: getChainId(chain),
+      chainId: helpers.getChainId(chain),
       transactionHash: hash,
     });
     console.log(res);

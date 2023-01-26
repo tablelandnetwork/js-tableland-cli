@@ -1,23 +1,23 @@
 import { Wallet, providers, getDefaultProvider } from "ethers";
-import { ChainName, getChainInfo, supportedChains } from "@tableland/sdk";
+import { helpers } from "@tableland/sdk";
 
 export const getChains = () =>
   Object.fromEntries(
-    Object.entries(supportedChains).filter(
+    Object.entries(helpers.supportedChains).filter(
       ([name]) => !name.includes("staging")
     )
   );
 
 export interface Options {
   privateKey: string;
-  chain: ChainName;
+  chain: helpers.ChainName;
   providerUrl: string | undefined;
 }
 
 export const wait = (timeout: number) =>
   new Promise((resolve) => setTimeout(resolve, timeout));
 
-export function getLink(chain: ChainName, hash: string): string {
+export function getLink(chain: helpers.ChainName, hash: string): string {
   /* c8 ignore start */
   if (chain.includes("ethereum")) {
     if (chain.includes("goerli")) {
@@ -52,7 +52,7 @@ export function getWalletWithProvider({
   if (privateKey == null) {
     throw new Error("missing required flag (`-k` or `--privateKey`)");
   }
-  const network: any = getChainInfo(chain);
+  const network: any = helpers.getChainInfo(chain);
   if (network == null) {
     throw new Error("unsupported chain (see `chains` command for details)");
   }

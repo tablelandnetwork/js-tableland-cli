@@ -1,5 +1,5 @@
 import type { Arguments, CommandBuilder } from "yargs";
-import { Database, ChainName } from "@tableland/sdk";
+import { Database, helpers } from "@tableland/sdk";
 import yargs from "yargs";
 import { promises } from "fs";
 import { createInterface } from "readline";
@@ -12,7 +12,7 @@ export type Options = {
   file?: string;
 
   // Global
-  chain: ChainName;
+  chain: helpers.ChainName;
   baseUrl: string | undefined;
 };
 

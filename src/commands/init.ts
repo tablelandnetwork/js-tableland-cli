@@ -15,7 +15,7 @@ export type Options = {
 
 const defaults = {
   chain: "maticmum",
-  rpcRelay: false,
+  // rpcRelay: false,
 };
 
 const moduleName = "tableland";

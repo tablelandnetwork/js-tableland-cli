@@ -1,6 +1,6 @@
 import yargs, { Arguments, CommandBuilder } from "yargs";
 import cliSelect from "cli-select";
-import { ChainName, Database, Config } from "@tableland/sdk";
+import { helpers, Database } from "@tableland/sdk";
 import chalk from "chalk";
 import { createInterface } from "readline";
 import { getChains, getWalletWithProvider } from "../utils.js";
@@ -12,7 +12,7 @@ export type Options = {
   format: "pretty" | "table" | "objects";
 
   // Global
-  chain: ChainName;
+  chain: helpers.ChainName;
   privateKey: string;
   providerUrl: string | undefined;
   verbose: boolean;
@@ -189,7 +189,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       chain,
       providerUrl,
     });
-    const options: Config = {
+    const options: helpers.Config = {
       signer,
       baseUrl,
     };

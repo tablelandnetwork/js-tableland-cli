@@ -2,7 +2,7 @@ import { helpers, Database, Registry, Validator } from "@tableland/sdk";
 import init from "@tableland/sqlparser";
 import { Signer } from "ethers";
 import { GlobalOptions } from "../cli.js";
-import { getChains, getWalletWithProvider } from "../utils.js";
+import { getWalletWithProvider } from "../utils.js";
 import EnsResolver from "./EnsResolver.js";
 
 export type ConnectionsOptions = { readOnly: boolean };
@@ -13,7 +13,7 @@ export class Connections {
   _signer: Signer | undefined;
   _registry: Registry | undefined;
   _ens: EnsResolver | undefined;
-  _network: helpers.ChainInfo;
+  _network: helpers.ChainInfo | undefined;
 
   get ens(): EnsResolver | undefined {
     return this._ens;
@@ -46,6 +46,7 @@ export class Connections {
   }
 
   get network(): helpers.ChainInfo {
+    if (!this._network) throw new Error("No network");
     return this._network;
   }
 
@@ -79,11 +80,12 @@ export class Connections {
         signer,
       });
     }
-
-    this._network = getChains()[chain];
-    if (!this._network) {
+    try {
+      this._network = helpers.getChainInfo(chain);
+    } catch (e) {
       console.error("unsupported chain (see `chains` command for details)");
     }
+
     if (signer) this._registry = new Registry({ signer });
 
     this._database =

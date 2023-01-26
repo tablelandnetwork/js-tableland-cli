@@ -52,8 +52,10 @@ export function getWalletWithProvider({
   if (privateKey == null) {
     throw new Error("missing required flag (`-k` or `--privateKey`)");
   }
-  const network: any = helpers.getChainInfo(chain);
-  if (network == null) {
+  let network: helpers.ChainInfo;
+  try {
+    network = helpers.getChainInfo(chain);
+  } catch (e) {
     throw new Error("unsupported chain (see `chains` command for details)");
   }
 
@@ -67,7 +69,7 @@ export function getWalletWithProvider({
   /* c8 ignore start */
   if (!provider) {
     // This will be significantly rate limited, but we only need to run it once
-    provider = getDefaultProvider(network);
+    provider = getDefaultProvider({ ...network, name: network.chainName });
   }
   if (!provider) {
     throw new Error("unable to create ETH API provider");

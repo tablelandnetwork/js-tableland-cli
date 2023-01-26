@@ -6,7 +6,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { commands } from "./commands/index.js";
 import { cosmiconfigSync } from "cosmiconfig";
-import { ChainName } from "@tableland/sdk";
+import { helpers } from "@tableland/sdk";
 
 if (!globalThis.fetch) {
   (globalThis as any).fetch = fetch;
@@ -33,7 +33,7 @@ dotenv.config();
 
 export type GlobalOptions = {
   privateKey: string;
-  chain: ChainName;
+  chain: helpers.ChainName;
   providerUrl: string;
   baseUrl: string;
   verbose: boolean;

@@ -1,6 +1,6 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
-import { getChainId } from "@tableland/sdk";
+import { helpers } from "@tableland/sdk";
 import { GlobalOptions } from "../cli.js";
 import { setupCommand } from "../lib/commandSetup.js";
 
@@ -23,7 +23,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     const { hash, chain } = argv;
     const { validator } = await setupCommand(argv);
     const res = await validator.receiptByTransactionHash({
-      chainId: getChainId(chain),
+      chainId: helpers.getChainId(chain),
       transactionHash: hash,
     });
     console.log(res);

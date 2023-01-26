@@ -1,4 +1,4 @@
-import { ChainInfo, Database, Registry, Validator } from "@tableland/sdk";
+import { helpers, Database, Registry, Validator } from "@tableland/sdk";
 import init from "@tableland/sqlparser";
 import { Signer } from "ethers";
 import { GlobalOptions } from "../cli.js";
@@ -13,7 +13,7 @@ export class Connections {
   _signer: Signer | undefined;
   _registry: Registry | undefined;
   _ens: EnsResolver | undefined;
-  _network: ChainInfo;
+  _network: helpers.ChainInfo;
 
   get ens(): EnsResolver | undefined {
     return this._ens;
@@ -45,7 +45,7 @@ export class Connections {
     return this._database;
   }
 
-  get network(): ChainInfo {
+  get network(): helpers.ChainInfo {
     return this._network;
   }
 

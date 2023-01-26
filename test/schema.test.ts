@@ -22,6 +22,7 @@ describe("commands/schema", function () {
   });
 
   test("throws with invalid chain", async function () {
+    // TODO: Figure out how to test this error.
     const consoleError = spy(console, "error");
     await yargs(["schema", "valid_9999_0"]).command(mod).parse();
     assert.calledWith(

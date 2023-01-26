@@ -28,10 +28,7 @@ describe("commands/info", function () {
     // TODO: Figure out how to test this error.
     const consoleError = spy(console, "error");
     await yargs(["info", "valid_9999_0"]).command(mod).parse();
-    assert.calledWith(
-      consoleError,
-      "unsupported chain (see `chains` command for details)"
-    );
+    assert.calledWith(consoleError, "cannot use unsupported chain: 9999");
   });
 
   test("Info passes with local-tableland", async function () {

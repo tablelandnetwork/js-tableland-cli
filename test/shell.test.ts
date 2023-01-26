@@ -47,10 +47,7 @@ describe("commands/shell", function () {
     const privateKey = account.privateKey.slice(2);
     const consoleError = spy(console, "error");
     await yargs(["shell", "--privateKey", privateKey]).command(mod).parse();
-    assert.calledWith(
-      consoleError,
-      "unsupported chain (see `chains` command for details)"
-    );
+    assert.calledWith(consoleError, `cannot use unsupported chain: undefined`);
   });
 
   test("Custom baseUrl is called", async function () {

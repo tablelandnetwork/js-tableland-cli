@@ -24,10 +24,7 @@ describe("commands/receipt", function () {
     await yargs(["receipt", "--privateKey", privateKey, "ignored"])
       .command(mod)
       .parse();
-    assert.calledWith(
-      consoleError,
-      "unsupported chain (see `chains` command for details)"
-    );
+    assert.calledWith(consoleError, `cannot use unsupported chain: undefined`);
   });
 
   test("throws with invalid tx hash", async function () {

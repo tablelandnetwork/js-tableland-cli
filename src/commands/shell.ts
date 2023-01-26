@@ -4,7 +4,7 @@ import { helpers, Database } from "@tableland/sdk";
 import chalk from "chalk";
 import { createInterface } from "readline";
 import { getChains, getWalletWithProvider } from "../utils.js";
-import init from "@tableland/sqlparser";
+import { init } from "@tableland/sqlparser";
 
 export type Options = {
   // Local
@@ -198,7 +198,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
 
     const network: any = getChains()[chain];
     if (!network) {
-      console.error("unsupported chain (see `chains` command for details)");
+      console.error(`cannot use unsupported chain: ${chain}`);
     }
 
     console.log("Welcome to Tableland");

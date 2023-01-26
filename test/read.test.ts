@@ -18,10 +18,7 @@ describe("commands/read", function () {
   test("throws with invalid chain", async function () {
     const consoleError = spy(console, "error");
     await yargs(["read", "select * from something;"]).command(mod).parse();
-    assert.calledWith(
-      consoleError,
-      "unsupported chain (see `chains` command for details)"
-    );
+    assert.calledWith(consoleError, "cannot use unsupported chain: undefined");
   });
 
   test("throws with invalid statement", async function () {

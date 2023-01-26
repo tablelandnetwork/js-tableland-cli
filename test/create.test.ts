@@ -39,10 +39,7 @@ describe("commands/create", function () {
     ])
       .command(mod)
       .parse();
-    assert.calledWith(
-      consoleError,
-      "unsupported chain (see `chains` command for details)"
-    );
+    assert.calledWith(consoleError, "cannot use unsupported chain: undefined");
   });
 
   test("throws with invalid statement", async function () {

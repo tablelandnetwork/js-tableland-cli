@@ -28,7 +28,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
 
   const network = getChains()[chain];
   if (!network) {
-    console.error("unsupported chain (see `chains` command for details)");
+    console.error(`cannot use unsupported chain: ${chain}`);
     return;
   }
 

@@ -27,10 +27,7 @@ describe("commands/list", function () {
     const privateKey = account.privateKey.slice(2);
     const consoleError = spy(console, "error");
     await yargs(["list", "--privateKey", privateKey]).command(mod).parse();
-    assert.calledWith(
-      consoleError,
-      "unsupported chain (see `chains` command for details)"
-    );
+    assert.calledWith(consoleError, `cannot use unsupported chain: undefined`);
   });
 
   test("throws with custom network", async function () {
@@ -40,10 +37,7 @@ describe("commands/list", function () {
     await yargs(["list", "--chain", "custom", "--privateKey", privateKey])
       .command(mod)
       .parse();
-    assert.calledWith(
-      consoleError,
-      "unsupported chain (see `chains` command for details)"
-    );
+    assert.calledWith(consoleError, `cannot use unsupported chain: custom`);
   });
 
   test("List passes with local-tableland", async function () {

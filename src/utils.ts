@@ -54,7 +54,7 @@ export function getWalletWithProvider({
   }
   const network: any = helpers.getChainInfo(chain);
   if (network == null) {
-    throw new Error("unsupported chain (see `chains` command for details)");
+    throw new Error(`cannot use unsupported chain: ${chain}`);
   }
 
   const wallet = new Wallet(privateKey);

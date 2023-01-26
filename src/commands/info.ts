@@ -30,14 +30,15 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   }
 
   const chain = parseInt(chainId);
-  const network = helpers.getChainInfo(chain);
-
-  if (!network) {
-    console.error("unsupported chain (see `chains` command for details)");
-    return;
-  }
 
   try {
+    const network = helpers.getChainInfo(chain);
+
+    if (network == null) {
+      console.error(`cannot use unsupported chain: ${chain}`);
+      return;
+    }
+
     const validator = baseUrl
       ? new Validator({ baseUrl })
       : Validator.forChain(parseInt(chainId));

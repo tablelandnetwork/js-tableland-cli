@@ -20,25 +20,25 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
   }) as yargs.Argv<Options>;
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
-  const { ens, validator } = await setupCommand(argv, { readOnly: true });
-
-  let { name } = argv;
-  const [tableId, chainId] = name.split("_").reverse();
-
-  if (argv.enableEnsExperiment && ens) {
-    name = await ens.resolveTable(name);
-  }
-
-  const parts = name.split("_");
-
-  if (parts.length < 3) {
-    console.error(
-      "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
-    );
-    return;
-  }
-
   try {
+    const { ens, validator } = await setupCommand(argv, { readOnly: true });
+
+    let { name } = argv;
+    const [tableId, chainId] = name.split("_").reverse();
+
+    if (argv.enableEnsExperiment && ens) {
+      name = await ens.resolveTable(name);
+    }
+
+    const parts = name.split("_");
+
+    if (parts.length < 3) {
+      console.error(
+        "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
+      );
+      return;
+    }
+
     const res = await validator.getTableById({
       tableId,
       chainId: parseInt(chainId),

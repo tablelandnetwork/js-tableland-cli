@@ -4,9 +4,9 @@ import { Wallet } from "ethers";
 import { GlobalOptions } from "../cli.js";
 import { setupCommand } from "../lib/commandSetup.js";
 
-export type Options = GlobalOptions & {
+export interface Options extends GlobalOptions {
   address: string;
-};
+}
 
 export const command = "list [address]";
 export const desc = "List tables by address";

@@ -3,9 +3,9 @@ import { GlobalOptions } from "../cli.js";
 import { getChains } from "../utils.js";
 import type yargs from "yargs";
 
-export type Options = GlobalOptions & {
+export interface Options extends GlobalOptions {
   // empty
-};
+}
 
 export const command = "chains";
 export const desc = "List information about supported chains";

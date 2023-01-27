@@ -6,11 +6,11 @@ import { promises } from "fs";
 import { GlobalOptions } from "../cli.js";
 import { setupCommand } from "../lib/commandSetup.js";
 
-export type Options = GlobalOptions & {
+export interface Options extends GlobalOptions {
   schema?: string;
   prefix?: string;
   file?: string;
-};
+}
 
 export const command = "create [schema]";
 export const desc = "Create a new table";

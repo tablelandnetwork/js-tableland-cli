@@ -5,13 +5,13 @@ import { createInterface } from "readline";
 import { GlobalOptions } from "../cli.js";
 import { setupCommand } from "../lib/commandSetup.js";
 
-export type Options = GlobalOptions & {
+export interface Options extends GlobalOptions {
   statement?: string;
   format: "pretty" | "table" | "objects";
   file?: string;
   providerUrl: string;
   privateKey?: string;
-};
+}
 
 export const command = "read [statement]";
 export const desc = "Run a read-only query against a remote table";

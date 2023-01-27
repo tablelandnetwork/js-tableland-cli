@@ -1,5 +1,5 @@
 import { helpers, Database, Registry, Validator } from "@tableland/sdk";
-import init from "@tableland/sqlparser";
+import { init } from "@tableland/sqlparser";
 import { Signer } from "ethers";
 import { GlobalOptions } from "../cli.js";
 import { getWalletWithProvider } from "../utils.js";

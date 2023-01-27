@@ -3,12 +3,12 @@ import type { Arguments, CommandBuilder } from "yargs";
 import { GlobalOptions } from "../cli.js";
 import { setupCommand } from "../lib/commandSetup.js";
 
-export type Options = GlobalOptions & {
+export interface Options extends GlobalOptions {
   domain: string;
   mappings: string[];
   get: boolean;
   set: boolean;
-};
+}
 
 export const command = "namespace <domain> [mappings..]";
 export const desc = "Get info about a given table by name";

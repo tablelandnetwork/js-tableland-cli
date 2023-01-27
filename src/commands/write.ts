@@ -6,11 +6,10 @@ import { createInterface } from "readline";
 import { GlobalOptions } from "../cli.js";
 import { setupCommand } from "../lib/commandSetup.js";
 
-export type Options = GlobalOptions & {
-  // Local
+export interface Options extends GlobalOptions {
   statement?: string;
   file?: string;
-};
+}
 
 export const command = "write [statement]";
 export const desc = "Run a mutating SQL statement against a remote table";

@@ -6,10 +6,10 @@ import { createInterface } from "readline";
 import { GlobalOptions } from "../cli.js";
 import { Connections, setupCommand } from "../lib/commandSetup.js";
 
-export type Options = GlobalOptions & {
+export interface Options extends GlobalOptions {
   statement?: string;
   format: "pretty" | "table" | "objects";
-};
+}
 
 export const command = "shell [statement]";
 export const desc =

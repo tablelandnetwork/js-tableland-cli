@@ -4,10 +4,10 @@ import { Registry } from "@tableland/sdk";
 import { getWalletWithProvider, getLink } from "../utils.js";
 import { GlobalOptions } from "../cli.js";
 
-export type Options = GlobalOptions & {
+export interface Options extends GlobalOptions {
   name: string;
   controller: string;
-};
+}
 
 export const command = "controller <sub>";
 export const desc =

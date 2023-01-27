@@ -3,10 +3,10 @@ import type { Arguments, CommandBuilder } from "yargs";
 import { GlobalOptions } from "../cli.js";
 import { setupCommand } from "../lib/commandSetup.js";
 
-export type Options = GlobalOptions & {
+export interface Options extends GlobalOptions {
   name: string;
   baseUrl: string | undefined;
-};
+}
 
 export const command = "schema <name>";
 export const desc = "Get info about a given table schema";

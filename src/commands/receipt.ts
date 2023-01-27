@@ -4,9 +4,9 @@ import { helpers } from "@tableland/sdk";
 import { GlobalOptions } from "../cli.js";
 import { setupCommand } from "../lib/commandSetup.js";
 
-export type Options = GlobalOptions & {
+export interface Options extends GlobalOptions {
   hash: string;
-};
+}
 
 export const command = "receipt <hash>";
 export const desc =

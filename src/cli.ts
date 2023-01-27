@@ -66,6 +66,10 @@ const _argv = yargs(hideBin(process.argv))
     type: "boolean",
     description: "Enable ENS experiment",
   })
+  .option("ensProviderUrl", {
+    type: "string",
+    description: "Enable ENS experiment",
+  })
   .option("baseUrl", {
     type: "string",
     description: "The URL of your Tableland validator",

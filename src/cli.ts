@@ -31,7 +31,7 @@ const config = explorer.search();
 // If a dotenv file (or exported env vars) are provided, these override any config values
 dotenv.config();
 
-export type GlobalOptions = {
+export interface GlobalOptions {
   privateKey: string;
   chain: helpers.ChainName;
   providerUrl: string;
@@ -39,7 +39,7 @@ export type GlobalOptions = {
   verbose: boolean;
   ensProviderUrl?: string;
   enableEnsExperiment?: boolean;
-};
+}
 
 // eslint-disable-next-line no-unused-vars
 const _argv = yargs(hideBin(process.argv))

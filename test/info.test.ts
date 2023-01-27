@@ -26,9 +26,9 @@ describe("commands/info", function () {
     );
   });
 
-  test("throws with invalid chain", async function () {
+  test("info throws with invalid chain", async function () {
     const consoleError = spy(console, "error");
-    await yargs(["info", "valid_9999_0", "--chain", "local-tabbleland"])
+    await yargs(["info", "valid_9999_0", "--chain", "local-tableland"])
       .command(mod)
       .parse();
     assert.calledWith(

@@ -10,7 +10,6 @@ export interface Options extends GlobalOptions {
   format: "pretty" | "table" | "objects";
   file?: string;
   providerUrl: string;
-  privateKey?: string;
 }
 
 export const command = "read [statement]";

@@ -5,7 +5,6 @@ import { setupCommand } from "../lib/commandSetup.js";
 
 export interface Options extends GlobalOptions {
   name: string;
-  baseUrl: string | undefined;
 }
 
 export const command = "schema <name>";

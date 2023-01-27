@@ -14,9 +14,7 @@ describe("commands/schema", function () {
 
   test("throws without invalid table name", async function () {
     const consoleError = spy(console, "error");
-    await yargs(["schema", "invalid_name", "--chain", "local-tableland"])
-      .command(mod)
-      .parse();
+    await yargs(["schema", "invalid_name"]).command(mod).parse();
     assert.calledWith(
       consoleError,
       "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
@@ -25,9 +23,7 @@ describe("commands/schema", function () {
 
   test("throws with invalid chain", async function () {
     const consoleError = spy(console, "error");
-    await yargs(["schema", "valid_9999_0", "--chain", "local-tabd"])
-      .command(mod)
-      .parse();
+    await yargs(["schema", "valid_9999_0"]).command(mod).parse();
     assert.calledWith(
       consoleError,
       "unsupported chain (see `chains` command for details)"
@@ -36,17 +32,13 @@ describe("commands/schema", function () {
 
   test("throws with missing table", async function () {
     const consoleError = spy(console, "error");
-    await yargs(["schema", "ignored_31337_99", "--chain", "local-tableland"])
-      .command(mod)
-      .parse();
+    await yargs(["schema", "ignored_31337_99"]).command(mod).parse();
     assert.calledWith(consoleError, "Not Found");
   });
 
   test("Schema passes with local-tableland", async function () {
     const consoleDir = spy(console, "dir");
-    await yargs(["schema", "healthbot_31337_1", "--chain", "local-tableland"])
-      .command(mod)
-      .parse();
+    await yargs(["schema", "healthbot_31337_1"]).command(mod).parse();
     assert.calledWith(consoleDir, {
       columns: [{ name: "counter", type: "integer" }],
     });

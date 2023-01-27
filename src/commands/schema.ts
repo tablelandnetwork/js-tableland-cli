@@ -18,14 +18,11 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   try {
-    const { validator, ens } = await setupCommand(argv, { readOnly: true });
-    let { name } = argv;
-
-    if (argv.enableEnsExperiment && ens) {
-      name = await ens.resolveTable(name);
-    }
+    const { name } = argv;
+    const [tableId, chainId] = name.split("_").reverse();
 
     const parts = name.split("_");
+
     if (parts.length < 3) {
       console.error(
         "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
@@ -33,12 +30,14 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       return;
     }
 
-    const tableId = parts.pop() as string;
-    const chainId = parseInt(parts.pop()!);
+    const { validator } = await setupCommand(
+      { ...argv, chain: parseInt(chainId) as any },
+      { readOnly: true }
+    );
 
     const res = await validator.getTableById({
       tableId,
-      chainId,
+      chainId: parseInt(chainId),
     });
     console.dir(res.schema, { depth: null });
     /* c8 ignore next 3 */

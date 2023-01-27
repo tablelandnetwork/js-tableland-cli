@@ -23,7 +23,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
 
     const parts = name.split("_");
 
-    if (parts.length < 3) {
+    if (parts.length < 3 && !argv.enableEnsExperiment) {
       console.error(
         "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
       );

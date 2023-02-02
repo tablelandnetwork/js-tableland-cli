@@ -57,14 +57,14 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       };
     });
 
-    console.log("Domain", domain);
-    console.log("Records", records);
-
     if (await ens.addTableRecords(domain, records)) {
-      console.log("Successfully added table mapppings to ens");
-      mappings.forEach((mapping) => {
-        console.log(mapping);
-      });
+      const response = {
+        domain,
+        records,
+        mappings,
+      };
+
+      console.log(response);
     }
   }
 };

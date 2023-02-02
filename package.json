@@ -1,6 +1,6 @@
 {
   "name": "@tableland/cli",
-  "version": "4.0.0-pre7.0",
+  "version": "0.0.0",
   "description": "Tableland command line tools",
   "repository": "https://github.com/tablelandnetwork/js-tableland-cli",
   "publishConfig": {

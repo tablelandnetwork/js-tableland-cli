@@ -41,7 +41,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   if (set) {
     const records = mappings.map((entry: any) => {
       const [key, value] = entry.split("=");
-      console.log(entry);
+
       const keyRegex = /^[a-zA-Z0-9_]*$/;
       const valueRegex = /^[a-zA-Z_][a-zA-Z0-9_]*_[0-9]+_[0-9]+$/;
 

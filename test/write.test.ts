@@ -95,7 +95,7 @@ describe("commands/write", function () {
     const consoleError = spy(console, "error");
     setTimeout(() => {
       stdin.send("\n").end();
-    }, 0);
+    }, 100);
     await yargs([
       "write",
       "--chain",
@@ -176,7 +176,7 @@ describe("commands/write", function () {
     const stdin = mockStd.stdin();
     setTimeout(() => {
       stdin.send("update healthbot_31337_1 set counter=1;\n").end();
-    }, 0);
+    }, 100);
     await yargs([
       "write",
       "--chain",

@@ -95,7 +95,7 @@ describe("commands/create", function () {
     const consoleError = spy(console, "error");
     setTimeout(() => {
       stdin.send("\n").end();
-    }, 0);
+    }, 100);
     await yargs([
       "create",
       "--chain",
@@ -221,7 +221,7 @@ describe("commands/create", function () {
       stdin
         .send("create table stdin_test (id int primary key, name text);\n")
         .end();
-    }, 0);
+    }, 100);
     await yargs([
       "create",
       "--chain",

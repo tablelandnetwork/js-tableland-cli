@@ -14,7 +14,7 @@ export class Connections {
   _registry: Registry | undefined;
   _ens: EnsResolver | undefined;
   _network: helpers.ChainInfo | undefined;
-  _ready: Promise<boolean>;
+  _ready: Promise<void>;
   _readyResolved = false;
 
   ready() {
@@ -74,11 +74,8 @@ export class Connections {
     argv: GlobalOptions,
     options: { readOnly: boolean } = { readOnly: false }
   ) {
-    this._ready = new Promise((resolve, reject) => {
-      this.prepare(argv, options).then(() => {
-        resolve(true);
-        this._readyResolved = true;
-      });
+    this._ready = this.prepare(argv, options).then(() => {
+      this._readyResolved = true;
     });
   }
 

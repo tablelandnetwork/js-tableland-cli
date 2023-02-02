@@ -54,7 +54,7 @@ describe("commands/read", function () {
     const consoleError = spy(console, "error");
     setTimeout(() => {
       stdin.send("\n").end();
-    }, 0);
+    }, 100);
     await yargs(["read", "--chain", "local-tableland"]).command(mod).parse();
     assert.calledWith(
       consoleError,
@@ -130,7 +130,7 @@ describe("commands/read", function () {
     const stdin = mockStd.stdin();
     setTimeout(() => {
       stdin.send("select * from healthbot_31337_1;\n").end();
-    }, 0);
+    }, 100);
     await yargs([
       "read",
       "--chain",

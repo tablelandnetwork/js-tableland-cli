@@ -5,7 +5,6 @@ import type yargs from "yargs";
 
 export type Options = GlobalOptions;
   // empty
-}
 
 export const command = "chains";
 export const desc = "List information about supported chains";

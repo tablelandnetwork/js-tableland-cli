@@ -71,8 +71,12 @@ export function getWalletWithProvider({
     // This will be significantly rate limited, but we only need to run it once
     provider = getDefaultProvider({ ...network, name: network.chainName });
   }
+
   if (!provider) {
     throw new Error("unable to create ETH API provider");
+  }
+  if (provider.network.chainId !== network.chainId) {
+    throw new Error("Provider / chain mismatch.");
   }
   /* c8 ignore stop */
   return wallet.connect(provider);

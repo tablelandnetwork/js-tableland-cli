@@ -3,7 +3,7 @@ import { GlobalOptions } from "../cli.js";
 import { getChains } from "../utils.js";
 import type yargs from "yargs";
 
-export interface Options extends GlobalOptions {
+export type Options = GlobalOptions;
   // empty
 }
 

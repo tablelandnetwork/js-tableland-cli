@@ -11,7 +11,7 @@ export interface Options extends GlobalOptions {
 }
 
 export const command = "namespace <domain> [mappings..]";
-export const desc = "Get info about a given table by name";
+export const desc = "Manage ENS names for tables";
 
 export const builder: CommandBuilder<{}, Options> = (yargs) =>
   yargs

@@ -44,11 +44,11 @@ export function getLink(chain: helpers.ChainName, hash: string): string {
   /* c8 ignore stop */
 }
 
-export function getWalletWithProvider({
+export async function getWalletWithProvider({
   privateKey,
   chain,
   providerUrl,
-}: Options): Wallet {
+}: Options): Promise<Wallet> {
   if (privateKey == null) {
     throw new Error("missing required flag (`-k` or `--privateKey`)");
   }
@@ -75,11 +75,10 @@ export function getWalletWithProvider({
   if (!provider) {
     throw new Error("unable to create ETH API provider");
   }
-  (async () => {
-    if ((await provider.getNetwork()).chainId !== network.chainId) {
-      throw new Error("Provider / chain mismatch.");
-    }
-  })();
+
+  if ((await provider.getNetwork()).chainId !== network.chainId) {
+    throw new Error("Provider / chain mismatch.");
+  }
 
   /* c8 ignore stop */
   return wallet.connect(provider);

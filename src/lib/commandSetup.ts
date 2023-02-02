@@ -9,26 +9,44 @@ export type ConnectionsOptions = { readOnly: boolean };
 
 export class Connections {
   _database: Database | undefined;
-  _validator: Validator;
+  _validator: Validator | undefined;
   _signer: Signer | undefined;
   _registry: Registry | undefined;
   _ens: EnsResolver | undefined;
   _network: helpers.ChainInfo | undefined;
+  _ready: Promise<boolean>;
+  _readyResolved = false;
+
+  ready() {
+    return this._ready;
+  }
+
+  readyCheck() {
+    if (!this._readyResolved)
+      throw new Error(
+        "You must await the 'ready' method before using this class"
+      );
+  }
 
   get ens(): EnsResolver | undefined {
+    this.readyCheck();
     return this._ens;
   }
 
   get registry(): Registry {
+    this.readyCheck();
     if (!this._registry) throw new Error("No registry");
     return this._registry;
   }
 
   get validator(): Validator {
+    this.readyCheck();
+    if (!this._validator) throw new Error("No registry");
     return this._validator;
   }
 
   get signer(): Signer {
+    this.readyCheck();
     if (!this._signer) {
       throw new Error(
         "To send transactions, you need to specify a privateKey, providerUrl, and chain"
@@ -38,6 +56,7 @@ export class Connections {
   }
 
   get database(): Database {
+    this.readyCheck();
     if (!this._database)
       throw new Error(
         "No database defined. You must specify a providerUrl or chain."
@@ -46,11 +65,24 @@ export class Connections {
   }
 
   get network(): helpers.ChainInfo {
+    this.readyCheck();
     if (!this._network) throw new Error("No network");
     return this._network;
   }
 
   constructor(
+    argv: GlobalOptions,
+    options: { readOnly: boolean } = { readOnly: false }
+  ) {
+    this._ready = new Promise((resolve, reject) => {
+      this.prepare(argv, options).then(() => {
+        resolve(true);
+        this._readyResolved = true;
+      });
+    });
+  }
+
+  async prepare(
     argv: GlobalOptions,
     options: { readOnly: boolean } = { readOnly: false }
   ) {
@@ -66,7 +98,7 @@ export class Connections {
     let signer: Signer | undefined;
 
     if (!options.readOnly) {
-      signer = getWalletWithProvider({
+      signer = await getWalletWithProvider({
         privateKey,
         providerUrl,
         chain,
@@ -108,5 +140,7 @@ export async function setupCommand(
   options?: ConnectionsOptions
 ) {
   await init();
-  return new Connections(argv, options);
+  const connections = new Connections(argv, options);
+  await connections.ready();
+  return connections;
 }

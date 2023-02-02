@@ -27,7 +27,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
         const { name, chain, privateKey, providerUrl } = argv;
 
         try {
-          const signer = getWalletWithProvider({
+          const signer = await getWalletWithProvider({
             privateKey,
             chain,
             providerUrl,
@@ -60,7 +60,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
         const { name, controller, chain, privateKey, providerUrl } = argv;
 
         try {
-          const signer = getWalletWithProvider({
+          const signer = await getWalletWithProvider({
             privateKey,
             chain,
             providerUrl,
@@ -90,7 +90,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
         const { name, chain, privateKey, providerUrl } = argv;
 
         try {
-          const signer = getWalletWithProvider({
+          const signer = await getWalletWithProvider({
             privateKey,
             chain,
             providerUrl,

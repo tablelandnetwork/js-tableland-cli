@@ -71,9 +71,9 @@ async function fireFullQuery(
     try {
       stmt = database.prepare(statement);
       const response = await stmt.all();
-      const result = {response};
+      const result = { response };
 
-      console.dir(response, {depth: null});
+      console.dir(response, { depth: null });
       switch (type) {
         case "create":
           console.log(`Created table: ${response.meta.txn?.name}`);
@@ -82,7 +82,7 @@ async function fireFullQuery(
           console.log(`Updated table: ${response.meta.txn?.name}`);
           break;
         case "read":
-          console.dir(result, {depth: null})
+          console.dir(result, { depth: null });
           break;
         default:
       }

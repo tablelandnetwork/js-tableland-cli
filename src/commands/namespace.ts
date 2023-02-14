@@ -64,7 +64,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
         mappings,
       };
 
-      console.log(response, {depth: null});
+      console.log(response, { depth: null });
     }
   }
 };

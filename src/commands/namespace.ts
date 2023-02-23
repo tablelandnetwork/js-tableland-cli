@@ -40,7 +40,7 @@ async function setHandler(argv: yargs.ArgumentsCamelCase<Options>) {
       throw new Error("Only letters or underscores in key name");
     }
     if (valueRegex.exec(value) === null) {
-      throw new Error("Tablename should be a valid tableland table name");
+      throw new Error("Tablename is invalid");
     }
     return {
       key,
@@ -67,7 +67,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
       (yargs) =>
         yargs.positional("record", {
           type: "string",
-          description: "The target table name",
+          description: "The mapped ENS record",
         }) as yargs.Argv<Options>,
       getHandler
     )
@@ -78,7 +78,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
         yargs
           .positional("domain", {
             type: "string",
-            description: "Blah",
+            description: "The ENS domain to which you are adding a record",
           })
           .positional("mappings", {}) as yargs.Argv<Options>,
       setHandler

@@ -52,7 +52,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       return;
     }
 
-    let statement = `CREATE TABLE ${prefix} (${schema})`;
+    let statement = `CREATE TABLE ${prefix || ""} (${schema})`;
 
     const check = /CREATE TABLE/gim.exec(schema.toString());
     if (check) {

@@ -17,7 +17,7 @@ async function getHandler(argv: yargs.ArgumentsCamelCase<Options>) {
   const { ens } = await setupCommand(argv);
   if (!ens) {
     console.log(
-      "You have no configured the tableland command for ENS correctly"
+      "To use ENS, ensure you have set the enableEnsExperiment flag to true"
     );
     return;
   }

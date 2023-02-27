@@ -18,10 +18,11 @@ describe("commands/read", function () {
 
   test("throws with invalid chain", async function () {
     const consoleError = spy(console, "error");
-    await yargs(["read", "select * from something;"]).command(mod).parse();
+    const statement = "select * from something;";
+    await yargs(["read", statement]).command(mod).parse();
     assert.calledWith(
       consoleError,
-      "unsupported chain (see `chains` command for details)"
+      `a chain is required for read statement: ${statement}`
     );
   });
 

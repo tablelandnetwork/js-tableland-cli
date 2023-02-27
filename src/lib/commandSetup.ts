@@ -5,7 +5,10 @@ import { GlobalOptions } from "../cli.js";
 import { getWalletWithProvider } from "../utils.js";
 import EnsResolver from "./EnsResolver.js";
 
-export type ConnectionsOptions = { readOnly: boolean };
+export type ConnectionsOptions = {
+  readOnly: boolean;
+  statement?: string;
+};
 
 export class Connections {
   _database: Database | undefined;
@@ -81,18 +84,30 @@ export class Connections {
 
   async prepare(
     argv: GlobalOptions,
-    options: { readOnly: boolean } = { readOnly: false }
+    options: ConnectionsOptions = { readOnly: false }
   ) {
     const {
       privateKey,
-      chain,
       providerUrl,
       baseUrl,
       enableEnsExperiment,
       ensProviderUrl,
     } = argv;
-    const { readOnly } = options;
+    let { chain } = argv;
+    const { readOnly, statement } = options;
     let signer: Signer | undefined;
+
+    // If the command is read only and there isn't an explicit chain, we will
+    // try to get the chain from the statement by looking at the first table.
+    if (options.readOnly && !chain && statement) {
+      try {
+        const { tables } = await sqlparser.normalize(statement); // eslint-disable-line no-undef
+        const { chainId } = await sqlparser.validateTableName(tables[0]); // eslint-disable-line no-undef
+        chain = helpers.getChainInfo(chainId).chainName;
+      } catch (err) {
+        throw new Error(`a chain is required for read statement: ${statement}`);
+      }
+    }
 
     if (!options.readOnly) {
       signer = await getWalletWithProvider({

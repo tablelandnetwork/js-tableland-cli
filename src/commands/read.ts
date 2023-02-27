@@ -54,10 +54,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       return;
     }
 
-    const { database: db, ens } = await setupCommand(argv, {
-      readOnly: true,
-      statement,
-    });
+    const { database: db, ens } = await setupCommand(argv);
 
     if (argv.enableEnsExperiment && ens) {
       statement = await ens.resolve(statement);

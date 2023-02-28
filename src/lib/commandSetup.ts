@@ -121,7 +121,7 @@ export class Connections {
       baseUrl,
     });
 
-    if (baseUrl || !chain) {
+    if (baseUrl) {
       this._validator = new Validator({ baseUrl });
     } else if (chain) {
       this._validator = Validator.forChain(chain);

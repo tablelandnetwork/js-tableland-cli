@@ -29,13 +29,6 @@ describe("commands/read", function () {
     );
   });
 
-  test("throws with missing baseUrl", async function () {
-    const consoleError = spy(console, "error");
-    const statement = "select * from something_31337_1;";
-    await yargs(["read", statement]).command(mod).parse();
-    assert.calledWith(consoleError, "missing baseUrl information");
-  });
-
   test("throws with invalid statement", async function () {
     const consoleError = spy(console, "error");
     await yargs(["read", "invalid;", "--baseUrl", "http://127.0.0.1:8080"])
@@ -83,12 +76,7 @@ describe("commands/read", function () {
 
   test("Read passes with local-tableland (defaults to table format)", async function () {
     const consoleDir = spy(console, "dir");
-    await yargs([
-      "read",
-      "select * from healthbot_31337_1",
-      "--baseUrl",
-      "http://127.0.0.1:8080",
-    ])
+    await yargs(["read", "select * from healthbot_31337_1"])
       .command(mod)
       .parse();
     assert.calledWith(
@@ -105,8 +93,6 @@ describe("commands/read", function () {
     await yargs([
       "read",
       "select * from healthbot_31337_1;",
-      "--baseUrl",
-      "http://127.0.0.1:8080",
       "--format",
       "objects",
     ])
@@ -124,15 +110,7 @@ describe("commands/read", function () {
   test("passes when provided input from file", async function () {
     const consoleDir = spy(console, "dir");
     const path = await temporaryWrite("select * from healthbot_31337_1;\n");
-    await yargs([
-      "read",
-      "--baseUrl",
-      "http://127.0.0.1:8080",
-      "--file",
-      path,
-      "--format",
-      "objects",
-    ])
+    await yargs(["read", "--file", path, "--format", "objects"])
       .command(mod)
       .parse();
     assert.calledWith(
@@ -152,8 +130,6 @@ describe("commands/read", function () {
     }, 100);
     await yargs([
       "read",
-      "--baseUrl",
-      "http://127.0.0.1:8080",
       "--format",
       "objects",
       "--providerUrl",
@@ -194,8 +170,6 @@ describe("commands/read", function () {
     await yargs([
       "read",
       "select * from healthbot_31337_1;",
-      "--baseUrl",
-      "http://127.0.0.1:8080",
       "--format",
       "pretty",
     ])

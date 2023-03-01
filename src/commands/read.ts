@@ -16,6 +16,13 @@ export const command = "read [statement]";
 export const desc = "Run a read-only query against a remote table";
 export const aliases = ["r", "query", "q"];
 
+function transformTableData(obj: any) {
+  if (obj.length < 1) return { columns: [], rows: [] };
+  const columns = Object.keys(obj[0]).map((key) => ({ name: key }));
+  const rows = obj.map((row: any) => Object.values(row));
+  return { columns, rows };
+}
+
 export const builder: CommandBuilder<{}, Options> = (yargs) =>
   yargs
     .positional("statement", {
@@ -64,9 +71,11 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
 
     if (format === "pretty") {
       console.table(res.results);
+    } else if (format === "table") {
+      console.log(JSON.stringify(transformTableData(res.results)));
     } else {
       const out = res;
-      console.dir(out, { depth: null });
+      console.log(JSON.stringify(out, null, "\t"));
     }
     /* c8 ignore next 3 */
   } catch (err: any) {

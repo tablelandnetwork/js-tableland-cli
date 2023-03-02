@@ -18,7 +18,7 @@ describe("commands/shell", function () {
   });
 
   test("Shell Works with single line", async function () {
-    const consoleDir = spy(console, "dir");
+    const consoleLog = spy(console, "log");
     const stdin = mockStd.stdin();
 
     setTimeout(() => {
@@ -39,14 +39,7 @@ describe("commands/shell", function () {
       .command(mod)
       .parse();
 
-    assert.calledWith(
-      consoleDir,
-      match((value) => {
-        console.log(value);
-        const res = value;
-        return res.results[0].counter === 1;
-      }, "Doesn't match expected output")
-    );
+    assert.match(consoleLog.getCall(3).args[0], '[{"counter":1}]');
   });
 
   test("Shell throws without network", async function () {
@@ -91,7 +84,7 @@ describe("commands/shell", function () {
   });
 
   test("Shell Works with multi-line", async function () {
-    const consoleDir = spy(console, "dir");
+    const consoleLog = spy(console, "log");
     const stdin = mockStd.stdin();
 
     setTimeout(() => {
@@ -112,13 +105,6 @@ describe("commands/shell", function () {
       .command(mod)
       .parse();
 
-    assert.calledWith(
-      consoleDir,
-      match((value) => {
-        console.log(value);
-        const res = value;
-        return res.results[0].counter === 1;
-      }, "Doesn't match expected output")
-    );
+    assert.match(consoleLog.getCall(3).args[0], '[{"counter":1}]');
   });
 });

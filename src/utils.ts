@@ -59,8 +59,6 @@ export async function getWalletWithProvider({
     throw new Error("unsupported chain (see `chains` command for details)");
   }
 
-  console.log(network, null, "\t");
-
   const wallet = new Wallet(privateKey);
   let provider: providers.BaseProvider = new providers.JsonRpcProvider(
     chain === "local-tableland" && !providerUrl

@@ -49,7 +49,7 @@ describe("commands/list", function () {
   test("List passes with local-tableland", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
-    const consoleDir = spy(console, "dir");
+    const consoleLog = spy(console, "log");
     await yargs([
       "list",
       "--chain",
@@ -60,8 +60,9 @@ describe("commands/list", function () {
       .command(mod)
       .parse();
     assert.calledWith(
-      consoleDir,
+      consoleLog,
       match(function (value: any) {
+        value = JSON.parse(value);
         const array = value;
         return (
           Array.isArray(array) &&

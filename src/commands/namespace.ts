@@ -55,7 +55,7 @@ async function setHandler(argv: yargs.ArgumentsCamelCase<Options>) {
       mappings,
     };
 
-    console.log(JSON.stringify(response, null, "\t"));
+    console.log(JSON.stringify(response));
   }
 }
 

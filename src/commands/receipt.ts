@@ -26,7 +26,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       chainId: helpers.getChainId(chain),
       transactionHash: hash,
     });
-    console.log(JSON.stringify(res, null, "\t"));
+    console.log(JSON.stringify(res));
     /* c8 ignore next 3 */
   } catch (err: any) {
     console.error(err.message);

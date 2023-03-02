@@ -116,7 +116,7 @@ describe("commands/create", function () {
   test("Create passes with local-tableland", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
-    const consoleDir = spy(console, "dir");
+    const consoleLog = spy(console, "log");
     await yargs([
       "create",
       "id int primary key, name text",
@@ -130,8 +130,9 @@ describe("commands/create", function () {
       .command(mod)
       .parse();
     assert.calledWith(
-      consoleDir,
+      consoleLog,
       match(function (value: any) {
+        value = JSON.parse(value);
         const { prefix, name, chainId, tableId, transactionHash } =
           value.meta.txn;
         return (
@@ -149,7 +150,7 @@ describe("commands/create", function () {
   test("passes with full create statement (override prefix)", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
-    const consoleDir = spy(console, "dir");
+    const consoleLog = spy(console, "log");
     await yargs([
       "create",
       "create table second_table (id int primary key, name text);",
@@ -163,8 +164,9 @@ describe("commands/create", function () {
       .command(mod)
       .parse();
     assert.calledWith(
-      consoleDir,
+      consoleLog,
       match(function (value: any) {
+        value = JSON.parse(value);
         const { prefix, name, chainId, tableId, transactionHash } =
           value.meta.txn;
         return (
@@ -182,7 +184,7 @@ describe("commands/create", function () {
   test("passes when provided input from file", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
-    const consoleDir = spy(console, "dir");
+    const consoleLog = spy(console, "log");
     const path = await temporaryWrite(`\nid int primary key,\nname text\n`);
     await yargs([
       "create",
@@ -198,8 +200,9 @@ describe("commands/create", function () {
       .command(mod)
       .parse();
     assert.calledWith(
-      consoleDir,
+      consoleLog,
       match(function (value: any) {
+        value = JSON.parse(value);
         const { prefix, name, chainId, tableId, transactionHash } =
           value.meta.txn;
         return (
@@ -217,7 +220,7 @@ describe("commands/create", function () {
   test("passes when provided input from stdin", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
-    const consoleDir = spy(console, "dir");
+    const consoleLog = spy(console, "log");
     const stdin = mockStd.stdin();
     setTimeout(() => {
       stdin
@@ -234,8 +237,9 @@ describe("commands/create", function () {
       .command(mod)
       .parse();
     assert.calledWith(
-      consoleDir,
+      consoleLog,
       match(function (value: any) {
+        value = JSON.parse(value);
         const { prefix, name, chainId, tableId, transactionHash } =
           value.meta.txn;
         return (

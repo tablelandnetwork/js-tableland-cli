@@ -114,7 +114,7 @@ describe("commands/write", function () {
   test("Write passes with local-tableland", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
-    const consoleDir = spy(console, "dir");
+    const consoleLog = spy(console, "log");
     await yargs([
       "write",
       "update healthbot_31337_1 set counter=1 where rowid=0;", // This just updates in place
@@ -126,8 +126,9 @@ describe("commands/write", function () {
       .command(mod)
       .parse();
     assert.calledWith(
-      consoleDir,
+      consoleLog,
       match(function (value: any) {
+        value = JSON.parse(value);
         const { transactionHash, link } = value.meta.txn;
         return (
           typeof transactionHash === "string" &&
@@ -141,7 +142,7 @@ describe("commands/write", function () {
   test("passes when provided input from file", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
-    const consoleDir = spy(console, "dir");
+    const consoleLog = spy(console, "log");
     const path = await temporaryWrite(
       "update healthbot_31337_1 set counter=1;\n"
     );
@@ -157,8 +158,9 @@ describe("commands/write", function () {
       .command(mod)
       .parse();
     assert.calledWith(
-      consoleDir,
+      consoleLog,
       match(function (value: any) {
+        value = JSON.parse(value);
         const { transactionHash, link } = value.meta.txn;
         return (
           typeof transactionHash === "string" &&
@@ -172,7 +174,7 @@ describe("commands/write", function () {
   test("passes when provided input from stdin", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
-    const consoleDir = spy(console, "dir");
+    const consoleLog = spy(console, "log");
     const stdin = mockStd.stdin();
     setTimeout(() => {
       stdin.send("update healthbot_31337_1 set counter=1;\n").end();
@@ -187,8 +189,9 @@ describe("commands/write", function () {
       .command(mod)
       .parse();
     assert.calledWith(
-      consoleDir,
+      consoleLog,
       match(function (value: any) {
+        value = JSON.parse(value);
         const { transactionHash, link } = value.meta.txn;
         return (
           typeof transactionHash === "string" &&

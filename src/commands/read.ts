@@ -7,7 +7,7 @@ import { setupCommand } from "../lib/commandSetup.js";
 
 export interface Options extends GlobalOptions {
   statement?: string;
-  format: "pretty" | "table" | "objects";
+  format: "pretty" | "table" | "objects" | "raw";
   file?: string;
   providerUrl: string;
 }
@@ -31,9 +31,9 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
     })
     .option("format", {
       type: "string",
-      choices: ["pretty", "table", "objects"] as const,
+      choices: ["pretty", "table", "objects", "raw"] as const,
       description: "Output format. One of 'pretty', 'table', or 'objects'.",
-      default: "table",
+      default: "objects",
     })
     .option("file", {
       type: "string",
@@ -69,14 +69,23 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
 
     const res = await db.prepare(statement).all();
 
-    if (format === "pretty") {
-      console.table(res.results);
-    } else if (format === "table") {
-      console.log(JSON.stringify(transformTableData(res.results)));
-    } else {
-      const out = res;
-      console.log(JSON.stringify(out, null, "\t"));
+    switch (format) {
+      case "pretty":
+        console.table(res.results);
+        break;
+      case "objects":
+        console.log(JSON.stringify(res.results));
+        break;
+      case "table":
+        console.log(JSON.stringify(transformTableData(res.results)));
+        break;
+      case "raw":
+        console.log(
+          JSON.stringify(transformTableData(await db.prepare(statement).raw()))
+        );
+        break;
     }
+
     /* c8 ignore next 3 */
   } catch (err: any) {
     console.error(err?.cause?.message || err?.message);

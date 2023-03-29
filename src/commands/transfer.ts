@@ -25,9 +25,8 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   try {
     const { name, receiver } = argv;
-    const [tableId, chainId] = name.split("_").reverse();
-
-    const parts = name.split("_");
+    const parts = name.split("_").reverse();
+    const chainId = parts[1];
 
     if (parts.length < 3 && !argv.enableEnsExperiment) {
       console.error(

@@ -1,7 +1,7 @@
 import { describe, test, afterEach, before } from "mocha";
 import { spy, restore, assert, match } from "sinon";
 import yargs from "yargs/yargs";
-import { getAccounts } from "@tableland/local";
+import { getAccounts, getDatabase } from "@tableland/local";
 import * as mod from "../src/commands/transfer.js";
 import { wait } from "../src/utils.js";
 import { helpers } from "@tableland/sdk";
@@ -9,8 +9,16 @@ import { helpers } from "@tableland/sdk";
 describe("commands/transfer", function () {
   this.timeout("30s");
 
+  const accounts = getAccounts();
+  // account 0 is the Validator's wallet, try to avoid using that
+  const db = getDatabase(accounts[1]);
+  let tableName: string;
   before(async function () {
     await wait(500);
+    const { meta } = await db
+      .prepare("CREATE TABLE test_transfer (a int);")
+      .all();
+    tableName = meta.txn?.name ?? "";
   });
 
   afterEach(function () {
@@ -19,7 +27,7 @@ describe("commands/transfer", function () {
 
   test("throws without privateKey", async function () {
     const consoleError = spy(console, "error");
-    await yargs(["transfer", "healthbot_31337_1", "0x0000000000000000000000"])
+    await yargs(["transfer", tableName, "0x0000000000000000000000"])
       .command(mod)
       .parse();
     assert.calledWith(
@@ -29,12 +37,12 @@ describe("commands/transfer", function () {
   });
 
   test("throws with invalid chain", async function () {
-    const [account] = getAccounts();
+    const [, account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
     const consoleError = spy(console, "error");
     await yargs([
       "transfer",
-      "healthbot_31337_1",
+      tableName,
       "0x0000000000000000000000000000000000000000",
       "--chain",
       "does-not-exist",
@@ -50,10 +58,10 @@ describe("commands/transfer", function () {
   });
 
   test("throws with invalid table name", async function () {
-    const [account] = getAccounts();
+    const [, account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
     const consoleError = spy(console, "error");
-    await yargs(["transfer", "healthbot", "blah", "-k", privateKey])
+    await yargs(["transfer", "fooz", "blah", "-k", privateKey])
       .command(mod)
       .parse();
     assert.calledWith(
@@ -63,12 +71,12 @@ describe("commands/transfer", function () {
   });
 
   test("throws with invalid receiver address", async function () {
-    const [account] = getAccounts();
+    const [, account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
     const consoleError = spy(console, "error");
     await yargs([
       "transfer",
-      "healthbot_31337_1",
+      tableName,
       "0x00",
       "--privateKey",
       privateKey,
@@ -85,13 +93,13 @@ describe("commands/transfer", function () {
 
   // Does transfering table have knock-on effects on other tables?
   test("Write passes with local-tableland", async function () {
-    const [account1, account2] = getAccounts();
+    const [, account1, account2] = getAccounts();
     const account2Address = account2.address;
     const consoleLog = spy(console, "log");
     const privateKey = account1.privateKey.slice(2);
     await yargs([
       "transfer",
-      "healthbot_31337_1",
+      tableName,
       account2Address,
       "--privateKey",
       privateKey,

@@ -28,7 +28,24 @@ describe("commands/transfer", function () {
     );
   });
 
-  test("throws with invalid chain", async function () {});
+  test("throws with invalid chain", async function () {
+    const [account] = getAccounts();
+    const privateKey = account.privateKey.slice(2);
+    const consoleError = spy(console, "error");
+    await yargs([
+      "transfer",
+      "healthbot_337_1",
+      "0x0000000000000000000000000000000000000000",
+      "--privateKey",
+      privateKey,
+    ])
+      .command(mod)
+      .parse();
+    assert.calledWith(
+      consoleError,
+      "unsupported chain (see `chains` command for details)"
+    );
+  });
 
   test("throws with invalid table name", async function () {
     const [account] = getAccounts();
@@ -43,7 +60,7 @@ describe("commands/transfer", function () {
     );
   });
 
-  test("throws with invalid receiver", async function () {
+  test("throws with invalid receiver address", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
     const consoleError = spy(console, "error");
@@ -64,10 +81,8 @@ describe("commands/transfer", function () {
     );
   });
 
-  test("throws with invalid privateKey", async function () {});
-
   // Does transfering table have knock-on effects on other tables?
-  test("receives receipt", async function () {
+  test("Write passes with local-tableland", async function () {
     const [account1, account2] = getAccounts();
     const account2Address = account2.address;
     console.log(account1.address, account2Address);

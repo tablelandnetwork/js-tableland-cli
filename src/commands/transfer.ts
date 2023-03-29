@@ -24,7 +24,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   try {
-    const { name, receiver } = argv;
+    const { name, receiver, chain } = argv;
     const parts = name.split("_").reverse();
     const chainId = parts[1];
 
@@ -37,7 +37,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
 
     const { registry } = await setupCommand({
       ...argv,
-      chain: parseInt(chainId) as any,
+      chain: chain || (parseInt(chainId) as any),
     });
 
     const res = await registry.safeTransferFrom({

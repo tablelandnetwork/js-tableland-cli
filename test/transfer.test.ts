@@ -34,8 +34,10 @@ describe("commands/transfer", function () {
     const consoleError = spy(console, "error");
     await yargs([
       "transfer",
-      "healthbot_337_1",
+      "healthbot_31337_1",
       "0x0000000000000000000000000000000000000000",
+      "--chain",
+      "does-not-exist",
       "--privateKey",
       privateKey,
     ])

@@ -25,7 +25,7 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   try {
     const { name, receiver } = argv;
-    const [chainId] = name.split("_").reverse()[1];
+    const [tableId, chainId] = name.split("_").reverse();
 
     const parts = name.split("_");
 

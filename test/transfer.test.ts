@@ -85,7 +85,6 @@ describe("commands/transfer", function () {
   test("Write passes with local-tableland", async function () {
     const [account1, account2] = getAccounts();
     const account2Address = account2.address;
-    console.log(account1.address, account2Address);
     const consoleLog = spy(console, "log");
     const privateKey = account1.privateKey.slice(2);
     await yargs([
@@ -105,7 +104,6 @@ describe("commands/transfer", function () {
       match(function (value: any) {
         value = JSON.parse(value);
         const { to, from } = value;
-        console.log(to, from);
         return (
           from === account1.address &&
           to === helpers.getContractAddress("local-tableland")

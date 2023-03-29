@@ -10,7 +10,7 @@ describe("commands/transfer", function () {
   this.timeout("30s");
 
   before(async function () {
-    await wait(10000);
+    await wait(500);
   });
 
   afterEach(function () {

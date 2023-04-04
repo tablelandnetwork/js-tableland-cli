@@ -42,7 +42,8 @@ export class Connections {
 
   get validator(): Validator {
     this.readyCheck();
-    if (!this._validator) throw new Error("No validator");
+    if (!this._validator)
+      throw new Error("No validator. Set a chain or a baseURL.");
     return this._validator;
   }
 

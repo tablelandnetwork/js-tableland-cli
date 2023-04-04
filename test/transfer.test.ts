@@ -37,7 +37,7 @@ describe("commands/transfer", function () {
   });
 
   test("throws with invalid chain", async function () {
-    const [, account] = getAccounts();
+    const account = accounts[1];
     const privateKey = account.privateKey.slice(2);
     const consoleError = spy(console, "error");
     await yargs([
@@ -58,7 +58,7 @@ describe("commands/transfer", function () {
   });
 
   test("throws with invalid table name", async function () {
-    const [, account] = getAccounts();
+    const account = accounts[1];
     const privateKey = account.privateKey.slice(2);
     const consoleError = spy(console, "error");
     await yargs(["transfer", "fooz", "blah", "-k", privateKey])
@@ -66,12 +66,12 @@ describe("commands/transfer", function () {
       .parse();
     assert.calledWith(
       consoleError,
-      "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
+      "error validating name: table name has wrong format: fooz"
     );
   });
 
   test("throws with invalid receiver address", async function () {
-    const [, account] = getAccounts();
+    const account = accounts[1];
     const privateKey = account.privateKey.slice(2);
     const consoleError = spy(console, "error");
     await yargs([
@@ -93,7 +93,7 @@ describe("commands/transfer", function () {
 
   // Does transfering table have knock-on effects on other tables?
   test("Write passes with local-tableland", async function () {
-    const [, account1, account2] = getAccounts();
+    const [, account1, account2] = accounts;
     const account2Address = account2.address;
     const consoleLog = spy(console, "log");
     const privateKey = account1.privateKey.slice(2);

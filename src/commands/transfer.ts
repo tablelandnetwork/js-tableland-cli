@@ -2,6 +2,7 @@ import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
 import { GlobalOptions } from "../cli.js";
 import { setupCommand } from "../lib/commandSetup.js";
+import { init } from "@tableland/sqlparser";
 
 export interface Options extends GlobalOptions {
   name: string;
@@ -24,20 +25,14 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
 
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   try {
+    await init();
     const { name, receiver, chain } = argv;
-    const parts = name.split("_").reverse();
-    const chainId = parts[1];
-
-    if (parts.length < 3 && !argv.enableEnsExperiment) {
-      console.error(
-        "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
-      );
-      return;
-    }
+    const tableDetails = await globalThis.sqlparser.validateTableName(name);
+    const chainId = tableDetails.chainId;
 
     const { registry } = await setupCommand({
       ...argv,
-      chain: chain || (parseInt(chainId) as any),
+      chain: chain || chainId,
     });
 
     const res = await registry.safeTransferFrom({

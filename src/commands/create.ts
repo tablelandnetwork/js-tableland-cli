@@ -86,13 +86,13 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
 
     const res = await db.prepare(statement).all();
     const link = getLink(chain, res.meta.txn?.transactionHash as string);
-    const out = { ...res, link };
+    const out = { ...res, link, ensNameRegistered: false };
 
     if (!check && argv.ns && argv.enableEnsExperiment && prefix) {
-      const register = await ens?.addTableRecords(argv.ns, [
+      const register = (await ens?.addTableRecords(argv.ns, [
         { key: prefix, value: out.meta.txn?.name as string },
-      ]);
-      console.log(register);
+      ])) as boolean;
+      out.ensNameRegistered = register;
     }
 
     console.log(JSON.stringify(out));

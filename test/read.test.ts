@@ -148,7 +148,7 @@ describe("commands/read", function () {
     );
   });
 
-  test("ENS flag transform name", async function () {
+  test("ENS experimental replaces shorthand with tablename", async function () {
     stub(ethers.providers.JsonRpcProvider.prototype, "getResolver")
       // @ts-ignore
       .callsFake(async () => {

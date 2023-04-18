@@ -1,10 +1,11 @@
 import { describe, test, afterEach, before } from "mocha";
-import { spy, restore, assert, match } from "sinon";
+import { spy, restore, assert, match, stub } from "sinon";
 import yargs from "yargs/yargs";
 import { temporaryWrite } from "tempy";
 import mockStd from "mock-stdin";
 import * as mod from "../src/commands/read.js";
 import { wait } from "../src/utils.js";
+import { ethers } from "ethers";
 
 describe("commands/read", function () {
   this.timeout(10000);
@@ -138,6 +139,38 @@ describe("commands/read", function () {
     ])
       .command(mod)
       .parse();
+    assert.calledWith(
+      consoleLog,
+      match((value) => {
+        value = JSON.parse(value);
+        return value[0].counter === 1;
+      }, "Doesn't match expected output")
+    );
+  });
+
+  test("ENS flag transform name", async function () {
+    stub(ethers.providers.JsonRpcProvider.prototype, "getResolver")
+      // @ts-ignore
+      .callsFake(async () => {
+        return {
+          getText: async () => {
+            return "healthbot_31337_1";
+          },
+        };
+      });
+    const consoleLog = spy(console, "log");
+    await yargs([
+      "read",
+      "select * from [foo.bar.ens];",
+      "--format",
+      "objects",
+      "--enableEnsExperiment",
+      "--ensProviderUrl",
+      "https://localhost:7070",
+    ])
+      .command(mod)
+      .parse();
+
     assert.calledWith(
       consoleLog,
       match((value) => {

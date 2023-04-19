@@ -1,10 +1,12 @@
 import { describe, test } from "mocha";
-import { spy, assert, restore, match } from "sinon";
+import { spy, assert, restore, match, stub } from "sinon";
 import yargs from "yargs/yargs";
 import mockStd from "mock-stdin";
 import { getAccounts } from "@tableland/local";
 import * as mod from "../src/commands/shell.js";
 import { wait } from "../src/utils.js";
+import { ethers } from "ethers";
+import { ENSMock } from "./mocks.js";
 
 describe("commands/shell", function () {
   this.timeout("30s");
@@ -40,6 +42,38 @@ describe("commands/shell", function () {
       .parse();
 
     assert.match(consoleLog.getCall(3).args[0], '[{"counter":1}]');
+  });
+
+  test("ENS in shell with single line", async function () {
+    stub(ethers.providers.JsonRpcProvider.prototype, "getResolver")
+      // @ts-ignore
+      .callsFake(ENSMock);
+
+    const consoleLog = spy(console, "log");
+    const stdin = mockStd.stdin();
+
+    setTimeout(() => {
+      stdin.send("select * from [foo.bar.eth];\n").end();
+    }, 1000);
+
+    const [account] = getAccounts();
+    const privateKey = account.privateKey.slice(2);
+    await yargs([
+      "shell",
+      "--chain",
+      "local-tableland",
+      "--format",
+      "objects",
+      "--privateKey",
+      privateKey,
+      "--enableEnsExperiment",
+      "--ensProviderUrl",
+      "http://localhost:8545",
+    ])
+      .command(mod)
+      .parse();
+
+    assert.match(consoleLog.getCall(4).args[0], '[{"counter":1}]');
   });
 
   test("Shell Works with initial input", async function () {

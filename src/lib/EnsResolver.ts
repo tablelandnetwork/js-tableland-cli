@@ -51,7 +51,7 @@ export default class EnsResolver {
       console.log("Adding table to ENS failed");
       console.error(e.message);
     }
-    return false;
+    return true;
   }
 
   async resolve(statement: string): Promise<string> {

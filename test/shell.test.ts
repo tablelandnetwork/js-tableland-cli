@@ -44,9 +44,17 @@ describe("commands/shell", function () {
   });
 
   test("ENS in shell with single line", async function () {
-    stub(ethers.providers.Resolver.prototype, "getText")
+    const fullReolverStub = stub(
+      ethers.providers.JsonRpcProvider.prototype,
+      "getResolver"
+    ).callsFake(
       // @ts-ignore
-      .callsFake(() => "healthbot_31337_1");
+      () => {
+        return {
+          getText: () => "healthbot_31337_1",
+        };
+      }
+    );
 
     const consoleLog = spy(console, "log");
     const stdin = mockStd.stdin();
@@ -71,6 +79,8 @@ describe("commands/shell", function () {
     ])
       .command(mod)
       .parse();
+
+    fullReolverStub.reset();
 
     assert.match(consoleLog.getCall(4).args[0], '[{"counter":1}]');
   });

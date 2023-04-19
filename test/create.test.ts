@@ -47,9 +47,17 @@ describe("commands/create", function () {
   });
 
   test("Create namespace with table using ENS", async () => {
-    stub(ethers.providers.Resolver.prototype, "getText")
+    const fullReolverStub = stub(
+      ethers.providers.JsonRpcProvider.prototype,
+      "getResolver"
+    ).callsFake(
       // @ts-ignore
-      .callsFake(() => "healthbot_31337_1");
+      () => {
+        return {
+          getText: () => "healthbot_31337_1",
+        };
+      }
+    );
 
     const consoleLog = spy(console, "log");
     const [account] = getAccounts();
@@ -71,13 +79,12 @@ describe("commands/create", function () {
       .command(mod)
       .parse();
 
-    assert.calledWith(
-      consoleLog,
-      match(function (value: any) {
-        value = JSON.parse(value);
-        return value.ensNameRegistered === true;
-      })
-    );
+    fullReolverStub.restore();
+
+    assert.match(consoleLog.getCall(1).args[0], function (value: any) {
+      value = JSON.parse(value);
+      return value.ensNameRegistered === true;
+    });
   });
 
   test("throws with invalid chain", async function () {

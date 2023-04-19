@@ -149,9 +149,17 @@ describe("commands/read", function () {
   });
 
   test("ENS experimental replaces shorthand with tablename", async function () {
-    stub(ethers.providers.Resolver.prototype, "getText")
+    const fullReolverStub = stub(
+      ethers.providers.JsonRpcProvider.prototype,
+      "getResolver"
+    ).callsFake(
       // @ts-ignore
-      .callsFake(() => "healthbot_31337_1");
+      () => {
+        return {
+          getText: () => "healthbot_31337_1",
+        };
+      }
+    );
     const consoleLog = spy(console, "log");
     await yargs([
       "read",
@@ -164,6 +172,8 @@ describe("commands/read", function () {
     ])
       .command(mod)
       .parse();
+
+    fullReolverStub.restore();
 
     assert.calledWith(
       consoleLog,

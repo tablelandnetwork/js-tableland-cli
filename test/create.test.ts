@@ -118,7 +118,9 @@ describe("commands/create", function () {
       .parse();
     assert.calledWith(
       consoleError,
-      "error parsing statement: syntax error at position 32 near ')'"
+      `error parsing statement: syntax error at position 32 near ')'
+CREATE TABLE cooltable (invalid)
+                               ^`
     );
   });
 

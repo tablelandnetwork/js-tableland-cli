@@ -48,9 +48,7 @@ describe("commands/shell", function () {
     const fullReolverStub = stub(
       ethers.providers.JsonRpcProvider.prototype,
       "getResolver"
-    ).callsFake(
-      getResolverMock
-    );
+    ).callsFake(getResolverMock);
 
     const consoleLog = spy(console, "log");
     const stdin = mockStd.stdin();

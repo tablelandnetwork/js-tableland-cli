@@ -6,7 +6,6 @@ import { getAccounts } from "@tableland/local";
 import * as mod from "../src/commands/shell.js";
 import { wait } from "../src/utils.js";
 import { ethers } from "ethers";
-import { ENSMock } from "./mocks.js";
 
 describe("commands/shell", function () {
   this.timeout("30s");
@@ -45,9 +44,9 @@ describe("commands/shell", function () {
   });
 
   test("ENS in shell with single line", async function () {
-    stub(ethers.providers.JsonRpcProvider.prototype, "getResolver")
+    stub(ethers.providers.Resolver.prototype, "getText")
       // @ts-ignore
-      .callsFake(ENSMock);
+      .callsFake(() => "healthbot_31337_1");
 
     const consoleLog = spy(console, "log");
     const stdin = mockStd.stdin();

@@ -6,7 +6,6 @@ import mockStd from "mock-stdin";
 import * as mod from "../src/commands/read.js";
 import { wait } from "../src/utils.js";
 import { ethers } from "ethers";
-import { ENSMock } from "./mocks.js";
 
 describe("commands/read", function () {
   this.timeout(10000);
@@ -150,9 +149,9 @@ describe("commands/read", function () {
   });
 
   test("ENS experimental replaces shorthand with tablename", async function () {
-    stub(ethers.providers.JsonRpcProvider.prototype, "getResolver")
+    stub(ethers.providers.Resolver.prototype, "getText")
       // @ts-ignore
-      .callsFake(ENSMock);
+      .callsFake(() => "healthbot_31337_1");
     const consoleLog = spy(console, "log");
     await yargs([
       "read",

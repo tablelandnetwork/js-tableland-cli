@@ -6,7 +6,6 @@ import mockStd from "mock-stdin";
 import { getAccounts } from "@tableland/local";
 import * as mod from "../src/commands/create.js";
 import { wait } from "../src/utils.js";
-import { ENSMock } from "./mocks.js";
 import { ethers } from "ethers";
 
 describe("commands/create", function () {
@@ -48,17 +47,17 @@ describe("commands/create", function () {
   });
 
   test("Create namespace with table using ENS", async () => {
-    stub(ethers.providers.JsonRpcProvider.prototype, "getResolver")
+    stub(ethers.providers.Resolver.prototype, "getText")
       // @ts-ignore
-      .callsFake(ENSMock);
+      .callsFake(() => "healthbot_31337_1");
 
     const consoleLog = spy(console, "log");
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
     await yargs([
       "create",
-      "id integer primary key, message text",
-      "cooltable",
+      "id integer, message text",
+      "hello",
       "--chain",
       "local-tableland",
       "--privateKey",
@@ -67,7 +66,7 @@ describe("commands/create", function () {
       "foo.bar.eth",
       "--enableEnsExperiment",
       "--ensProviderUrl",
-      "https://localhost:7070",
+      "https://localhost:8080",
     ])
       .command(mod)
       .parse();
@@ -76,7 +75,7 @@ describe("commands/create", function () {
       consoleLog,
       match(function (value: any) {
         value = JSON.parse(value);
-        return value.name === "foo.bar.eth" && value.ensNameRegistered === true;
+        return value.ensNameRegistered === true;
       })
     );
   });

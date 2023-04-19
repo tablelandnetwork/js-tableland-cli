@@ -6,6 +6,7 @@ import mockStd from "mock-stdin";
 import * as mod from "../src/commands/read.js";
 import { wait } from "../src/utils.js";
 import { ethers } from "ethers";
+import { getResolverMock } from "./mock.js";
 
 describe("commands/read", function () {
   this.timeout(10000);
@@ -152,14 +153,7 @@ describe("commands/read", function () {
     const fullReolverStub = stub(
       ethers.providers.JsonRpcProvider.prototype,
       "getResolver"
-    ).callsFake(
-      // @ts-ignore
-      () => {
-        return {
-          getText: () => "healthbot_31337_1",
-        };
-      }
-    );
+    ).callsFake(getResolverMock);
     const consoleLog = spy(console, "log");
     await yargs([
       "read",

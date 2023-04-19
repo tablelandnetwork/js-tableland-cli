@@ -7,6 +7,7 @@ import { getAccounts } from "@tableland/local";
 import * as mod from "../src/commands/create.js";
 import { wait } from "../src/utils.js";
 import { ethers } from "ethers";
+import { getResolverMock } from "./mock.js";
 
 describe("commands/create", function () {
   this.timeout("30s");
@@ -50,14 +51,7 @@ describe("commands/create", function () {
     const fullReolverStub = stub(
       ethers.providers.JsonRpcProvider.prototype,
       "getResolver"
-    ).callsFake(
-      // @ts-ignore
-      () => {
-        return {
-          getText: () => "healthbot_31337_1",
-        };
-      }
-    );
+    ).callsFake(getResolverMock);
 
     const consoleLog = spy(console, "log");
     const [account] = getAccounts();

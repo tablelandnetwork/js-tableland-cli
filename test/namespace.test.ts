@@ -4,6 +4,7 @@ import yargs from "yargs/yargs";
 import * as mod from "../src/commands/namespace.js";
 import ensLib from "../src/lib/EnsCommand";
 import { ethers } from "ethers";
+import { getResolverMock } from "./mock.js";
 
 describe("commands/namespace", function () {
   beforeEach(async function () {
@@ -22,13 +23,7 @@ describe("commands/namespace", function () {
 
     stub(ethers.providers.JsonRpcProvider.prototype, "getResolver")
       // @ts-ignore
-      .callsFake(async () => {
-        return {
-          getText: async () => {
-            return "healthbot_31337_1";
-          },
-        };
-      });
+      .callsFake(getResolverMock);
   });
 
   afterEach(function () {

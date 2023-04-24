@@ -10,6 +10,8 @@ import { wait } from "../src/utils.js";
 import { ethers } from "ethers";
 import { getResolverMock } from "./mock.js";
 
+const accounts = getAccounts();
+
 describe("commands/create", function () {
   this.timeout("30s");
 
@@ -31,7 +33,7 @@ describe("commands/create", function () {
   });
 
   test("throws if chain not provided", async function () {
-    const [account] = getAccounts();
+    const [account] = accounts;
     const privateKey = account.privateKey.slice(2);
     const consoleError = spy(console, "error");
     await yargs([
@@ -83,7 +85,7 @@ describe("commands/create", function () {
   });
 
   test("throws with invalid chain", async function () {
-    const [account] = getAccounts();
+    const [account] = accounts;
     const privateKey = account.privateKey.slice(2);
     const consoleError = spy(console, "error");
     await yargs([
@@ -103,7 +105,7 @@ describe("commands/create", function () {
   });
 
   test("throws with invalid statement", async function () {
-    const [account] = getAccounts();
+    const [account] = accounts;
     const privateKey = account.privateKey.slice(2);
     const consoleError = spy(console, "error");
     await yargs([
@@ -118,16 +120,34 @@ describe("commands/create", function () {
     ])
       .command(mod)
       .parse();
-    assert.calledWith(
-      consoleError,
-      `error parsing statement: syntax error at position 32 near ')'
-CREATE TABLE cooltable (invalid)
-                               ^`
-    );
+
+    const res = consoleError.getCall(0).firstArg;
+    equal(res, "error parsing statement: syntax error at position 32 near ')'");
+  });
+
+  test("throws when mixing create and write statements", async function () {
+    const [account] = accounts;
+    const privateKey = account.privateKey.slice(2);
+    const consoleError = spy(console, "error");
+    await yargs([
+      "create",
+      "create table fooz (a int);insert into fooz (a) values (1);",
+      "--chain",
+      "local-tableland",
+      "--prefix",
+      "cooltable",
+      "--privateKey",
+      privateKey,
+    ])
+      .command(mod)
+      .parse();
+
+    const res = consoleError.getCall(0).firstArg;
+    equal(res, "the `create` command can only accept create queries");
   });
 
   test("throws with missing file", async function () {
-    const [account] = getAccounts();
+    const [account] = accounts;
     const privateKey = account.privateKey.slice(2);
     const consoleError = spy(console, "error");
     await yargs([
@@ -150,7 +170,7 @@ CREATE TABLE cooltable (invalid)
   });
 
   test("throws with empty stdin", async function () {
-    const [account] = getAccounts();
+    const [account] = accounts;
     const privateKey = account.privateKey.slice(2);
     const stdin = mockStd.stdin();
     const consoleError = spy(console, "error");
@@ -173,7 +193,7 @@ CREATE TABLE cooltable (invalid)
   });
 
   test("Create passes with local-tableland", async function () {
-    const [account] = getAccounts();
+    const [account] = accounts;
     const privateKey = account.privateKey.slice(2);
     const consoleLog = spy(console, "log");
     await yargs([
@@ -207,7 +227,7 @@ CREATE TABLE cooltable (invalid)
   });
 
   test("passes with full create statement (override prefix)", async function () {
-    const [account] = getAccounts();
+    const [account] = accounts;
     const privateKey = account.privateKey.slice(2);
     const consoleLog = spy(console, "log");
     await yargs([
@@ -240,8 +260,44 @@ CREATE TABLE cooltable (invalid)
     );
   });
 
+  test("passes with two create statements", async function () {
+    const [account] = accounts;
+    const privateKey = account.privateKey.slice(2);
+    const consoleLog = spy(console, "log");
+    await yargs([
+      "create",
+      `create table first_table (id int primary key, name text);
+      create table second_table (id int primary key, name text);`,
+      "--chain",
+      "local-tableland",
+      "--privateKey",
+      privateKey,
+      "--prefix",
+      "ignore_me",
+    ])
+      .command(mod)
+      .parse();
+
+    const res = consoleLog.getCall(0).firstArg;
+    const value = JSON.parse(res);
+    const { prefixes, names, chainId, tableIds, transactionHash } =
+      value.meta.txn;
+
+    equal(prefixes.length, 2);
+    equal(prefixes[0], "first_table");
+    equal(prefixes[1], "second_table");
+    equal(chainId, 31337);
+    equal(typeof transactionHash, "string");
+    equal(transactionHash.startsWith("0x"), true);
+    equal(names.length, 2);
+    equal(names[0].startsWith("first_table"), true);
+    equal(names[1].startsWith("second_table"), true);
+    equal(names[0].endsWith(tableIds[0]), true);
+    equal(names[1].endsWith(tableIds[1]), true);
+  });
+
   test("passes when provided input from file", async function () {
-    const [account] = getAccounts();
+    const [account] = accounts;
     const privateKey = account.privateKey.slice(2);
     const consoleLog = spy(console, "log");
     const path = await temporaryWrite(`\nid int primary key,\nname text\n`);
@@ -259,8 +315,6 @@ CREATE TABLE cooltable (invalid)
       .command(mod)
       .parse();
 
-    await new Promise((resolve) => setTimeout(() => resolve(undefined), 3000));
-
     const res = consoleLog.getCall(0).firstArg;
     const value = JSON.parse(res);
     const { prefix, name, chainId, tableId, transactionHash } = value.meta.txn;
@@ -274,7 +328,7 @@ CREATE TABLE cooltable (invalid)
   });
 
   test("passes when provided input from stdin", async function () {
-    const [account] = getAccounts();
+    const [account] = accounts;
     const privateKey = account.privateKey.slice(2);
     const consoleLog = spy(console, "log");
     const stdin = mockStd.stdin();

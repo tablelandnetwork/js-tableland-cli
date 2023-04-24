@@ -105,6 +105,30 @@ describe("commands/write", function () {
     );
   });
 
+  test("throws when mixing write and create statements", async function () {
+    const [account] = accounts;
+    const privateKey = account.privateKey.slice(2);
+    const consoleError = spy(console, "error");
+    await yargs([
+      "write",
+      "insert into fooz (a) values (1);create table fooz (a int);",
+      "--chain",
+      "local-tableland",
+      "--prefix",
+      "cooltable",
+      "--privateKey",
+      privateKey,
+    ])
+      .command(mod)
+      .parse();
+
+    const res = consoleError.getCall(0).firstArg;
+    equal(
+      res,
+      "error parsing statement: syntax error at position 38 near 'create'"
+    );
+  });
+
   test("throws with missing file", async function () {
     const [account] = accounts;
     const privateKey = account.privateKey.slice(2);
@@ -200,18 +224,14 @@ describe("commands/write", function () {
     ])
       .command(mod)
       .parse();
-    assert.calledWith(
-      consoleLog,
-      match(function (value: any) {
-        value = JSON.parse(value);
-        const { transactionHash, link } = value.meta.txn;
-        return (
-          typeof transactionHash === "string" &&
-          transactionHash.startsWith("0x") &&
-          !link
-        );
-      }, "does not match")
-    );
+
+    const res = consoleLog.getCall(0).firstArg;
+    const value = JSON.parse(res);
+    const { transactionHash, link } = value.meta?.txn;
+
+    equal(typeof transactionHash, "string");
+    equal(transactionHash.startsWith("0x"), true);
+    equal(!link, true);
 
     const results = await db.batch([
       db.prepare(`select * from ${tableName1};`),

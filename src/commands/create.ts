@@ -84,6 +84,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     if (argv.enableEnsExperiment && ens)
       statement = await ens.resolve(statement);
 
+    statement = statement.replace(/\n/g, "").replace(/\r/g, "");
     const res = await db.prepare(statement).all();
     const link = getLink(chain, res.meta.txn?.transactionHash as string);
     const out = { ...res, link, ensNameRegistered: false };

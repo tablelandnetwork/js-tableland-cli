@@ -1,3 +1,4 @@
+import { equal } from "node:assert";
 import { describe, test, afterEach, before } from "mocha";
 import { spy, restore, assert, match, stub } from "sinon";
 import yargs from "yargs/yargs";
@@ -257,22 +258,19 @@ CREATE TABLE cooltable (invalid)
     ])
       .command(mod)
       .parse();
-    assert.calledWith(
-      consoleLog,
-      match(function (value: any) {
-        value = JSON.parse(value);
-        const { prefix, name, chainId, tableId, transactionHash } =
-          value.meta.txn;
-        return (
-          prefix === "file_test" &&
-          chainId === 31337 &&
-          name.startsWith(prefix) &&
-          name.endsWith(tableId) &&
-          typeof transactionHash === "string" &&
-          transactionHash.startsWith("0x")
-        );
-      }, "does not match")
-    );
+
+    await new Promise((resolve) => setTimeout(() => resolve(undefined), 3000));
+
+    const res = consoleLog.getCall(0).firstArg;
+    const value = JSON.parse(res);
+    const { prefix, name, chainId, tableId, transactionHash } = value.meta.txn;
+
+    equal(prefix, "file_test");
+    equal(chainId, 31337);
+    equal(typeof transactionHash, "string");
+    equal(name.startsWith(prefix), true);
+    equal(name.endsWith(tableId), true);
+    equal(transactionHash.startsWith("0x"), true);
   });
 
   test("passes when provided input from stdin", async function () {

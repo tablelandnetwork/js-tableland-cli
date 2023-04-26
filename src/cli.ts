@@ -62,9 +62,7 @@ const _argv = yargs(hideBin(process.argv))
   .option("help", {
     alias: "h",
   })
-  .option("version", {
-    alias: "V",
-  })
+  .alias("version", "V")
   // custom options are in alphabetical order
   .option("baseUrl", {
     type: "string",

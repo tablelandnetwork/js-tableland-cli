@@ -1,6 +1,6 @@
 import { equal } from "node:assert";
 import { describe, test, afterEach, before } from "mocha";
-import { spy, restore, assert, match } from "sinon";
+import { spy, restore, assert } from "sinon";
 import yargs from "yargs/yargs";
 import * as mod from "../src/commands/info.js";
 import { wait } from "../src/utils.js";

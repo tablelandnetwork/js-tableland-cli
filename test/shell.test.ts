@@ -81,6 +81,78 @@ describe("commands/shell", function () {
     equal(call4.args[0], '[{"counter":1}]');
   });
 
+  test("ENS in shell with backtics", async function () {
+    const fullResolverStub = stub(
+      ethers.providers.JsonRpcProvider.prototype,
+      "getResolver"
+    ).callsFake(getResolverMock);
+
+    const consoleLog = spy(console, "log");
+    const stdin = mockStd.stdin();
+
+    setTimeout(() => {
+      stdin.send("select * from `foo.bar.eth`;\n").end();
+    }, 2000);
+
+    const [account] = getAccounts();
+    const privateKey = account.privateKey.slice(2);
+    await yargs([
+      "shell",
+      "--chain",
+      "local-tableland",
+      "--format",
+      "objects",
+      "--privateKey",
+      privateKey,
+      "--enableEnsExperiment",
+      "--ensProviderUrl",
+      "http://localhost:8545",
+    ])
+      .command(mod)
+      .parse();
+
+    fullResolverStub.reset();
+
+    const call4 = consoleLog.getCall(4);
+    equal(call4.args[0], '[{"counter":1}]');
+  });
+
+  test("ENS in shell with double quotes", async function () {
+    const fullResolverStub = stub(
+      ethers.providers.JsonRpcProvider.prototype,
+      "getResolver"
+    ).callsFake(getResolverMock);
+
+    const consoleLog = spy(console, "log");
+    const stdin = mockStd.stdin();
+
+    setTimeout(() => {
+      stdin.send(`select * from "foo.bar.eth";\n`).end();
+    }, 2000);
+
+    const [account] = getAccounts();
+    const privateKey = account.privateKey.slice(2);
+    await yargs([
+      "shell",
+      "--chain",
+      "local-tableland",
+      "--format",
+      "objects",
+      "--privateKey",
+      privateKey,
+      "--enableEnsExperiment",
+      "--ensProviderUrl",
+      "http://localhost:8545",
+    ])
+      .command(mod)
+      .parse();
+
+    fullResolverStub.reset();
+
+    const call4 = consoleLog.getCall(4);
+    equal(call4.args[0], '[{"counter":1}]');
+  });
+
   test("Shell Works with initial input", async function () {
     const consoleLog = spy(console, "log");
     const [account] = getAccounts();

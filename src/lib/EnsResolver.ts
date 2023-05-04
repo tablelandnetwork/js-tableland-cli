@@ -30,11 +30,8 @@ export default class EnsResolver {
   async resolveTable(tablename: string): Promise<string> {
     // strip the [] sql identifier escape characters at the start and
     // end, if they exist, then split on the "." separator
-    const [textRecord, ...domainArray] = tablename
-      .trim()
-      .replace(/^\[/, "")
-      .replace(/\]$/, "")
-      .split(".");
+    const [textRecord, ...domainArray] =
+      removeEscapeChars(tablename).split(".");
 
     const domain = domainArray.join(".");
     const address = await this.provider.getResolver(domain);
@@ -67,7 +64,7 @@ export default class EnsResolver {
 
     const resolvedTablenames = await Promise.all(
       tableNames.map(async (tableName) => {
-        tableName = tableName.trim().replace(/^\[/, "").replace(/\]$/, "");
+        tableName = removeEscapeChars(tableName);
         return [tableName, await this.resolveTable(tableName)];
       })
     );
@@ -81,4 +78,15 @@ export default class EnsResolver {
 
     return finalStatement;
   }
+}
+
+function removeEscapeChars(tableName: string): string {
+  return tableName
+    .trim()
+    .replace(/^\[/, "")
+    .replace(/\]$/, "")
+    .replace(/^`/, "")
+    .replace(/`$/, "")
+    .replace(/^"/, "")
+    .replace(/"$/, "");
 }

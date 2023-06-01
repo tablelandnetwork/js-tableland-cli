@@ -1,11 +1,11 @@
-import { equal } from "node:assert";
+import { equal, match } from "node:assert";
 import { describe, test } from "mocha";
-import { spy, assert, restore, match, stub } from "sinon";
+import { spy, restore, stub, assert } from "sinon";
 import yargs from "yargs/yargs";
 import mockStd from "mock-stdin";
 import { getAccounts } from "@tableland/local";
 import * as mod from "../src/commands/shell.js";
-import { wait } from "../src/utils.js";
+import { wait, logger } from "../src/utils.js";
 import { ethers } from "ethers";
 import { getResolverMock } from "./mock.js";
 
@@ -21,7 +21,7 @@ describe("commands/shell", function () {
   });
 
   test("Shell Works with single line", async function () {
-    const consoleLog = spy(console, "log");
+    const consoleLog = spy(logger, "log");
     const stdin = mockStd.stdin();
 
     setTimeout(() => {
@@ -42,7 +42,8 @@ describe("commands/shell", function () {
       .command(mod)
       .parse();
 
-    assert.match(consoleLog.getCall(3).args[0], '[{"counter":1}]');
+    const value = consoleLog.getCall(3).args[0];
+    equal(value, '[{"counter":1}]');
   });
 
   test("ENS in shell with single line", async function () {
@@ -51,7 +52,7 @@ describe("commands/shell", function () {
       "getResolver"
     ).callsFake(getResolverMock);
 
-    const consoleLog = spy(console, "log");
+    const consoleLog = spy(logger, "log");
     const stdin = mockStd.stdin();
 
     setTimeout(() => {
@@ -87,7 +88,7 @@ describe("commands/shell", function () {
       "getResolver"
     ).callsFake(getResolverMock);
 
-    const consoleLog = spy(console, "log");
+    const consoleLog = spy(logger, "log");
     const stdin = mockStd.stdin();
 
     setTimeout(() => {
@@ -123,7 +124,7 @@ describe("commands/shell", function () {
       "getResolver"
     ).callsFake(getResolverMock);
 
-    const consoleLog = spy(console, "log");
+    const consoleLog = spy(logger, "log");
     const stdin = mockStd.stdin();
 
     setTimeout(() => {
@@ -149,12 +150,12 @@ describe("commands/shell", function () {
 
     fullResolverStub.reset();
 
-    const call4 = consoleLog.getCall(4);
-    equal(call4.args[0], '[{"counter":1}]');
+    const value = consoleLog.getCall(4).args[0];
+    equal(value, '[{"counter":1}]');
   });
 
   test("Shell Works with initial input", async function () {
-    const consoleLog = spy(console, "log");
+    const consoleLog = spy(logger, "log");
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
     await yargs([
@@ -170,11 +171,12 @@ describe("commands/shell", function () {
       .command(mod)
       .parse();
 
-    assert.match(consoleLog.getCall(3).args[0], '[{"counter":1}]');
+    const value = consoleLog.getCall(3).args[0];
+    equal(value, '[{"counter":1}]');
   });
 
   test("Shell handles invalid query", async function () {
-    const consoleError = spy(console, "error");
+    const consoleError = spy(logger, "error");
     const stdin = mockStd.stdin();
 
     setTimeout(() => {
@@ -195,18 +197,16 @@ describe("commands/shell", function () {
       .command(mod)
       .parse();
 
-    assert.calledWith(
-      consoleError,
-      match((v: any) => v.message.includes("error parsing statement"))
-    );
+    const value = consoleError.getCall(0).args[0] as string;
+    match(value, /error parsing statement/);
   });
 
   test("Write queries continue with 'y' input", async function () {
-    const consoleLog = spy(console, "log");
+    const consoleLog = spy(logger, "log");
     const stdin = mockStd.stdin();
 
     setTimeout(() => {
-      stdin.send("CREATE TABLE SomeTable (id integer, message text);\n");
+      stdin.send("CREATE TABLE sometable (id integer, message text);\n");
       setTimeout(() => {
         stdin.send("y\n");
       }, 500);
@@ -226,14 +226,13 @@ describe("commands/shell", function () {
       .command(mod)
       .parse();
 
-    assert.match(consoleLog.getCall(4).args[0], (v: any) => {
-      const value = JSON.parse(v);
-      return value.createdTable;
-    });
+    const value = consoleLog.getCall(4).args[0];
+    match(value, /"createdTable":/);
+    match(value, /sometable_31337_\d+/);
   });
 
   test("Write queries aborts with 'n' input", async function () {
-    const consoleLog = spy(console, "log");
+    const consoleLog = spy(logger, "log");
     const stdin = mockStd.stdin();
 
     setTimeout(() => {
@@ -257,31 +256,29 @@ describe("commands/shell", function () {
       .command(mod)
       .parse();
 
-    assert.match(consoleLog.getCall(3).args[0], "Aborting.");
+    match(consoleLog.getCall(3).args[0], /Aborting\./i);
   });
 
   test("Shell throws without chain", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
-    const consoleError = spy(console, "error");
+    const consoleError = spy(logger, "error");
     await yargs(["shell", "--privateKey", privateKey]).command(mod).parse();
-    assert.calledWith(
-      consoleError,
-      "missing required flag (`-c` or `--chain`)"
-    );
+
+    const value = consoleError.getCall(0).args[0];
+    equal(value, "missing required flag (`-c` or `--chain`)");
   });
 
   test("Shell throws with invalid chain", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
-    const consoleError = spy(console, "error");
+    const consoleError = spy(logger, "error");
     await yargs(["shell", "--privateKey", privateKey, "--chain", "foozbazz"])
       .command(mod)
       .parse();
-    assert.calledWith(
-      consoleError,
-      "unsupported chain (see `chains` command for details)"
-    );
+
+    const value = consoleError.getCall(0).args[0];
+    equal(value, "unsupported chain (see `chains` command for details)");
   });
 
   test("Custom baseUrl is called", async function () {
@@ -308,10 +305,8 @@ describe("commands/shell", function () {
       .command(mod)
       .parse();
 
-    assert.calledWith(
-      fetchSpy,
-      match((v: any) => v.includes("https://localhost:8909/"))
-    );
+    const value = fetchSpy.getCall(0).args[0] as string;
+    match(value, /https:\/\/localhost:8909\//);
   });
 
   test(".exit exits the shell", async function () {
@@ -346,7 +341,7 @@ describe("commands/shell", function () {
   });
 
   test("Shell Works with multi-line", async function () {
-    const consoleLog = spy(console, "log");
+    const consoleLog = spy(logger, "log");
     const stdin = mockStd.stdin();
 
     setTimeout(() => {
@@ -367,6 +362,7 @@ describe("commands/shell", function () {
       .command(mod)
       .parse();
 
-    assert.match(consoleLog.getCall(3).args[0], '[{"counter":1}]');
+    const value = consoleLog.getCall(3).args[0];
+    equal(value, '[{"counter":1}]');
   });
 });

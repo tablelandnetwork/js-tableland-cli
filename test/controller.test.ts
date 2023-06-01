@@ -1,10 +1,10 @@
-import { equal } from "node:assert";
+import { equal, match } from "node:assert";
 import { describe, test, afterEach, before } from "mocha";
-import { spy, restore, assert, match } from "sinon";
+import { spy, restore } from "sinon";
 import yargs from "yargs/yargs";
 import { getAccounts } from "@tableland/local";
 import * as mod from "../src/commands/controller.js";
-import { wait } from "../src/utils.js";
+import { wait, logger } from "../src/utils.js";
 
 describe("commands/controller", function () {
   this.timeout("30s");
@@ -18,18 +18,17 @@ describe("commands/controller", function () {
   });
 
   test("throws without privateKey", async function () {
-    const consoleError = spy(console, "error");
+    const consoleError = spy(logger, "error");
     await yargs(["controller", "get", "blah"]).command(mod).parse();
-    assert.calledWith(
-      consoleError,
-      "missing required flag (`-k` or `--privateKey`)"
-    );
+
+    const value = consoleError.getCall(0).firstArg;
+    equal(value, "missing required flag (`-k` or `--privateKey`)");
   });
 
   test("throws with invalid chain", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
-    const consoleError = spy(console, "error");
+    const consoleError = spy(logger, "error");
     await yargs([
       "controller",
       "set",
@@ -40,16 +39,15 @@ describe("commands/controller", function () {
     ])
       .command(mod)
       .parse();
-    assert.calledWith(
-      consoleError,
-      "unsupported chain (see `chains` command for details)"
-    );
+
+    const value = consoleError.getCall(0).firstArg;
+    equal(value, "unsupported chain (see `chains` command for details)");
   });
 
   test("throws with invalid get argument", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
-    const consoleError = spy(console, "error");
+    const consoleError = spy(logger, "error");
     await yargs([
       "controller",
       "get",
@@ -61,16 +59,15 @@ describe("commands/controller", function () {
     ])
       .command(mod)
       .parse();
-    assert.calledWith(
-      consoleError,
-      "error validating name: table name has wrong format: invalid"
-    );
+
+    const value = consoleError.getCall(0).firstArg;
+    equal(value, "error validating name: table name has wrong format: invalid");
   });
 
   test("throws with invalid set arguments", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
-    const consoleError = spy(console, "error");
+    const consoleError = spy(logger, "error");
     await yargs([
       "controller",
       "set",
@@ -85,16 +82,13 @@ describe("commands/controller", function () {
       .parse();
 
     const value = consoleError.getCall(0).firstArg;
-    equal(
-      value.includes("error validating name: table name has wrong format: "),
-      true
-    );
+    match(value, /error validating name: table name has wrong format:/);
   });
 
   test("passes when setting a controller", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
-    const consoleLog = spy(console, "log");
+    const consoleLog = spy(logger, "log");
 
     await yargs([
       "controller",
@@ -108,19 +102,18 @@ describe("commands/controller", function () {
     ])
       .command(mod)
       .parse();
-    assert.calledWith(
-      consoleLog,
-      match(function (value: any) {
-        const { hash, link } = JSON.parse(value);
-        return typeof hash === "string" && hash.startsWith("0x") && !link;
-      }, "does not match")
-    );
+
+    const res = consoleLog.getCall(0).firstArg;
+    const { hash, link } = JSON.parse(res);
+    equal(typeof hash, "string");
+    equal(hash.startsWith("0x"), true);
+    equal(!link, true);
   });
 
   test("passes when getting a controller", async function () {
     const [account] = getAccounts();
     const privateKey = account.privateKey.slice(2);
-    const consoleLog = spy(console, "log");
+    const consoleLog = spy(logger, "log");
     await yargs([
       "controller",
       "get",
@@ -132,7 +125,9 @@ describe("commands/controller", function () {
     ])
       .command(mod)
       .parse();
-    assert.calledWith(consoleLog, `0x0000000000000000000000000000000000000000`);
+
+    const value = consoleLog.getCall(0).firstArg;
+    equal(value, "0x0000000000000000000000000000000000000000");
   });
 
   // TODO: Create tests for locking a controller

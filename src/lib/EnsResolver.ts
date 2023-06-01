@@ -1,7 +1,8 @@
 import ethers, { Signer } from "ethers";
-import ensLib from "./EnsCommand.js";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { ENS } from "@ensdomains/ensjs";
+import ensLib from "./EnsCommand.js";
+import { logger } from "../utils.js";
 
 interface EnsResolverOptions {
   ensProviderUrl: string;
@@ -50,8 +51,8 @@ export default class EnsResolver {
       });
       return true;
     } catch (e: any) {
-      console.log("Adding table to ENS failed");
-      console.error(e.message);
+      logger.log("Adding table to ENS failed");
+      logger.error(e.message);
     }
     return true;
   }

@@ -2,6 +2,7 @@ import type yargs from "yargs";
 import { Arguments, CommandBuilder } from "yargs";
 import { GlobalOptions } from "../cli.js";
 import { setupCommand } from "../lib/commandSetup.js";
+import { logger } from "../utils.js";
 
 export interface Options extends GlobalOptions {
   domain: string;
@@ -16,13 +17,13 @@ async function getHandler(argv: yargs.ArgumentsCamelCase<Options>) {
   const { record } = argv;
   const { ens } = await setupCommand(argv);
   if (!ens) {
-    console.log(
+    logger.log(
       "To use ENS, ensure you have set the enableEnsExperiment flag to true"
     );
     return;
   }
 
-  console.log(JSON.stringify({ value: await ens.resolveTable(record) }));
+  logger.log(JSON.stringify({ value: await ens.resolveTable(record) }));
 }
 
 async function setHandler(argv: yargs.ArgumentsCamelCase<Options>) {
@@ -55,7 +56,7 @@ async function setHandler(argv: yargs.ArgumentsCamelCase<Options>) {
       mappings,
     };
 
-    console.log(JSON.stringify(response));
+    logger.log(JSON.stringify(response));
   }
 }
 

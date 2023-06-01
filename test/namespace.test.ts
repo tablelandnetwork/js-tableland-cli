@@ -1,10 +1,12 @@
+import { equal } from "node:assert";
 import { describe, test, afterEach, beforeEach } from "mocha";
-import { spy, restore, assert, stub, match } from "sinon";
+import { spy, restore, stub } from "sinon";
 import yargs from "yargs/yargs";
 import * as mod from "../src/commands/namespace.js";
 import ensLib from "../src/lib/EnsCommand";
 import { ethers } from "ethers";
 import { getResolverMock } from "./mock.js";
+import { logger } from "../src/utils.js";
 
 describe("commands/namespace", function () {
   beforeEach(async function () {
@@ -31,7 +33,7 @@ describe("commands/namespace", function () {
   });
 
   test("Get ENS name", async function () {
-    const consoleLog = spy(console, "log");
+    const consoleLog = spy(logger, "log");
     await yargs([
       "namespace",
       "get",
@@ -43,18 +45,13 @@ describe("commands/namespace", function () {
       .command(mod)
       .parse();
 
-    assert.calledWith(
-      consoleLog,
-      match((value) => {
-        value = JSON.parse(value);
-
-        return value.value === "healthbot_31337_1";
-      }, "Doesn't match expected output")
-    );
+    const res = consoleLog.getCall(0).firstArg;
+    const value = JSON.parse(res);
+    equal(value.value, "healthbot_31337_1");
   });
 
   test("Set ENS name", async function () {
-    const consoleLog = spy(console, "log");
+    const consoleLog = spy(logger, "log");
     await yargs([
       "namespace",
       "set",
@@ -67,17 +64,10 @@ describe("commands/namespace", function () {
       .command(mod)
       .parse();
 
-    assert.calledWith(
-      consoleLog,
-      match((value) => {
-        value = JSON.parse(value);
-
-        return (
-          value.domain === "foo.bar.eth" &&
-          value.records[0].key === "healthbot" &&
-          value.records[0].value === "healthbot_31337_1"
-        );
-      }, "Doesn't match expected output")
-    );
+    const res = consoleLog.getCall(0).firstArg;
+    const value = JSON.parse(res);
+    equal(value.domain, "foo.bar.eth");
+    equal(value.records[0].key, "healthbot");
+    equal(value.records[0].value, "healthbot_31337_1");
   });
 });

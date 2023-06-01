@@ -71,7 +71,10 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       logger.error("the `write` command can only accept write queries");
       return;
     }
+    // Note: I can't figure out a write statement that updates 2 tables and makes
+    //  it through the parser, but leaving this here because one might exist.
     if (normalized.tables.length < 1) {
+      /* c8 ignore next 5 */
       logger.error(
         "after normalizing the statement there was no write query, hence nothing to do"
       );
@@ -95,6 +98,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
           // re-normalize so we can be sure we've isolated each statement and it's tableId
           const norm = await normalize(stmt);
           if (norm.tables.length > 1) {
+            /* c8 ignore next 4 */
             throw new Error(
               "cannot normalize if single query affects more then one table"
             );

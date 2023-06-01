@@ -10,9 +10,10 @@ import { helpers } from "@tableland/sdk";
 describe("commands/transfer", function () {
   this.timeout("30s");
 
+  // account[0] is the Validator's wallet, try to avoid using that
   const accounts = getAccounts();
-  // account 0 is the Validator's wallet, try to avoid using that
   const db = getDatabase(accounts[1]);
+
   let tableName: string;
   before(async function () {
     await wait(500);

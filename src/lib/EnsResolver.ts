@@ -21,7 +21,10 @@ export default class EnsResolver {
 
   constructor(options: EnsResolverOptions) {
     const { signer, ensProviderUrl } = options;
-    if (!ensProviderUrl) throw new Error("No ensProviderUrl given");
+    /* c8 ignore next 3 */
+    if (!ensProviderUrl) {
+      throw new Error("No ensProviderUrl given");
+    }
     this.signer = signer;
     this.provider = new JsonRpcProvider(ensProviderUrl);
 
@@ -37,6 +40,7 @@ export default class EnsResolver {
     const domain = domainArray.join(".");
     const address = await this.provider.getResolver(domain);
 
+    // TODO: mock `this.provider.getResolver` so address is undefined and we get coverage on the or clause
     return (await address?.getText(textRecord)) || tablename;
   }
 

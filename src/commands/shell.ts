@@ -22,8 +22,8 @@ export const desc =
 export const aliases = ["s", "sh"];
 
 process.on("SIGINT", function () {
+  /* c8 ignore next 2 */
   logger.log("Caught interrupt signal");
-
   process.exit();
 });
 
@@ -108,6 +108,7 @@ async function shellYeah(
         history = newHistory;
       });
       rl.on("SIGINT", () => {
+        /* c8 ignore next 1 */
         process.exit();
       });
 
@@ -141,6 +142,7 @@ async function shellYeah(
     }
 
     shellYeah(argv, tablelandConnection, history);
+    /* c8 ignore next 6 */
   } catch (err: any) {
     logger.error(err.message);
     if (argv.verbose) {

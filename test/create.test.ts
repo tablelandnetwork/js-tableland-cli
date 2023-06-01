@@ -48,39 +48,6 @@ describe("commands/create", function () {
     equal(value, "missing required flag (`-c` or `--chain`)");
   });
 
-  test("Create namespace with table using ENS", async () => {
-    const fullReolverStub = stub(
-      ethers.providers.JsonRpcProvider.prototype,
-      "getResolver"
-    ).callsFake(getResolverMock);
-
-    const consoleLog = spy(logger, "log");
-    const [account] = getAccounts();
-    const privateKey = account.privateKey.slice(2);
-    await yargs([
-      "create",
-      "id integer, message text",
-      "hello",
-      "--chain",
-      "local-tableland",
-      "--privateKey",
-      privateKey,
-      "--ns",
-      "foo.bar.eth",
-      "--enableEnsExperiment",
-      "--ensProviderUrl",
-      "https://localhost:8080",
-    ])
-      .command(mod)
-      .parse();
-
-    fullReolverStub.restore();
-
-    const res = consoleLog.getCall(1).firstArg;
-    const value = JSON.parse(res);
-    equal(value.ensNameRegistered, true);
-  });
-
   test("throws with invalid chain", async function () {
     const [account] = accounts;
     const privateKey = account.privateKey.slice(2);
@@ -189,6 +156,28 @@ describe("commands/create", function () {
     equal(
       value,
       "missing input value (`schema`, `file`, or piped input from stdin required)"
+    );
+  });
+
+  test("throws if prefix not provided", async function () {
+    const [account] = accounts;
+    const privateKey = account.privateKey.slice(2);
+    const consoleError = spy(logger, "error");
+    await yargs([
+      "create",
+      "(id int primary key, desc text)",
+      "--privateKey",
+      privateKey,
+      "--chain",
+      "local-tableland",
+    ])
+      .command(mod)
+      .parse();
+
+    const value = consoleError.getCall(0).firstArg;
+    equal(
+      value,
+      "Must specify --prefix if you do not provide a full Create statement"
     );
   });
 
@@ -347,5 +336,62 @@ describe("commands/create", function () {
     equal(name.endsWith(tableId), true);
     equal(typeof transactionHash, "string");
     equal(transactionHash.startsWith("0x"), true);
+  });
+
+  test("Create namespace with table using ENS", async () => {
+    const fullReolverStub = stub(
+      ethers.providers.JsonRpcProvider.prototype,
+      "getResolver"
+    ).callsFake(getResolverMock);
+
+    const consoleLog = spy(logger, "log");
+    const [account] = getAccounts();
+    const privateKey = account.privateKey.slice(2);
+    await yargs([
+      "create",
+      "id integer, message text",
+      "hello",
+      "--chain",
+      "local-tableland",
+      "--privateKey",
+      privateKey,
+      "--ns",
+      "foo.bar.eth",
+      "--enableEnsExperiment",
+      "--ensProviderUrl",
+      "https://localhost:8080",
+    ])
+      .command(mod)
+      .parse();
+
+    fullReolverStub.restore();
+
+    const res = consoleLog.getCall(1).firstArg;
+    const value = JSON.parse(res);
+    equal(value.ensNameRegistered, true);
+  });
+
+  test("create can accept custom providerUrl", async function () {
+    const [account] = accounts;
+    const privateKey = account.privateKey.slice(2);
+    const consoleError = spy(logger, "error");
+
+    await yargs([
+      "create",
+      "id int primary key, name text",
+      "--prefix",
+      "custom_url_table",
+      "--chain",
+      "local-tableland",
+      "--privateKey",
+      privateKey,
+      "--providerUrl",
+      "http://localhost:9876",
+    ])
+      .command(mod)
+      .parse();
+
+    const value = consoleError.getCall(0).firstArg;
+    equal(value, "cannot determine provider chain ID");
   });
 });

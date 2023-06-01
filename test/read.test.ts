@@ -4,6 +4,7 @@ import { spy, restore, stub } from "sinon";
 import yargs from "yargs/yargs";
 import { temporaryWrite } from "tempy";
 import mockStd from "mock-stdin";
+import { getAccounts, getDatabase } from "@tableland/local";
 import * as mod from "../src/commands/read.js";
 import { wait, logger } from "../src/utils.js";
 import { ethers } from "ethers";
@@ -11,15 +12,21 @@ import { getResolverMock } from "./mock.js";
 
 describe("commands/read", function () {
   this.timeout(10000);
+
+  const accounts = getAccounts();
+  const db = getDatabase(accounts[1]);
+
   before(async function () {
     await wait(5000);
   });
 
-  afterEach(function () {
+  afterEach(async function () {
     restore();
+    // ensure these tests don't hit rate limitting errors
+    await wait(500);
   });
 
-  test("throws with invalid table name", async function () {
+  test("fails with invalid table name", async function () {
     const consoleError = spy(logger, "error");
     const tableName = "something";
     const statement = `select * from ${tableName};`;
@@ -34,7 +41,7 @@ describe("commands/read", function () {
     );
   });
 
-  test("throws with invalid statement", async function () {
+  test("fails with invalid statement", async function () {
     const consoleError = spy(logger, "error");
     await yargs(["read", "invalid;", "--baseUrl", "http://127.0.0.1:8080"])
       .command(mod)
@@ -47,7 +54,48 @@ describe("commands/read", function () {
     );
   });
 
-  test("throws with missing file", async function () {
+  test("fails when using unwrap without chainId", async function () {
+    const consoleError = spy(logger, "error");
+    await yargs([
+      "read",
+      "select counter from healthbot_31337_1 where counter = 1;",
+      "--unwrap",
+    ])
+      .command(mod)
+      .parse();
+
+    const value = consoleError.getCall(0).firstArg;
+    equal(value, "Chain ID is required to use unwrap or extract");
+  });
+
+  test("fails when using unwrap for multiple rows", async function () {
+    const { meta } = await db
+      .prepare("CREATE TABLE test_unwrap_multi (a int);")
+      .all();
+    const tableName = meta.txn?.name ?? "";
+    await db.batch([
+      db.prepare(`INSERT INTO ${tableName} VALUES (1);`),
+      db.prepare(`INSERT INTO ${tableName} VALUES (2);`),
+    ]);
+
+    const consoleError = spy(logger, "error");
+    await yargs([
+      "read",
+      `select * from ${tableName};`,
+      "--format",
+      "objects",
+      "--unwrap",
+      "--chain",
+      "local-tableland",
+    ])
+      .command(mod)
+      .parse();
+
+    const value = consoleError.getCall(0).firstArg;
+    equal(value, "Can't unwrap multiple rows. Use --unwrap=false");
+  });
+
+  test("fails with missing file", async function () {
     const consoleError = spy(logger, "error");
     await yargs([
       "read",
@@ -63,7 +111,7 @@ describe("commands/read", function () {
     match(value, /^ENOENT: no such file or directory/i);
   });
 
-  test("throws with empty stdin", async function () {
+  test("fails with empty stdin", async function () {
     const stdin = mockStd.stdin();
     const consoleError = spy(logger, "error");
     setTimeout(() => {
@@ -141,6 +189,16 @@ describe("commands/read", function () {
     const res = consoleLog.getCall(0).firstArg;
     const value = JSON.parse(res);
     equal(value[0].counter, 1);
+  });
+
+  test("passes with alternate output format (raw)", async function () {
+    const consoleLog = spy(logger, "log");
+    await yargs(["read", "select * from healthbot_31337_1;", "--format", "raw"])
+      .command(mod)
+      .parse();
+
+    const value = consoleLog.getCall(0).firstArg;
+    equal(value, '{"columns":[{"name":"0"}],"rows":[[1]]}');
   });
 
   test("ENS experimental replaces shorthand with tablename", async function () {
@@ -232,5 +290,35 @@ describe("commands/read", function () {
     const value = consoleLog.getCall(0).firstArg;
 
     deepStrictEqual(value, [{ counter: 1 }]);
+  });
+
+  test("passes with alternate output format (table)", async function () {
+    const consoleLog = spy(logger, "log");
+    await yargs([
+      "read",
+      "select * from healthbot_31337_1;",
+      "--format",
+      "table",
+    ])
+      .command(mod)
+      .parse();
+
+    const value = consoleLog.getCall(0).firstArg;
+    deepStrictEqual(value, '{"columns":[{"name":"counter"}],"rows":[[1]]}');
+  });
+
+  test("passes withoutput format (table) when results are empty", async function () {
+    const { meta } = await db
+      .prepare("CREATE TABLE empty_table (a int);")
+      .all();
+    const tableName = meta.txn?.name ?? "";
+
+    const consoleLog = spy(logger, "log");
+    await yargs(["read", `select * from ${tableName};`, "--format", "table"])
+      .command(mod)
+      .parse();
+
+    const value = consoleLog.getCall(0).firstArg;
+    deepStrictEqual(value, '{"columns":[],"rows":[]}');
   });
 });

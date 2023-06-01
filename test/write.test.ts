@@ -113,6 +113,27 @@ describe("commands/write", function () {
     );
   });
 
+  test("throws when used with create statement", async function () {
+    const [account] = accounts;
+    const privateKey = account.privateKey.slice(2);
+    const consoleError = spy(logger, "error");
+    await yargs([
+      "write",
+      "create table fooz (a int);",
+      "--chain",
+      "local-tableland",
+      "--prefix",
+      "cooltable",
+      "--privateKey",
+      privateKey,
+    ])
+      .command(mod)
+      .parse();
+
+    const value = consoleError.getCall(0).firstArg;
+    equal(value, "the `write` command can only accept write queries");
+  });
+
   test("throws with missing file", async function () {
     const [account] = accounts;
     const privateKey = account.privateKey.slice(2);

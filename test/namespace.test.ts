@@ -32,6 +32,81 @@ describe("commands/namespace", function () {
     restore();
   });
 
+  test("get fails if used without experiment flag", async function () {
+    const consoleLog = spy(logger, "log");
+    await yargs([
+      "namespace",
+      "get",
+      "foo.bar.eth",
+      "--ensProviderUrl",
+      "https://localhost:7070",
+    ])
+      .command(mod)
+      .parse();
+
+    const value = consoleLog.getCall(0).firstArg;
+    equal(
+      value,
+      "To use ENS, ensure you have set the enableEnsExperiment flag to true"
+    );
+  });
+
+  test("set fails if used without experiment flag", async function () {
+    const consoleLog = spy(logger, "log");
+    await yargs([
+      "namespace",
+      "set",
+      "foo.bar.eth",
+      "mytable=my_table_31337_4",
+      "--ensProviderUrl",
+      "https://localhost:7070",
+    ])
+      .command(mod)
+      .parse();
+
+    const value = consoleLog.getCall(0).firstArg;
+    equal(
+      value,
+      "To use ENS, ensure you have set the enableEnsExperiment flag to true"
+    );
+  });
+
+  test("fails if ens name is invalid", async function () {
+    const consoleError = spy(logger, "error");
+    await yargs([
+      "namespace",
+      "set",
+      "foo.bar.eth",
+      "invalid&ensname=my_table_31337_4",
+      "--enableEnsExperiment",
+      "--ensProviderUrl",
+      "https://localhost:7070",
+    ])
+      .command(mod)
+      .parse();
+
+    const value = consoleError.getCall(0).firstArg;
+    equal(value, "Only letters or underscores in key name");
+  });
+
+  test("fails if table name is invalid", async function () {
+    const consoleError = spy(logger, "error");
+    await yargs([
+      "namespace",
+      "set",
+      "foo.bar.eth",
+      "mytable=123-invalid_31337_4",
+      "--enableEnsExperiment",
+      "--ensProviderUrl",
+      "https://localhost:7070",
+    ])
+      .command(mod)
+      .parse();
+
+    const value = consoleError.getCall(0).firstArg;
+    equal(value, "Tablename is invalid");
+  });
+
   test("Get ENS name", async function () {
     const consoleLog = spy(logger, "log");
     await yargs([

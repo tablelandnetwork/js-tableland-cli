@@ -2,15 +2,24 @@ import { equal, match } from "node:assert";
 import { describe, test, afterEach, before } from "mocha";
 import { spy, restore } from "sinon";
 import yargs from "yargs/yargs";
-import { getAccounts } from "@tableland/local";
+import { getAccounts, getDatabase } from "@tableland/local";
 import * as mod from "../src/commands/controller.js";
 import { wait, logger } from "../src/utils.js";
 
 describe("commands/controller", function () {
   this.timeout("30s");
 
+  // account[0] is the Validator's wallet, try to avoid using that
+  const accounts = getAccounts();
+  const db = getDatabase(accounts[1]);
+
+  let tableName: string;
   before(async function () {
     await wait(500);
+    const { meta } = await db
+      .prepare("CREATE TABLE test_controller (a int);")
+      .all();
+    tableName = meta.txn?.name ?? "";
   });
 
   afterEach(function () {
@@ -26,8 +35,7 @@ describe("commands/controller", function () {
   });
 
   test("throws with invalid chain", async function () {
-    const [account] = getAccounts();
-    const privateKey = account.privateKey.slice(2);
+    const privateKey = accounts[1].privateKey.slice(2);
     const consoleError = spy(logger, "error");
     await yargs([
       "controller",
@@ -45,8 +53,7 @@ describe("commands/controller", function () {
   });
 
   test("throws with invalid get argument", async function () {
-    const [account] = getAccounts();
-    const privateKey = account.privateKey.slice(2);
+    const privateKey = accounts[1].privateKey.slice(2);
     const consoleError = spy(logger, "error");
     await yargs([
       "controller",
@@ -65,8 +72,7 @@ describe("commands/controller", function () {
   });
 
   test("throws with invalid set arguments", async function () {
-    const [account] = getAccounts();
-    const privateKey = account.privateKey.slice(2);
+    const privateKey = accounts[1].privateKey.slice(2);
     const consoleError = spy(logger, "error");
     await yargs([
       "controller",
@@ -86,15 +92,14 @@ describe("commands/controller", function () {
   });
 
   test("passes when setting a controller", async function () {
-    const [account] = getAccounts();
-    const privateKey = account.privateKey.slice(2);
+    const privateKey = accounts[1].privateKey.slice(2);
     const consoleLog = spy(logger, "log");
 
     await yargs([
       "controller",
       "set",
-      "0x0000000000000000000000000000000000000000",
-      "healthbot_31337_1",
+      accounts[2].address,
+      tableName,
       "--privateKey",
       privateKey,
       "--chain",
@@ -111,13 +116,12 @@ describe("commands/controller", function () {
   });
 
   test("passes when getting a controller", async function () {
-    const [account] = getAccounts();
-    const privateKey = account.privateKey.slice(2);
+    const privateKey = accounts[1].privateKey.slice(2);
     const consoleLog = spy(logger, "log");
     await yargs([
       "controller",
       "get",
-      "healthbot_31337_1",
+      tableName,
       "--privateKey",
       privateKey,
       "--chain",
@@ -127,8 +131,28 @@ describe("commands/controller", function () {
       .parse();
 
     const value = consoleLog.getCall(0).firstArg;
-    equal(value, "0x0000000000000000000000000000000000000000");
+    equal(value, accounts[2].address);
   });
 
-  // TODO: Create tests for locking a controller
+  test("passes when locking a controller", async function () {
+    const privateKey = accounts[1].privateKey.slice(2);
+    const consoleLog = spy(logger, "log");
+    await yargs([
+      "controller",
+      "lock",
+      tableName,
+      "--privateKey",
+      privateKey,
+      "--chain",
+      "local-tableland",
+    ])
+      .command(mod)
+      .parse();
+
+    const res = consoleLog.getCall(0).firstArg;
+    const value = JSON.parse(res);
+
+    equal(value.hash.startsWith("0x"), true);
+    equal(value.from, accounts[1].address);
+  });
 });

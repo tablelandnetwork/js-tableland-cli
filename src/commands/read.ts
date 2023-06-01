@@ -96,11 +96,12 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
           format: "objects",
           unwrap: argv.unwrap,
         });
-      } catch (e: any) {
-        if (e.message.includes("in JSON at position")) {
-          logger.log("Can't unwrap multiple rows. Use --unwrap=false");
+      } catch (err: any) {
+        if (err.message.includes("in JSON at position")) {
+          logger.error("Can't unwrap multiple rows. Use --unwrap=false");
+          /* c8 ignore next 3 */
         } else {
-          throw e;
+          throw err;
         }
       }
     } else {

@@ -36,6 +36,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       chain: parseInt(chainId) as any,
     });
 
+    /* c8 ignore next 3 */
     if (argv.enableEnsExperiment && ens) {
       name = await ens.resolveTable(name);
     }

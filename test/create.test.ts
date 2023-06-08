@@ -338,7 +338,7 @@ describe("commands/create", function () {
     equal(transactionHash.startsWith("0x"), true);
   });
 
-  test("Create namespace with table using ENS", async () => {
+  test("create namespace with table using ENS", async () => {
     const fullReolverStub = stub(
       ethers.providers.JsonRpcProvider.prototype,
       "getResolver"

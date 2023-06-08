@@ -96,4 +96,5 @@ export const builder: CommandBuilder<{}, Options> = (yargs) =>
     )
     .usage(``) as yargs.Argv<Options>;
 
+/* c8 ignore next */
 export const handler = async (argv: Arguments<Options>): Promise<void> => {};

@@ -22,10 +22,6 @@ describe("commands/namespace", function () {
         },
       };
     });
-
-    stub(ethers.providers.JsonRpcProvider.prototype, "getResolver")
-      // @ts-ignore
-      .callsFake(getResolverMock);
   });
 
   afterEach(function () {
@@ -108,6 +104,12 @@ describe("commands/namespace", function () {
   });
 
   test("Get ENS name", async function () {
+    stub(
+      ethers.providers.JsonRpcProvider.prototype,
+      "getResolver"
+      // @ts-ignore
+    ).callsFake(getResolverMock);
+
     const consoleLog = spy(logger, "log");
     await yargs([
       "namespace",

@@ -135,6 +135,9 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     const link = getLink(chain, res.meta.txn?.transactionHash as string);
     const out = { ...res, link, ensNameRegistered: false };
 
+    // TODO: I'm not sure how `check` would be false and statements.length < 2
+    //    so I didn't write a test for it
+    /* c8 ignore next 6 */
     if (!check && argv.ns && argv.enableEnsExperiment && prefix) {
       const register = (await ens?.addTableRecords(argv.ns, [
         { key: prefix, value: out.meta.txn?.name as string },

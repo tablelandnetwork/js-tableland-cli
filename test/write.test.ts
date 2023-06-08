@@ -1,6 +1,8 @@
 import { equal, match } from "node:assert";
 import { describe, test, afterEach, before } from "mocha";
-import { spy, restore } from "sinon";
+import { spy, stub, restore } from "sinon";
+import { ethers } from "ethers";
+import { getResolverUndefinedMock } from "./mock.js";
 import yargs from "yargs/yargs";
 import { temporaryWrite } from "tempy";
 import mockStd from "mock-stdin";
@@ -304,5 +306,44 @@ describe("commands/write", function () {
     equal(typeof transactionHash, "string");
     equal(transactionHash.startsWith("0x"), true);
     equal(!link, true);
+  });
+
+  test("resolves table name to literal name if ens is not set", async function () {
+    const resolverMock = stub(
+      ethers.providers.JsonRpcProvider.prototype,
+      "getResolver"
+      // @ts-ignore
+    ).callsFake(getResolverUndefinedMock);
+
+    const { meta } = await db.prepare("CREATE TABLE ens_write (a int);").all();
+    const tableName = meta.txn?.name ?? "";
+
+    const account = accounts[1];
+    const privateKey = account.privateKey.slice(2);
+    const consoleLog = spy(logger, "log");
+
+    await yargs([
+      "write",
+      `insert into ${tableName} (a) values (1);`,
+      "--chain",
+      "local-tableland",
+      "--privateKey",
+      privateKey,
+      "--enableEnsExperiment",
+      "--ensProviderUrl",
+      "https://localhost:7070",
+    ])
+      .command(mod)
+      .parse();
+
+    const res = consoleLog.getCall(0).firstArg;
+    const value = JSON.parse(res);
+    const { transactionHash, link } = value.meta?.txn;
+
+    equal(typeof transactionHash, "string");
+    equal(transactionHash.startsWith("0x"), true);
+    equal(!link, true);
+
+    equal(resolverMock.calledOnce, true);
   });
 });

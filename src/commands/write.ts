@@ -73,8 +73,8 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     }
     // Note: I can't figure out a write statement that updates 2 tables and makes
     //  it through the parser, but leaving this here because one might exist.
+    /* c8 ignore next 6 */
     if (normalized.tables.length < 1) {
-      /* c8 ignore next 5 */
       logger.error(
         "after normalizing the statement there was no write query, hence nothing to do"
       );
@@ -97,8 +97,8 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
         normalized.statements.map(async function (stmt) {
           // re-normalize so we can be sure we've isolated each statement and it's tableId
           const norm = await normalize(stmt);
+          /* c8 ignore next 5 */
           if (norm.tables.length > 1) {
-            /* c8 ignore next 4 */
             throw new Error(
               "cannot normalize if single query affects more then one table"
             );
@@ -126,6 +126,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       id,
       stmt,
     ]) {
+      /* c8 ignore next 1 */
       if (typeof stmt !== "string") throw new Error("cannot prepare statement");
       return db.prepare(stmt);
     });

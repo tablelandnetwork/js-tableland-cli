@@ -103,12 +103,6 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       logger.error("the `create` command can only accept create queries");
       return;
     }
-    if (statements.length < 1) {
-      logger.error(
-        "after normalizing the statement there was no create query, hence nothing to do"
-      );
-      return;
-    }
 
     if (statements.length < 2) {
       // send the original statement as a single create

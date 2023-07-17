@@ -74,7 +74,7 @@
     "cli-select-2": "^2.0.0",
     "cosmiconfig": "^8.0.0",
     "dotenv": "^16.0.3",
-    "ethers": "^5.7.1",
+    "ethers": "^6.6.4",
     "inquirer": "^9.1.2",
     "js-yaml": "^4.1.0",
     "node-fetch": "^3.2.10",

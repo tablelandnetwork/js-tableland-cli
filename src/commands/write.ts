@@ -97,12 +97,6 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
         normalized.statements.map(async function (stmt) {
           // re-normalize so we can be sure we've isolated each statement and it's tableId
           const norm = await normalize(stmt);
-          /* c8 ignore next 5 */
-          if (norm.tables.length > 1) {
-            throw new Error(
-              "cannot normalize if single query affects more then one table"
-            );
-          }
           const { tableId } = await globalThis.sqlparser.validateTableName(
             norm.tables[0]
           );
@@ -123,7 +117,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     }, {} as any);
 
     const preparedStatements = Object.entries(statementsById).map(function ([
-      id,
+      _,
       stmt,
     ]) {
       /* c8 ignore next 1 */

@@ -78,10 +78,9 @@ async function fireFullQuery(
         break;
       default:
     }
-    /* c8 ignore next 3 */
+    /* c8 ignore next 2 */
   } catch (err: any) {
     logger.error(err?.cause?.message || err?.message);
-    logger.error(err);
   }
 }
 

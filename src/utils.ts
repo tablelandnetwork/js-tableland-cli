@@ -36,8 +36,8 @@ export const wait = async (timeout: number): Promise<void> =>
 export function getLink(chain: helpers.ChainName, hash: string): string {
   /* c8 ignore start */
   if (chain.includes("ethereum")) {
-    if (chain.includes("goerli")) {
-      return `https://goerli.etherscan.io/tx/${hash}`;
+    if (chain.includes("sepolia")) {
+      return `https://sepolia.etherscan.io/tx/${hash}`;
     }
     return `https://etherscan.io/tx/${hash}`;
   } else if (chain.includes("polygon")) {
@@ -47,12 +47,15 @@ export function getLink(chain: helpers.ChainName, hash: string): string {
     return `https://polygonscan.com/tx/${hash}`;
   } else if (chain.includes("optimism")) {
     if (chain.includes("goerli")) {
-      return `https://blockscout.com/optimism/goerli/tx/${hash}`;
+      return `https://goerli-optimism.etherscan.io/tx/${hash}`;
     }
     return `https://optimistic.etherscan.io/tx/${hash}`;
   } else if (chain.includes("arbitrum")) {
     if (chain.includes("goerli")) {
-      return `https://goerli-rollup-explorer.arbitrum.io/tx/${hash}`;
+      return `https://goerli.arbiscan.io/tx/${hash}`;
+    }
+    if (chain.includes("nova")) {
+      return `https://nova.arbiscan.io/tx/${hash}`;
     }
     return `https://arbiscan.io/tx/${hash}`;
   }

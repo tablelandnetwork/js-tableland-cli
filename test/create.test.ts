@@ -6,6 +6,7 @@ import { temporaryWrite } from "tempy";
 import mockStd from "mock-stdin";
 import { getAccounts } from "@tableland/local";
 import { ethers } from "ethers";
+import { helpers } from "@tableland/sdk";
 import * as mod from "../src/commands/create.js";
 import { wait, logger } from "../src/utils.js";
 import { getResolverMock } from "./mock.js";
@@ -422,5 +423,39 @@ describe("commands/create", function () {
 
     const value = consoleError.getCall(0).firstArg;
     equal(value, "cannot determine provider chain ID");
+  });
+
+  test("passes using table alias", async function () {
+    const [account] = accounts;
+    const privateKey = account.privateKey.slice(2);
+    const consoleLog = spy(logger, "log");
+    // Set up test aliases file
+    const aliasesFilePath = await temporaryWrite(`{}`);
+
+    await yargs([
+      "create",
+      "id int",
+      "--prefix",
+      "table_aliases",
+      "--chain",
+      "local-tableland",
+      "--privateKey",
+      privateKey,
+      "--aliases",
+      aliasesFilePath,
+    ])
+      .command(mod)
+      .parse();
+    await wait(3000);
+    const res = consoleLog.getCall(0).firstArg;
+    const value = JSON.parse(res);
+    const { prefix, name } = value.meta.txn;
+
+    // Check the aliases file was updated and matches with the prefix
+    const nameMap = await helpers.jsonFileAliases(aliasesFilePath).read();
+    const tableAlias = Object.keys(nameMap).find(
+      (alias) => nameMap[alias] === name
+    );
+    equal(tableAlias, prefix);
   });
 });

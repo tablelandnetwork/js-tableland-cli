@@ -6,6 +6,7 @@ import { temporaryWrite } from "tempy";
 import mockStd from "mock-stdin";
 import { getAccounts, getDatabase } from "@tableland/local";
 import { ethers } from "ethers";
+import { helpers, Database } from "@tableland/sdk";
 import * as mod from "../src/commands/read.js";
 import { wait, logger } from "../src/utils.js";
 import { getResolverMock } from "./mock.js";
@@ -22,7 +23,7 @@ describe("commands/read", function () {
 
   afterEach(async function () {
     restore();
-    // ensure these tests don't hit rate limitting errors
+    // ensure these tests don't hit rate limiting errors
     await wait(500);
   });
 
@@ -320,5 +321,47 @@ describe("commands/read", function () {
 
     const value = consoleLog.getCall(0).firstArg;
     deepStrictEqual(value, '{"columns":[],"rows":[]}');
+  });
+
+  test("passes using table aliases file", async function () {
+    const account = accounts[1];
+    // Set up test aliases file
+    const aliasesFilePath = await temporaryWrite(`{}`);
+    // Create new db instance to enable aliases
+    const db = new Database({
+      signer: account,
+      baseUrl: helpers.getBaseUrl("local-tableland"),
+      autoWait: true,
+      aliases: helpers.jsonFileAliases(aliasesFilePath),
+    });
+    let { meta } = await db
+      .prepare("CREATE TABLE table_aliases (id int);")
+      .all();
+    const name = meta.txn?.name ?? "";
+    const prefix = meta.txn?.prefix ?? "";
+
+    // Check the aliases file was updated and matches with the prefix
+    const nameMap = await helpers.jsonFileAliases(aliasesFilePath).read();
+    const tableAlias = Object.keys(nameMap).find(
+      (alias) => nameMap[alias] === name
+    );
+    equal(tableAlias, prefix);
+
+    // Write to the table
+    ({ meta } = await db.prepare(`INSERT INTO ${name} values (1);`).run());
+    await meta.txn?.wait();
+
+    const consoleLog = spy(logger, "log");
+    await yargs([
+      "read",
+      `select * from ${tableAlias};`,
+      "--aliases",
+      aliasesFilePath,
+    ])
+      .command(mod)
+      .parse();
+
+    const value = consoleLog.getCall(0).firstArg;
+    deepStrictEqual(value, '[{"id":1}]');
   });
 });

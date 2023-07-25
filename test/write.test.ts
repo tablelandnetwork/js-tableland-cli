@@ -6,6 +6,7 @@ import yargs from "yargs/yargs";
 import { temporaryWrite } from "tempy";
 import mockStd from "mock-stdin";
 import { getAccounts, getDatabase } from "@tableland/local";
+import { helpers, Database } from "@tableland/sdk";
 import * as mod from "../src/commands/write.js";
 import { wait, logger } from "../src/utils.js";
 import { getResolverUndefinedMock } from "./mock.js";
@@ -533,5 +534,61 @@ describe("commands/write", function () {
       .run()) as any;
     equal(results[0].id, 1);
     equal(results[0].data, data);
+  });
+
+  test("passes using table alias", async function () {
+    const account = accounts[1];
+    const privateKey = account.privateKey.slice(2);
+    // Set up test aliases file
+    const aliasesFilePath = await temporaryWrite(`{}`);
+    // Create new db instance to enable aliases
+    const db = new Database({
+      signer: account,
+      baseUrl: helpers.getBaseUrl("local-tableland"),
+      autoWait: true,
+      aliases: helpers.jsonFileAliases(aliasesFilePath),
+    });
+    const { meta } = await db
+      .prepare("CREATE TABLE table_aliases (id int);")
+      .all();
+    const name = meta.txn?.name ?? "";
+    const prefix = meta.txn?.prefix ?? "";
+
+    // Check the aliases file was updated and matches with the prefix
+    const nameMap = await helpers.jsonFileAliases(aliasesFilePath).read();
+    const tableAlias = Object.keys(nameMap).find(
+      (alias) => nameMap[alias] === name
+    );
+    equal(tableAlias, prefix);
+
+    // Write to the table using the alias
+    const consoleLog = spy(logger, "log");
+    await yargs([
+      "write",
+      `insert into ${tableAlias} values (1);`,
+      "--chain",
+      "local-tableland",
+      "--privateKey",
+      privateKey,
+      "--aliases",
+      aliasesFilePath,
+    ])
+      .command(mod)
+      .parse();
+
+    const res = consoleLog.getCall(0).firstArg;
+    const value = JSON.parse(res);
+    const { transactionHash, link } = value.meta?.txn;
+
+    equal(typeof transactionHash, "string");
+    equal(transactionHash.startsWith("0x"), true);
+    equal(!link, true);
+
+    // Make sure data was materialized (note aliases aren't enabled on `db`)
+    const { results } = await db
+      .prepare(`SELECT * FROM ${name}`)
+      .all<{ id: number }>();
+    equal(results.length, 1);
+    equal(results[0].id, 1);
   });
 });

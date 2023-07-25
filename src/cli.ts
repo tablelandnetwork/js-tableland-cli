@@ -46,6 +46,7 @@ export interface GlobalOptions {
   verbose: boolean;
   ensProviderUrl?: string;
   enableEnsExperiment?: boolean;
+  aliases?: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -92,6 +93,12 @@ const _argv = yargs(hideBin(process.argv))
     type: "string",
     description:
       "JSON RPC API provider URL (e.g., https://eth-sepolia.g.alchemy.com/v2/123abc123a...)",
+  })
+  .option("aliases", {
+    alias: "a",
+    type: "string",
+    description:
+      "Path to table aliases JSON file (e.g., ./tableland.aliases.json)",
   })
   .demandCommand(1, "")
   .strict().argv;

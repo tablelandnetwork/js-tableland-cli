@@ -6,4 +6,5 @@
 .env
 .DS_Store
 .tableland*
+tableland.aliases.json
 coverage/

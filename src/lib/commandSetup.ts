@@ -101,6 +101,7 @@ export class Connections {
       baseUrl,
       enableEnsExperiment,
       ensProviderUrl,
+      aliases,
     } = argv;
 
     if (privateKey != null && chain != null) {
@@ -135,6 +136,7 @@ export class Connections {
       signer: this._signer,
       baseUrl,
       autoWait: true,
+      aliases: aliases ? helpers.jsonFileAliases(aliases) : undefined,
     });
 
     if (typeof baseUrl === "string" && baseUrl.trim() !== "") {

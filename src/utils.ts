@@ -1,5 +1,7 @@
 import { Wallet, providers, getDefaultProvider } from "ethers";
 import { helpers } from "@tableland/sdk";
+import { stat } from "node:fs/promises";
+import { extname } from "path";
 
 export const getChains = function (): typeof helpers.supportedChains {
   return Object.fromEntries(
@@ -139,3 +141,16 @@ export const logger = {
     console.error(message);
   },
 };
+
+// Check if a table aliases file exists, or if a directory exists where we can create one
+export async function checkPath(path: string) {
+  try {
+    const stats = await stat(path);
+    if (stats.isFile()) {
+      return extname(path) === ".json" ? "file" : "invalid";
+    }
+    return stats.isDirectory() ? "dir" : "invalid";
+  } catch (err) {
+    return "invalid";
+  }
+}

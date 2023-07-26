@@ -8,7 +8,7 @@ import mockStd from "mock-stdin";
 import { getAccounts, getDatabase } from "@tableland/local";
 import { helpers, Database } from "@tableland/sdk";
 import * as mod from "../src/commands/write.js";
-import { wait, logger } from "../src/utils.js";
+import { wait, logger, jsonFileAliases } from "../src/utils.js";
 import { getResolverUndefinedMock } from "./mock.js";
 
 const accounts = getAccounts();
@@ -180,6 +180,30 @@ describe("commands/write", function () {
       value,
       "missing input value (`statement`, `file`, or piped input from stdin required)"
     );
+  });
+
+  test("throws with invalid table alias file", async function () {
+    const [account] = accounts;
+    const privateKey = account.privateKey.slice(2);
+    const consoleError = spy(logger, "error");
+    // Set up faux aliases file
+    const aliasesFilePath = "./invalid.json";
+
+    await yargs([
+      "write",
+      "INSERT INTO table_aliases (id) VALUES (1);",
+      "--chain",
+      "local-tableland",
+      "--privateKey",
+      privateKey,
+      "--aliases",
+      aliasesFilePath,
+    ])
+      .command(mod)
+      .parse();
+
+    const res = consoleError.getCall(0).firstArg;
+    equal(res, "invalid table aliases file");
   });
 
   test("passes when writing with local-tableland", async function () {
@@ -536,17 +560,17 @@ describe("commands/write", function () {
     equal(results[0].data, data);
   });
 
-  test("passes using table alias", async function () {
+  test("passes with table aliases", async function () {
     const account = accounts[1];
     const privateKey = account.privateKey.slice(2);
     // Set up test aliases file
-    const aliasesFilePath = await temporaryWrite(`{}`);
+    const aliasesFilePath = await temporaryWrite(`{}`, { extension: "json" });
     // Create new db instance to enable aliases
     const db = new Database({
       signer: account,
       baseUrl: helpers.getBaseUrl("local-tableland"),
       autoWait: true,
-      aliases: helpers.jsonFileAliases(aliasesFilePath),
+      aliases: jsonFileAliases(aliasesFilePath),
     });
     const { meta } = await db
       .prepare("CREATE TABLE table_aliases (id int);")
@@ -555,7 +579,7 @@ describe("commands/write", function () {
     const prefix = meta.txn?.prefix ?? "";
 
     // Check the aliases file was updated and matches with the prefix
-    const nameMap = await helpers.jsonFileAliases(aliasesFilePath).read();
+    const nameMap = await jsonFileAliases(aliasesFilePath).read();
     const tableAlias = Object.keys(nameMap).find(
       (alias) => nameMap[alias] === name
     );
@@ -590,29 +614,5 @@ describe("commands/write", function () {
       .all<{ id: number }>();
     equal(results.length, 1);
     equal(results[0].id, 1);
-  });
-
-  test("fails with invalid table alias file", async function () {
-    const [account] = accounts;
-    const privateKey = account.privateKey.slice(2);
-    const consoleError = spy(logger, "error");
-    // Set up faux aliases file
-    const aliasesFilePath = "./invalid.json";
-
-    await yargs([
-      "write",
-      "INSERT INTO table_aliases (id) VALUES (1);",
-      "--chain",
-      "local-tableland",
-      "--privateKey",
-      privateKey,
-      "--aliases",
-      aliasesFilePath,
-    ])
-      .command(mod)
-      .parse();
-
-    const res = consoleError.getCall(0).firstArg;
-    equal(res, "invalid table aliases file");
   });
 });

@@ -8,7 +8,7 @@ import { getAccounts } from "@tableland/local";
 import { ethers } from "ethers";
 import { helpers } from "@tableland/sdk";
 import * as mod from "../src/commands/create.js";
-import { wait, logger } from "../src/utils.js";
+import { wait, logger, jsonFileAliases } from "../src/utils.js";
 import { getResolverMock } from "./mock.js";
 
 const accounts = getAccounts();
@@ -160,6 +160,32 @@ describe("commands/create", function () {
     );
   });
 
+  test("throws with invalid table alias file", async function () {
+    const [account] = accounts;
+    const privateKey = account.privateKey.slice(2);
+    const consoleError = spy(logger, "error");
+    // Set up faux aliases file
+    const aliasesFilePath = "./invalid.json";
+
+    await yargs([
+      "create",
+      "id int",
+      "--prefix",
+      "table_aliases",
+      "--chain",
+      "local-tableland",
+      "--privateKey",
+      privateKey,
+      "--aliases",
+      aliasesFilePath,
+    ])
+      .command(mod)
+      .parse();
+
+    const res = consoleError.getCall(0).firstArg;
+    equal(res, "invalid table aliases file");
+  });
+
   test("creates table if prefix not provided", async function () {
     const [account] = accounts;
     const privateKey = account.privateKey.slice(2);
@@ -182,7 +208,7 @@ describe("commands/create", function () {
     match(name, /^_31337_[0-9]+$/);
   });
 
-  test("Create passes with local-tableland", async function () {
+  test("create passes with local-tableland", async function () {
     const [account] = accounts;
     const privateKey = account.privateKey.slice(2);
     const consoleLog = spy(logger, "log");
@@ -425,12 +451,12 @@ describe("commands/create", function () {
     equal(value, "cannot determine provider chain ID");
   });
 
-  test("passes using table alias", async function () {
+  test("passes with table aliases", async function () {
     const [account] = accounts;
     const privateKey = account.privateKey.slice(2);
     const consoleLog = spy(logger, "log");
     // Set up test aliases file
-    const aliasesFilePath = await temporaryWrite(`{}`);
+    const aliasesFilePath = await temporaryWrite(`{}`, { extension: "json" });
 
     await yargs([
       "create",
@@ -446,31 +472,24 @@ describe("commands/create", function () {
     ])
       .command(mod)
       .parse();
-    await wait(3000);
-    const res = consoleLog.getCall(0).firstArg;
-    const value = JSON.parse(res);
-    const { prefix, name } = value.meta.txn;
+
+    let res = consoleLog.getCall(0).firstArg;
+    let value = JSON.parse(res);
+    const { prefix1, name1 } = value.meta.txn;
 
     // Check the aliases file was updated and matches with the prefix
-    const nameMap = await helpers.jsonFileAliases(aliasesFilePath).read();
-    const tableAlias = Object.keys(nameMap).find(
-      (alias) => nameMap[alias] === name
+    let nameMap = await jsonFileAliases(aliasesFilePath).read();
+    const tableAlias1 = Object.keys(nameMap).find(
+      (alias) => nameMap[alias] === name1
     );
-    equal(tableAlias, prefix);
-  });
+    equal(tableAlias1, prefix1);
 
-  test("fails with invalid table alias file", async function () {
-    const [account] = accounts;
-    const privateKey = account.privateKey.slice(2);
-    const consoleError = spy(logger, "error");
-    // Set up faux aliases file
-    const aliasesFilePath = "./invalid.json";
-
+    // Make sure that creating another table mutates the file, not overwrites it
     await yargs([
       "create",
       "id int",
       "--prefix",
-      "table_aliases",
+      "second_table",
       "--chain",
       "local-tableland",
       "--privateKey",
@@ -481,7 +500,16 @@ describe("commands/create", function () {
       .command(mod)
       .parse();
 
-    const res = consoleError.getCall(0).firstArg;
-    equal(res, "invalid table aliases file");
+    res = consoleLog.getCall(0).firstArg;
+    value = JSON.parse(res);
+    const { prefix2, name2 } = value.meta.txn;
+
+    // Check the aliases file was updated and matches with both prefixes
+    nameMap = await jsonFileAliases(aliasesFilePath).read();
+    const tableAlias2 = Object.keys(nameMap).find(
+      (alias) => nameMap[alias] === name2
+    );
+    equal(tableAlias1, prefix1);
+    equal(tableAlias2, prefix2);
   });
 });

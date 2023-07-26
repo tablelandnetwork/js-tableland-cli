@@ -458,4 +458,30 @@ describe("commands/create", function () {
     );
     equal(tableAlias, prefix);
   });
+
+  test("fails with invalid table alias file", async function () {
+    const [account] = accounts;
+    const privateKey = account.privateKey.slice(2);
+    const consoleError = spy(logger, "error");
+    // Set up faux aliases file
+    const aliasesFilePath = "./invalid.json";
+
+    await yargs([
+      "create",
+      "id int",
+      "--prefix",
+      "table_aliases",
+      "--chain",
+      "local-tableland",
+      "--privateKey",
+      privateKey,
+      "--aliases",
+      aliasesFilePath,
+    ])
+      .command(mod)
+      .parse();
+
+    const res = consoleError.getCall(0).firstArg;
+    equal(res, "invalid table aliases file");
+  });
 });

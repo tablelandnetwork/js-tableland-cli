@@ -277,7 +277,7 @@ describe("commands/shell", function () {
     equal(value, "missing required flag (`-c` or `--chain`)");
   });
 
-  test("Shell throws with invalid chain", async function () {
+  test("throws with invalid chain", async function () {
     const privateKey = accounts[0].privateKey.slice(2);
     const consoleError = spy(logger, "error");
     await yargs(["shell", "--privateKey", privateKey, "--chain", "foozbazz"])
@@ -288,7 +288,7 @@ describe("commands/shell", function () {
     equal(value, "unsupported chain (see `chains` command for details)");
   });
 
-  test("Custom baseUrl is called", async function () {
+  test("works when custom baseUrl is called", async function () {
     const stdin = mockStd.stdin();
     const fetchSpy = spy(global, "fetch");
 
@@ -428,7 +428,7 @@ SQL Queries can be multi-line, and must end with a semicolon (;)`
     );
   });
 
-  test("passes using table alias with creates, writes, reads", async function () {
+  test("works using table alias with creates, writes, reads", async function () {
     const consoleLog = spy(logger, "log");
     const stdin = mockStd.stdin();
     // Set up test aliases file
@@ -486,5 +486,27 @@ SQL Queries can be multi-line, and must end with a semicolon (;)`
     res = consoleLog.getCall(7).args[0];
     filter = res.replace("tableland> ", "");
     deepStrictEqual(filter, '[{"id":1}]');
+  });
+
+  test("fails with invalid table alias file", async function () {
+    const consoleError = spy(logger, "error");
+    // Set up faux aliases file
+    const aliasesFilePath = "./invalid.json";
+
+    const privateKey = accounts[0].privateKey.slice(2);
+    await yargs([
+      "shell",
+      "--chain",
+      "local-tableland",
+      "--privateKey",
+      privateKey,
+      "--aliases",
+      aliasesFilePath,
+    ])
+      .command(mod)
+      .parse();
+
+    const res = consoleError.getCall(0).args[0];
+    equal(res, "invalid table aliases file");
   });
 });

@@ -591,4 +591,28 @@ describe("commands/write", function () {
     equal(results.length, 1);
     equal(results[0].id, 1);
   });
+
+  test("fails with invalid table alias file", async function () {
+    const [account] = accounts;
+    const privateKey = account.privateKey.slice(2);
+    const consoleError = spy(logger, "error");
+    // Set up faux aliases file
+    const aliasesFilePath = "./invalid.json";
+
+    await yargs([
+      "write",
+      "INSERT INTO table_aliases (id) VALUES (1);",
+      "--chain",
+      "local-tableland",
+      "--privateKey",
+      privateKey,
+      "--aliases",
+      aliasesFilePath,
+    ])
+      .command(mod)
+      .parse();
+
+    const res = consoleError.getCall(0).firstArg;
+    equal(res, "invalid table aliases file");
+  });
 });

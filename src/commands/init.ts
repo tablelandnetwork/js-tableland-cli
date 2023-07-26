@@ -109,13 +109,13 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   // Make sure the table aliases file or provided directory exists
   if (aliases) {
     try {
-      const type = await checkAliasesPath(aliases);
+      const type = checkAliasesPath(aliases);
       if (type === "file") {
         rest.aliases = resolve(aliases);
       }
       if (type === "dir") {
         const aliasesFilePath = resolve(aliases, "tableland.aliases.json");
-        writeFileSync(aliasesFilePath, "{}");
+        writeFileSync(aliasesFilePath, JSON.stringify({}));
         rest.aliases = aliasesFilePath;
       }
     } catch (err: any) {

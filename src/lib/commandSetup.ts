@@ -2,7 +2,12 @@ import { helpers, Database, Registry, Validator } from "@tableland/sdk";
 import { init } from "@tableland/sqlparser";
 import { type Signer } from "ethers";
 import { type GlobalOptions } from "../cli.js";
-import { getWalletWithProvider, logger, isValidAliasesFile } from "../utils.js";
+import {
+  getWalletWithProvider,
+  logger,
+  isValidAliasesFile,
+  jsonFileAliases,
+} from "../utils.js";
 import EnsResolver from "./EnsResolver.js";
 
 export class Connections {
@@ -133,11 +138,11 @@ export class Connections {
 
     let aliasesNameMap;
     if (aliases) {
-      const isValid = await isValidAliasesFile(aliases);
+      const isValid = isValidAliasesFile(aliases);
       if (!isValid) {
         throw new Error(`invalid table aliases file`);
       }
-      aliasesNameMap = helpers.jsonFileAliases(aliases);
+      aliasesNameMap = jsonFileAliases(aliases);
     }
 
     this._database = new Database({

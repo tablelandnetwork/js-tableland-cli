@@ -1,6 +1,6 @@
 import { Wallet, providers, getDefaultProvider } from "ethers";
 import { helpers } from "@tableland/sdk";
-import { stat } from "node:fs/promises";
+import { readFileSync, writeFileSync, statSync } from "node:fs";
 import { extname } from "path";
 
 export const getChains = function (): typeof helpers.supportedChains {
@@ -148,11 +148,11 @@ export const logger = {
  * @param path Path to existing aliases file or directory to create one at.
  * @returns The type of the path, either "file" or "dir".
  */
-export async function checkAliasesPath(path: string) {
+export function checkAliasesPath(path: string) {
   let type;
   let isStatErr;
   try {
-    const stats = await stat(path);
+    const stats = statSync(path);
     if (stats.isFile() && extname(path) === ".json") type = "file"; // only set "type" if it's JSON
     if (stats.isDirectory()) type = "dir";
   } catch {
@@ -168,12 +168,38 @@ export async function checkAliasesPath(path: string) {
  * @param path Path to existing aliases file.
  * @returns true if the file exists and is JSON, false otherwise.
  */
-export async function isValidAliasesFile(path: string) {
+export function isValidAliasesFile(path: string) {
   try {
-    const stats = await stat(path);
+    const stats = statSync(path);
     if (stats.isFile() && extname(path) === ".json") return true;
   } catch {
     return false;
   }
   return false;
+}
+
+// Recreate SDK helper's `jsonFileAliases` but with updating the file, not overwriting
+type NameMapping = Record<string, string>;
+
+interface AliasesNameMap {
+  read: () => Promise<NameMapping>;
+  write: (map: NameMapping) => Promise<void>;
+}
+
+// note: slight modification from the original SDK helper
+// since we check if the file exists before calling this, we don't need to use
+// the original `findOrCreateFile` function as no file will be created
+export function jsonFileAliases(filepath: string): AliasesNameMap {
+  return {
+    read: async function (): Promise<NameMapping> {
+      const file = readFileSync(filepath);
+      return JSON.parse(file.toString());
+    },
+    write: async function (nameMap: NameMapping) {
+      const file = readFileSync(filepath);
+      const original = JSON.parse(file.toString());
+      const merged = { ...original, ...nameMap };
+      writeFileSync(filepath, JSON.stringify(merged));
+    },
+  };
 }

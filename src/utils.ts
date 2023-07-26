@@ -121,7 +121,7 @@ export async function getWalletWithProvider({
   }
 
   if (providerChainId !== network.chainId) {
-    throw new Error("provider / chain mismatch.");
+    throw new Error("provider / chain mismatch");
   }
 
   /* c8 ignore stop */
@@ -142,15 +142,38 @@ export const logger = {
   },
 };
 
-// Check if a table aliases file exists, or if a directory exists where we can create one
-export async function checkPath(path: string) {
+/**
+ * Check if a table aliases file exists, or if a directory exists where we can
+ * create a new one (note: only used with `init`, where creation can happen).
+ * @param path Path to existing aliases file or directory to create one at.
+ * @returns The type of the path, either "file" or "dir".
+ */
+export async function checkAliasesPath(path: string) {
+  let type;
+  let isStatErr;
   try {
     const stats = await stat(path);
-    if (stats.isFile()) {
-      return extname(path) === ".json" ? "file" : "invalid";
-    }
-    return stats.isDirectory() ? "dir" : "invalid";
-  } catch (err) {
-    return "invalid";
+    if (stats.isFile() && extname(path) === ".json") type = "file"; // only set "type" if it's JSON
+    if (stats.isDirectory()) type = "dir";
+  } catch {
+    isStatErr = true;
   }
+  if (type === undefined || isStatErr)
+    throw new Error("invalid table aliases path");
+  return type;
+}
+
+/**
+ * Check if a table aliases file exists and is JSON.
+ * @param path Path to existing aliases file.
+ * @returns true if the file exists and is JSON, false otherwise.
+ */
+export async function isValidAliasesFile(path: string) {
+  try {
+    const stats = await stat(path);
+    if (stats.isFile() && extname(path) === ".json") return true;
+  } catch {
+    return false;
+  }
+  return false;
 }

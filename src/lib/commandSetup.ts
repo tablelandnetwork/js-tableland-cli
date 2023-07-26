@@ -2,7 +2,7 @@ import { helpers, Database, Registry, Validator } from "@tableland/sdk";
 import { init } from "@tableland/sqlparser";
 import { type Signer } from "ethers";
 import { type GlobalOptions } from "../cli.js";
-import { getWalletWithProvider, logger } from "../utils.js";
+import { getWalletWithProvider, logger, isValidAliasesFile } from "../utils.js";
 import EnsResolver from "./EnsResolver.js";
 
 export class Connections {
@@ -131,12 +131,21 @@ export class Connections {
     if (this._signer != null)
       this._registry = new Registry({ signer: this._signer });
 
+    let aliasesNameMap;
+    if (aliases) {
+      const isValid = await isValidAliasesFile(aliases);
+      if (!isValid) {
+        throw new Error(`invalid table aliases file`);
+      }
+      aliasesNameMap = helpers.jsonFileAliases(aliases);
+    }
+
     this._database = new Database({
-      // both of these props might be undefined
+      // signer, baseURL, and aliases might be undefined
       signer: this._signer,
       baseUrl,
       autoWait: true,
-      aliases: aliases ? helpers.jsonFileAliases(aliases) : undefined,
+      aliases: aliasesNameMap,
     });
 
     if (typeof baseUrl === "string" && baseUrl.trim() !== "") {

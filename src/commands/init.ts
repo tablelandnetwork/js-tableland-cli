@@ -9,7 +9,7 @@ import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
 import yaml from "js-yaml";
 import inquirer from "inquirer";
-import { getChains, logger, checkPath } from "../utils.js";
+import { getChains, logger, checkAliasesPath } from "../utils.js";
 import { type GlobalOptions } from "../cli.js";
 
 export interface Options extends GlobalOptions {
@@ -108,23 +108,19 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   const configFilePath = resolve(path || `.${moduleName}rc`);
   // Make sure the table aliases file or provided directory exists
   if (aliases) {
-    const type = await checkPath(aliases);
-    switch (type) {
-      case "file":
+    try {
+      const type = await checkAliasesPath(aliases);
+      if (type === "file") {
         rest.aliases = resolve(aliases);
-        break;
-      case "dir": {
+      }
+      if (type === "dir") {
         const aliasesFilePath = resolve(aliases, "tableland.aliases.json");
         writeFileSync(aliasesFilePath, "{}");
         rest.aliases = aliasesFilePath;
-        break;
       }
-      default:
-        // If the paths were invalid, log an error and exit early
-        logger.error(
-          `Failed: table aliases JSON file or directory path does not exist, please enter a valid path`
-        );
-        return;
+    } catch (err: any) {
+      logger.error(err.message); // exit early since the input was invalid
+      return;
     }
   }
   let stream = process.stdout as unknown as WriteStream;

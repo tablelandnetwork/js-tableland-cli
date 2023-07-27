@@ -155,6 +155,71 @@ describe("commands/schema", function () {
     equal(res, `{"columns":[{"name":"counter","type":"integer"}]}`);
   });
 
+  test("passes with valid ENS name when invalid alias provided", async function () {
+    // Must do initial ENS setup and set the record name to the table
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    stub(ensLib, "ENS").callsFake(function () {
+      return {
+        withProvider: () => {
+          return {
+            setRecords: async () => {
+              return false;
+            },
+          };
+        },
+      };
+    });
+    stub(
+      ethers.providers.JsonRpcProvider.prototype,
+      "getResolver"
+      // @ts-ignore
+    ).callsFake(getResolverMock);
+
+    const consoleLog = spy(logger, "log");
+    await yargs([
+      "namespace",
+      "set",
+      "foo.bar.eth",
+      "healthbot=healthbot_31337_1",
+      "--enableEnsExperiment",
+      "--ensProviderUrl",
+      "https://localhost:7070",
+    ])
+      .command(ns)
+      .parse();
+
+    let res = consoleLog.getCall(0).firstArg;
+    const value = JSON.parse(res);
+    equal(value.domain, "foo.bar.eth");
+    equal(value.records[0].key, "healthbot");
+    equal(value.records[0].value, "healthbot_31337_1");
+
+    // Create an empty aliases file
+    const aliasesFilePath = await temporaryWrite(`{}`, {
+      extension: "json",
+    });
+
+    // Now, check the table info using ENS as the name
+    await yargs([
+      "schema",
+      "foo.bar.eth",
+      "--chain",
+      "local-tableland",
+      "--baseUrl",
+      "http://localhost:8080/api/v1",
+      "--enableEnsExperiment",
+      "--ensProviderUrl",
+      "https://localhost:7070",
+      "--aliases",
+      aliasesFilePath,
+    ])
+      .command(mod)
+      .parse();
+
+    res = consoleLog.getCall(1).firstArg;
+    equal(res, `{"columns":[{"name":"counter","type":"integer"}]}`);
+  });
+
   test("passes with table aliases", async function () {
     const [account] = getAccounts();
     // Set up test aliases file

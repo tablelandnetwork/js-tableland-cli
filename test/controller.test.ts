@@ -93,6 +93,25 @@ describe("commands/controller", function () {
     match(value, /error validating name: table name has wrong format:/);
   });
 
+  test("throws with invalid lock arguments", async function () {
+    const privateKey = accounts[1].privateKey.slice(2);
+    const consoleError = spy(logger, "error");
+    await yargs([
+      "controller",
+      "lock",
+      "invalid",
+      "--privateKey",
+      privateKey,
+      "--chain",
+      "local-tableland",
+    ])
+      .command(mod)
+      .parse();
+
+    const value = consoleError.getCall(0).firstArg;
+    match(value, /error validating name: table name has wrong format:/);
+  });
+
   test("passes when setting a controller", async function () {
     const privateKey = accounts[1].privateKey.slice(2);
     const consoleLog = spy(logger, "log");
@@ -159,6 +178,94 @@ describe("commands/controller", function () {
   });
 
   describe("with table aliases", function () {
+    test("throws with invalid get arguments", async function () {
+      const [account] = accounts;
+      const privateKey = account.privateKey.slice(2);
+      const aliasesFilePath = await temporaryWrite(`{}`, {
+        extension: "json",
+      });
+
+      const consoleError = spy(logger, "error");
+      await yargs([
+        "controller",
+        "get",
+        "invalid",
+        "--privateKey",
+        privateKey,
+        "--chain",
+        "local-tableland",
+        "--aliases",
+        aliasesFilePath,
+      ])
+        .command(mod)
+        .parse();
+
+      const value = consoleError.getCall(0).firstArg;
+      equal(
+        value,
+        "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
+      );
+    });
+
+    test("throws with invalid set arguments", async function () {
+      const [account] = accounts;
+      const privateKey = account.privateKey.slice(2);
+      const aliasesFilePath = await temporaryWrite(`{}`, {
+        extension: "json",
+      });
+
+      const consoleError = spy(logger, "error");
+      await yargs([
+        "controller",
+        "set",
+        "invalid",
+        "invalid",
+        "--privateKey",
+        privateKey,
+        "--chain",
+        "local-tableland",
+        "--aliases",
+        aliasesFilePath,
+      ])
+        .command(mod)
+        .parse();
+
+      const value = consoleError.getCall(0).firstArg;
+      equal(
+        value,
+        "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
+      );
+    });
+
+    test("throws with invalid lock arguments", async function () {
+      const [account] = accounts;
+      const privateKey = account.privateKey.slice(2);
+      const aliasesFilePath = await temporaryWrite(`{}`, {
+        extension: "json",
+      });
+
+      const consoleError = spy(logger, "error");
+      await yargs([
+        "controller",
+        "lock",
+        "invalid",
+        "--privateKey",
+        privateKey,
+        "--chain",
+        "local-tableland",
+        "--aliases",
+        aliasesFilePath,
+      ])
+        .command(mod)
+        .parse();
+
+      const value = consoleError.getCall(0).firstArg;
+      equal(
+        value,
+        "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
+      );
+    });
+
     test("passes when setting a controller", async function () {
       const [account] = accounts;
       const privateKey = account.privateKey.slice(2);

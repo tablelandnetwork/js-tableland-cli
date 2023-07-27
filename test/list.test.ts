@@ -4,11 +4,11 @@ import { spy, restore } from "sinon";
 import { getAccounts } from "@tableland/local";
 import yargs from "yargs/yargs";
 import * as mod from "../src/commands/list.js";
-import { logger } from "../src/utils.js";
+import { logger, wait } from "../src/utils.js";
 
 describe("commands/list", function () {
   before(async function () {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await wait(1000);
   });
 
   afterEach(function () {

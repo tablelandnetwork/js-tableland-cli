@@ -1,6 +1,7 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
 import { Registry } from "@tableland/sdk";
+import { init } from "@tableland/sqlparser";
 import {
   getWalletWithProvider,
   getLink,
@@ -9,7 +10,6 @@ import {
   jsonFileAliases,
 } from "../utils.js";
 import { type GlobalOptions } from "../cli.js";
-import { setupCommand } from "../lib/commandSetup.js";
 
 export interface Options extends GlobalOptions {
   name: string;
@@ -33,7 +33,7 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
           description: "The target table name (or alias, if enabled)",
         }) as yargs.Argv<Options>,
       async (argv) => {
-        const { normalize } = await setupCommand(argv);
+        await init();
         const { privateKey, providerUrl, aliases } = argv;
         const chain = getChainName(argv.chain);
         let { name } = argv;
@@ -48,7 +48,7 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
 
           // Check if the passed `name` is valid, otherwise, if it's a table alias
           try {
-            await normalize(name);
+            await globalThis.sqlparser.validateTableName(name);
           } catch (err: any) {
             if (aliases) {
               const nameMap = await jsonFileAliases(aliases).read();
@@ -84,7 +84,7 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
             description: "The target table name (or alias, if enabled)",
           }) as yargs.Argv<Options>,
       async (argv) => {
-        const { normalize } = await setupCommand(argv);
+        await init();
         const { controller, privateKey, providerUrl, aliases } = argv;
         const chain = getChainName(argv.chain);
         let { name } = argv;
@@ -99,7 +99,7 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
           const reg = new Registry({ signer });
           // Check if the passed `name` is valid, otherwise, if it's a table alias
           try {
-            await normalize(name);
+            await globalThis.sqlparser.validateTableName(name);
           } catch (err: any) {
             if (aliases) {
               const nameMap = await jsonFileAliases(aliases).read();
@@ -132,7 +132,7 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
           description: "The target table name (or alias, if enabled)",
         }) as yargs.Argv<Options>,
       async (argv) => {
-        const { normalize } = await setupCommand(argv);
+        await init();
         const { privateKey, providerUrl, aliases } = argv;
         const chain = getChainName(argv.chain);
         let { name } = argv;
@@ -147,7 +147,7 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
           const reg = new Registry({ signer });
           // Check if the passed `name` is valid, otherwise, if it's a table alias
           try {
-            await normalize(name);
+            await globalThis.sqlparser.validateTableName(name);
           } catch (err: any) {
             if (aliases) {
               const nameMap = await jsonFileAliases(aliases).read();

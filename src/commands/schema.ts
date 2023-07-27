@@ -43,9 +43,10 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
           ));
         } catch (err: any) {
           // Throw only if ENS isn't enabled, which is checked next
-          if (!(enableEnsExperiment && ensProviderUrl))
+          if (!(enableEnsExperiment && ensProviderUrl)) {
             logger.error("invalid table alias, table name not found");
-          return;
+            return;
+          }
         }
       }
       // We'll throw later if `chainId` or `tableId` are undefined

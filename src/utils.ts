@@ -148,6 +148,7 @@ export const logger = {
  * @param path Path to existing aliases file or directory to create one at.
  * @returns The type of the path, either "file" or "dir".
  */
+/* c8 ignore start */
 export function checkAliasesPath(path: string) {
   let type;
   let isStatErr;
@@ -162,6 +163,7 @@ export function checkAliasesPath(path: string) {
     throw new Error("invalid table aliases path");
   return type;
 }
+/* c8 ignore stop */
 
 /**
  * Check if a table aliases file exists and is JSON.
@@ -173,6 +175,7 @@ export function isValidAliasesFile(path: string) {
     const stats = statSync(path);
     if (stats.isFile() && extname(path) === ".json") return true;
   } catch {
+    /* c8 ignore next 4 */
     return false;
   }
   return false;

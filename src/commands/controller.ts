@@ -6,8 +6,10 @@ import {
   getLink,
   logger,
   getChainName,
+  jsonFileAliases,
 } from "../utils.js";
 import { type GlobalOptions } from "../cli.js";
+import { setupCommand } from "../lib/commandSetup.js";
 
 export interface Options extends GlobalOptions {
   name: string;
@@ -28,11 +30,13 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
       (yargs) =>
         yargs.positional("name", {
           type: "string",
-          description: "The target table name",
+          description: "The target table name (or alias, if enabled)",
         }) as yargs.Argv<Options>,
       async (argv) => {
-        const { name, privateKey, providerUrl } = argv;
+        const { normalize } = await setupCommand(argv);
+        const { privateKey, providerUrl, aliases } = argv;
         const chain = getChainName(argv.chain);
+        let { name } = argv;
 
         try {
           const signer = await getWalletWithProvider({
@@ -42,6 +46,21 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
           });
           const reg = new Registry({ signer });
 
+          // Check if the passed `name` is valid, otherwise, if it's a table alias
+          try {
+            await normalize(name);
+          } catch (err: any) {
+            if (aliases) {
+              const nameMap = await jsonFileAliases(aliases).read();
+              name = nameMap[name];
+            }
+            if (!name) {
+              logger.error(
+                "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
+              );
+              return;
+            }
+          }
           const res = await reg.getController(name);
 
           logger.log(res);
@@ -62,11 +81,13 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
           })
           .positional("name", {
             type: "string",
-            description: "The target table name",
+            description: "The target table name (or alias, if enabled)",
           }) as yargs.Argv<Options>,
       async (argv) => {
-        const { name, controller, privateKey, providerUrl } = argv;
+        const { normalize } = await setupCommand(argv);
+        const { controller, privateKey, providerUrl, aliases } = argv;
         const chain = getChainName(argv.chain);
+        let { name } = argv;
 
         try {
           const signer = await getWalletWithProvider({
@@ -76,6 +97,21 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
           });
 
           const reg = new Registry({ signer });
+          // Check if the passed `name` is valid, otherwise, if it's a table alias
+          try {
+            await normalize(name);
+          } catch (err: any) {
+            if (aliases) {
+              const nameMap = await jsonFileAliases(aliases).read();
+              name = nameMap[name];
+            }
+            if (!name) {
+              logger.error(
+                "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
+              );
+              return;
+            }
+          }
           const res = await reg.setController({ tableName: name, controller });
 
           const link = getLink(chain, res.hash);
@@ -93,11 +129,13 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
       (yargs) =>
         yargs.positional("name", {
           type: "string",
-          description: "The target table name",
+          description: "The target table name (or alias, if enabled)",
         }) as yargs.Argv<Options>,
       async (argv) => {
-        const { name, privateKey, providerUrl } = argv;
+        const { normalize } = await setupCommand(argv);
+        const { privateKey, providerUrl, aliases } = argv;
         const chain = getChainName(argv.chain);
+        let { name } = argv;
 
         try {
           const signer = await getWalletWithProvider({
@@ -107,7 +145,21 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
           });
 
           const reg = new Registry({ signer });
-
+          // Check if the passed `name` is valid, otherwise, if it's a table alias
+          try {
+            await normalize(name);
+          } catch (err: any) {
+            if (aliases) {
+              const nameMap = await jsonFileAliases(aliases).read();
+              name = nameMap[name];
+            }
+            if (!name) {
+              logger.error(
+                "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
+              );
+              return;
+            }
+          }
           const res = await reg.lockController(name);
 
           const link = getLink(chain, res.hash);

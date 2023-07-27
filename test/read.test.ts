@@ -5,9 +5,9 @@ import yargs from "yargs/yargs";
 import { temporaryWrite } from "tempy";
 import mockStd from "mock-stdin";
 import { getAccounts, getDatabase } from "@tableland/local";
+import { ethers } from "ethers";
 import * as mod from "../src/commands/read.js";
 import { wait, logger } from "../src/utils.js";
-import { ethers } from "ethers";
 import { getResolverMock } from "./mock.js";
 
 describe("commands/read", function () {

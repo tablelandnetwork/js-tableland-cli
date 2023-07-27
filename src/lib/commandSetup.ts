@@ -128,6 +128,7 @@ export class Connections {
     if (chain != null) {
       try {
         this._network = helpers.getChainInfo(chain);
+        /* c8 ignore next 3 */
       } catch (e) {
         logger.error("unsupported chain (see `chains` command for details)");
       }

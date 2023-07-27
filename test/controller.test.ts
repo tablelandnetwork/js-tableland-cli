@@ -3,8 +3,10 @@ import { describe, test, afterEach, before } from "mocha";
 import { spy, restore } from "sinon";
 import yargs from "yargs/yargs";
 import { getAccounts, getDatabase } from "@tableland/local";
+import { helpers, Database } from "@tableland/sdk";
+import { temporaryWrite } from "tempy";
 import * as mod from "../src/commands/controller.js";
-import { wait, logger } from "../src/utils.js";
+import { jsonFileAliases, logger, wait } from "../src/utils.js";
 
 describe("commands/controller", function () {
   this.timeout("30s");
@@ -40,7 +42,7 @@ describe("commands/controller", function () {
     await yargs([
       "controller",
       "set",
-      "someting",
+      "something",
       "another",
       "--privateKey",
       privateKey,
@@ -154,5 +156,155 @@ describe("commands/controller", function () {
 
     equal(value.hash.startsWith("0x"), true);
     equal(value.from, accounts[1].address);
+  });
+
+  describe("with table aliases", function () {
+    test("passes when setting a controller", async function () {
+      const [account] = accounts;
+      const privateKey = account.privateKey.slice(2);
+      // Set up test aliases file
+      const aliasesFilePath = await temporaryWrite(`{}`, {
+        extension: "json",
+      });
+      // Create new db instance to enable aliases
+      const db = new Database({
+        signer: account,
+        baseUrl: helpers.getBaseUrl("local-tableland"),
+        autoWait: true,
+        aliases: jsonFileAliases(aliasesFilePath),
+      });
+      const { meta } = await db
+        .prepare("CREATE TABLE table_aliases (id int);")
+        .all();
+      const nameFromCreate = meta.txn?.name ?? "";
+      const prefix = meta.txn?.prefix ?? "";
+
+      // Check the aliases file was updated and matches with the prefix
+      const nameMap = await jsonFileAliases(aliasesFilePath).read();
+      const tableAlias = Object.keys(nameMap).find(
+        (alias) => nameMap[alias] === nameFromCreate
+      );
+      equal(tableAlias, prefix);
+
+      // Now, set the controller
+      const consoleLog = spy(logger, "log");
+      await yargs([
+        "controller",
+        "set",
+        accounts[2].address,
+        tableAlias!,
+        "--privateKey",
+        privateKey,
+        "--chain",
+        "local-tableland",
+        "--aliases",
+        aliasesFilePath,
+      ])
+        .command(mod)
+        .parse();
+
+      const res = consoleLog.getCall(0).firstArg;
+      const { hash, link } = JSON.parse(res);
+      equal(typeof hash, "string");
+      equal(hash.startsWith("0x"), true);
+      equal(!link, true);
+    });
+
+    test("passes when getting a controller", async function () {
+      const [account] = accounts;
+      const privateKey = account.privateKey.slice(2);
+      // Set up test aliases file
+      const aliasesFilePath = await temporaryWrite(`{}`, {
+        extension: "json",
+      });
+      // Create new db instance to enable aliases
+      const db = new Database({
+        signer: account,
+        baseUrl: helpers.getBaseUrl("local-tableland"),
+        autoWait: true,
+        aliases: jsonFileAliases(aliasesFilePath),
+      });
+      const { meta } = await db
+        .prepare("CREATE TABLE table_aliases (id int);")
+        .all();
+      const nameFromCreate = meta.txn?.name ?? "";
+      const prefix = meta.txn?.prefix ?? "";
+
+      // Check the aliases file was updated and matches with the prefix
+      const nameMap = await jsonFileAliases(aliasesFilePath).read();
+      const tableAlias = Object.keys(nameMap).find(
+        (alias) => nameMap[alias] === nameFromCreate
+      );
+      equal(tableAlias, prefix);
+
+      // Now, get the controller
+      const consoleLog = spy(logger, "log");
+      await yargs([
+        "controller",
+        "get",
+        tableAlias!,
+        "--privateKey",
+        privateKey,
+        "--chain",
+        "local-tableland",
+        "--aliases",
+        aliasesFilePath,
+      ])
+        .command(mod)
+        .parse();
+
+      const value = consoleLog.getCall(0).firstArg;
+      equal(value, "0x0000000000000000000000000000000000000000");
+    });
+
+    test("passes when locking a controller", async function () {
+      const [account] = accounts;
+      const privateKey = account.privateKey.slice(2);
+      // Set up test aliases file
+      const aliasesFilePath = await temporaryWrite(`{}`, {
+        extension: "json",
+      });
+      // Create new db instance to enable aliases
+      const db = new Database({
+        signer: account,
+        baseUrl: helpers.getBaseUrl("local-tableland"),
+        autoWait: true,
+        aliases: jsonFileAliases(aliasesFilePath),
+      });
+      const { meta } = await db
+        .prepare("CREATE TABLE table_aliases (id int);")
+        .all();
+      const nameFromCreate = meta.txn?.name ?? "";
+      const prefix = meta.txn?.prefix ?? "";
+
+      // Check the aliases file was updated and matches with the prefix
+      const nameMap = await jsonFileAliases(aliasesFilePath).read();
+      const tableAlias = Object.keys(nameMap).find(
+        (alias) => nameMap[alias] === nameFromCreate
+      );
+      equal(tableAlias, prefix);
+
+      // Now, lock the controller
+      const consoleLog = spy(logger, "log");
+      await yargs([
+        "controller",
+        "lock",
+        tableAlias!,
+        "--privateKey",
+        privateKey,
+        "--chain",
+        "local-tableland",
+        "--aliases",
+        aliasesFilePath,
+      ])
+        .command(mod)
+        .parse();
+
+      const res = consoleLog.getCall(0).firstArg;
+      const value = JSON.parse(res);
+
+      equal(value.hash.startsWith("0x"), true);
+      equal(value.from, account.address);
+    });
   });
 });

@@ -64,7 +64,7 @@ async function fireFullQuery(
     }
 
     const { type } = await globalThis.sqlparser.normalize(statement);
-    if (type !== "read" && (await confirmQuery()) == null) return;
+    if (type !== "read" && !(await confirmQuery())) return;
 
     const stmt = database.prepare(statement);
     const response = await stmt.all();

@@ -65,13 +65,13 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   try {
     if (file != null) {
       statement = await promises.readFile(file, { encoding: "utf-8" });
-    } else if (statement == null) {
+    } else if (statement == null || statement === "") {
       const rl = createInterface({ input: process.stdin });
       const it = rl[Symbol.asyncIterator]();
       const { value } = await it.next();
       statement = value;
     }
-    if (statement == null) {
+    if (statement == null || statement === "") {
       logger.error(
         "missing input value (`statement`, `file`, or piped input from stdin required)"
       );

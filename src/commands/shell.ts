@@ -146,7 +146,11 @@ async function shellYeah(
       }
     }
 
-    await shellYeah(argv, tablelandConnection, history);
+    // NOTE: we must use catch here instead of awaiting because this is calling
+    //       itself and the tests will hang forever if we use `await`
+    shellYeah(argv, tablelandConnection, history).catch((err) => {
+      logger.error(err);
+    });
     /* c8 ignore next 6 */
   } catch (err: any) {
     logger.error(err.message);

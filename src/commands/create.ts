@@ -62,7 +62,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       const { value } = await it.next();
       schema = value;
     }
-    if (schema == null) {
+    if (schema == null || schema === "") {
       logger.error(
         "missing input value (`schema`, `file`, or piped input from stdin required)"
       );

@@ -2,7 +2,7 @@ import { helpers, Database, Registry, Validator } from "@tableland/sdk";
 import { init } from "@tableland/sqlparser";
 import { type Signer } from "ethers";
 import { type GlobalOptions } from "../cli.js";
-import { getWalletWithProvider } from "../utils.js";
+import { getWalletWithProvider, logger } from "../utils.js";
 import EnsResolver from "./EnsResolver.js";
 
 export class Connections {
@@ -119,11 +119,11 @@ export class Connections {
       });
     }
 
-    if (typeof chain === "string" && chain.trim() !== "") {
+    if (chain != null) {
       try {
         this._network = helpers.getChainInfo(chain);
       } catch (e) {
-        console.error("unsupported chain (see `chains` command for details)");
+        logger.error("unsupported chain (see `chains` command for details)");
       }
     }
 
@@ -139,7 +139,7 @@ export class Connections {
 
     if (typeof baseUrl === "string" && baseUrl.trim() !== "") {
       this._validator = new Validator({ baseUrl });
-    } else if (typeof chain === "string" && chain.trim() !== "") {
+    } else if (chain != null) {
       this._validator = Validator.forChain(chain);
     }
   }

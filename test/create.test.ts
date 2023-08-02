@@ -141,7 +141,7 @@ describe("commands/create", function () {
     const consoleError = spy(logger, "error");
     setTimeout(() => {
       stdin.send("\n").end();
-    }, 100);
+    }, 300);
     await yargs([
       "create",
       "--chain",

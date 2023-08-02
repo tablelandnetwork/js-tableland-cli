@@ -104,11 +104,9 @@ describe("commands/namespace", function () {
   });
 
   test("Get ENS name", async function () {
-    stub(
-      ethers.providers.JsonRpcProvider.prototype,
-      "getResolver"
-      // @ts-expect-error TODO: mock doesn't match type requirements
-    ).callsFake(getResolverMock);
+    stub(ethers.providers.JsonRpcProvider.prototype, "getResolver").callsFake(
+      getResolverMock
+    );
 
     const consoleLog = spy(logger, "log");
     await yargs([

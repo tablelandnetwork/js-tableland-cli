@@ -15,8 +15,7 @@ const lt = new LocalTableland({ silent: false });
 
 before(async function () {
   this.timeout(30000);
-  lt.start();
-  await lt.isReady();
+  await lt.start();
 });
 
 after(async function () {

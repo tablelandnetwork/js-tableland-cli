@@ -5,9 +5,9 @@ import yargs from "yargs/yargs";
 import { temporaryWrite } from "tempy";
 import mockStd from "mock-stdin";
 import { getAccounts } from "@tableland/local";
+import { ethers } from "ethers";
 import * as mod from "../src/commands/create.js";
 import { wait, logger } from "../src/utils.js";
-import { ethers } from "ethers";
 import { getResolverMock } from "./mock.js";
 
 const accounts = getAccounts();
@@ -141,7 +141,7 @@ describe("commands/create", function () {
     const consoleError = spy(logger, "error");
     setTimeout(() => {
       stdin.send("\n").end();
-    }, 100);
+    }, 300);
     await yargs([
       "create",
       "--chain",
@@ -203,6 +203,35 @@ describe("commands/create", function () {
     const { prefix, name, chainId, tableId, transactionHash } = value.meta.txn;
 
     equal(prefix, "first_table");
+    equal(chainId, 31337);
+    equal(name.startsWith(prefix), true);
+    equal(name.endsWith(tableId), true);
+    equal(typeof transactionHash, "string");
+    equal(transactionHash.startsWith("0x"), true);
+  });
+
+  test("Create works with chain as number", async function () {
+    const [account] = accounts;
+    const privateKey = account.privateKey.slice(2);
+    const consoleLog = spy(logger, "log");
+    await yargs([
+      "create",
+      "id int primary key, name text",
+      "--chain",
+      "31337",
+      "--privateKey",
+      privateKey,
+      "--prefix",
+      "chainid_table",
+    ])
+      .command(mod)
+      .parse();
+
+    const res = consoleLog.getCall(0).firstArg;
+    const value = JSON.parse(res);
+    const { prefix, name, chainId, tableId, transactionHash } = value.meta.txn;
+
+    equal(prefix, "chainid_table");
     equal(chainId, 31337);
     equal(name.startsWith(prefix), true);
     equal(name.endsWith(tableId), true);

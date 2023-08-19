@@ -182,7 +182,7 @@ describe("commands/write", function () {
     );
   });
 
-  test("throws with invalid table alias file", async function () {
+  test("throws with invalid table aliases file", async function () {
     const [account] = accounts;
     const privateKey = account.privateKey.slice(2);
     const consoleError = spy(logger, "error");
@@ -204,6 +204,30 @@ describe("commands/write", function () {
 
     const res = consoleError.getCall(0).firstArg;
     equal(res, "invalid table aliases file");
+  });
+
+  test("throws with invalid table alias definition", async function () {
+    const [account] = accounts;
+    const privateKey = account.privateKey.slice(2);
+    const consoleError = spy(logger, "error");
+    // Set up faux aliases file
+    const aliasesFilePath = await temporaryWrite(`{}`, { extension: "json" });
+
+    await yargs([
+      "write",
+      "INSERT INTO table_aliases (id) VALUES (1);",
+      "--chain",
+      "local-tableland",
+      "--privateKey",
+      privateKey,
+      "--aliases",
+      aliasesFilePath,
+    ])
+      .command(mod)
+      .parse();
+
+    const res = consoleError.getCall(0).firstArg;
+    match(res, /error validating name: table name has wrong format:/);
   });
 
   test("passes when writing with local-tableland", async function () {

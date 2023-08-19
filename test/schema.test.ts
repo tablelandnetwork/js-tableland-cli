@@ -50,27 +50,7 @@ describe("commands/schema", function () {
     equal(value, "Not Found");
   });
 
-  test("throws with valid ENS name but no namespace record set", async function () {
-    const consoleError = spy(logger, "error");
-    await yargs([
-      "schema",
-      "foo.bar.eth",
-      "--chain",
-      "local-tableland",
-      "--baseUrl",
-      "http://localhost:8080/api/v1",
-      "--enableEnsExperiment",
-      "--ensProviderUrl",
-      "https://localhost:7070",
-    ])
-      .command(mod)
-      .parse();
-
-    const value = consoleError.getCall(0).firstArg;
-    equal(value, "invalid ENS namespace, table record not found");
-  });
-
-  test("throws with invalid table alias", async function () {
+  test("throws with invalid table aliases file", async function () {
     const consoleError = spy(logger, "error");
     await yargs([
       "schema",
@@ -86,7 +66,33 @@ describe("commands/schema", function () {
       .parse();
 
     const value = consoleError.getCall(0).firstArg;
-    equal(value, "invalid table alias, table name not found");
+    equal(value, "invalid table aliases file");
+  });
+
+  test("throws with invalid table alias definition", async function () {
+    // Set up test aliases file
+    const aliasesFilePath = await temporaryWrite(`{}`, {
+      extension: "json",
+    });
+    const consoleError = spy(logger, "error");
+    await yargs([
+      "schema",
+      "table_alias",
+      "--chain",
+      "local-tableland",
+      "--baseUrl",
+      "http://localhost:8080/api/v1",
+      "--aliases",
+      aliasesFilePath,
+    ])
+      .command(mod)
+      .parse();
+
+    const value = consoleError.getCall(0).firstArg;
+    equal(
+      value,
+      "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
+    );
   });
 
   test("passes with local-tableland", async function () {

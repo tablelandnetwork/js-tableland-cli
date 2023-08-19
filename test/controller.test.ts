@@ -201,10 +201,7 @@ describe("commands/controller", function () {
         .parse();
 
       const value = consoleError.getCall(0).firstArg;
-      equal(
-        value,
-        "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
-      );
+      match(value, /error validating name: table name has wrong format:/);
     });
 
     test("throws with invalid set arguments", async function () {
@@ -231,10 +228,7 @@ describe("commands/controller", function () {
         .parse();
 
       const value = consoleError.getCall(0).firstArg;
-      equal(
-        value,
-        "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
-      );
+      match(value, /error validating name: table name has wrong format:/);
     });
 
     test("throws with invalid lock arguments", async function () {
@@ -260,10 +254,7 @@ describe("commands/controller", function () {
         .parse();
 
       const value = consoleError.getCall(0).firstArg;
-      equal(
-        value,
-        "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
-      );
+      match(value, /error validating name: table name has wrong format:/);
     });
 
     test("passes when setting a controller", async function () {

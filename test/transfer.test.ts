@@ -96,7 +96,32 @@ describe("commands/transfer", function () {
     );
   });
 
-  test("throws with invalid table alias", async function () {
+  test("throws with invalid table aliases file", async function () {
+    const [, account1, account2] = accounts;
+    const account2Address = account2.address;
+    const consoleError = spy(logger, "error");
+    const privateKey = account1.privateKey.slice(2);
+
+    // Transfer the table
+    await yargs([
+      "transfer",
+      "invalid",
+      account2Address,
+      "--privateKey",
+      privateKey,
+      "--chain",
+      "local-tableland",
+      "--aliases",
+      "./invalid.json",
+    ])
+      .command(mod)
+      .parse();
+
+    const res = consoleError.getCall(0).firstArg;
+    equal(res, "invalid table aliases file");
+  });
+
+  test("throws with invalid table alias definition", async function () {
     const [, account1, account2] = accounts;
     const account2Address = account2.address;
     const consoleError = spy(logger, "error");
@@ -120,10 +145,7 @@ describe("commands/transfer", function () {
       .parse();
 
     const res = consoleError.getCall(0).firstArg;
-    equal(
-      res,
-      "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
-    );
+    equal(res, "error validating name: table name has wrong format: invalid");
   });
 
   // Does transfering table have knock-on effects on other tables?

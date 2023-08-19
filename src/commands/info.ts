@@ -3,7 +3,7 @@ import type { Arguments, CommandBuilder } from "yargs";
 import { init } from "@tableland/sqlparser";
 import { type GlobalOptions } from "../cli.js";
 import { setupCommand } from "../lib/commandSetup.js";
-import { getTableNameFromAlias, logger } from "../utils.js";
+import { getTableNameWithAlias, logger } from "../utils.js";
 
 export interface Options extends GlobalOptions {
   name: string;
@@ -27,7 +27,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
 
     // Check if the passed `name` is a table alias
     if (argv.aliases != null)
-      name = await getTableNameFromAlias(argv.aliases, name);
+      name = await getTableNameWithAlias(argv.aliases, name);
     // Check if the passed `name` uses ENS
     // Note: duplicative `setupCommand` calls will occur with ENS, but this is
     // required to properly parse the chainId from the table name

@@ -208,7 +208,7 @@ export function jsonFileAliases(filepath: string): AliasesNameMap {
   };
 }
 
-export async function getTableNameFromAlias(
+export async function getTableNameWithAlias(
   filepath: string,
   name: string
 ): Promise<string> {

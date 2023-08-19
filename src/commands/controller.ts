@@ -3,7 +3,7 @@ import type { Arguments, CommandBuilder } from "yargs";
 import { Registry } from "@tableland/sdk";
 import { init } from "@tableland/sqlparser";
 import {
-  getTableNameFromAlias,
+  getTableNameWithAlias,
   getWalletWithProvider,
   getLink,
   logger,
@@ -47,7 +47,7 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
 
           // Check if the passed `name` is a table alias
           if (argv.aliases != null)
-            name = await getTableNameFromAlias(argv.aliases, name);
+            name = await getTableNameWithAlias(argv.aliases, name);
 
           const reg = new Registry({ signer });
           const res = await reg.getController(name);
@@ -87,7 +87,7 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
 
           // Check if the passed `name` is a table alias
           if (argv.aliases != null)
-            name = await getTableNameFromAlias(argv.aliases, name);
+            name = await getTableNameWithAlias(argv.aliases, name);
 
           const reg = new Registry({ signer });
           const res = await reg.setController({ tableName: name, controller });
@@ -124,7 +124,7 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
 
           // Check if the passed `name` is a table alias
           if (argv.aliases != null)
-            name = await getTableNameFromAlias(argv.aliases, name);
+            name = await getTableNameWithAlias(argv.aliases, name);
 
           const reg = new Registry({ signer });
           const res = await reg.lockController(name);

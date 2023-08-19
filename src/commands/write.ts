@@ -6,7 +6,7 @@ import {
   getLink,
   logger,
   getChainName,
-  getTableNameFromAlias,
+  getTableNameWithAlias,
   type NormalizedStatement,
 } from "../utils.js";
 import { type GlobalOptions } from "../cli.js";
@@ -109,7 +109,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
           let name = norm.tables[0];
           // Check if the passed `name` is a table alias
           if (argv.aliases != null)
-            name = await getTableNameFromAlias(argv.aliases, name);
+            name = await getTableNameWithAlias(argv.aliases, name);
           const { tableId } = await globalThis.sqlparser.validateTableName(
             name
           );

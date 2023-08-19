@@ -3,7 +3,7 @@ import type { Arguments, CommandBuilder } from "yargs";
 import { init } from "@tableland/sqlparser";
 import { type GlobalOptions } from "../cli.js";
 import { setupCommand } from "../lib/commandSetup.js";
-import { logger, getTableNameFromAlias } from "../utils.js";
+import { logger, getTableNameWithAlias } from "../utils.js";
 
 export interface Options extends GlobalOptions {
   name: string;
@@ -34,7 +34,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
 
     // Check if the passed `name` is a table alias
     if (argv.aliases != null)
-      name = await getTableNameFromAlias(argv.aliases, name);
+      name = await getTableNameWithAlias(argv.aliases, name);
 
     const tableDetails = await globalThis.sqlparser.validateTableName(name);
     const chainId = tableDetails.chainId;

@@ -629,7 +629,7 @@ describe("commands/write", function () {
 
     equal(typeof transactionHash, "string");
     equal(transactionHash.startsWith("0x"), true);
-    equal(link != null, true);
+    equal(link, undefined);
 
     // Make sure data was materialized (note aliases aren't enabled on `db`)
     const { results } = await db

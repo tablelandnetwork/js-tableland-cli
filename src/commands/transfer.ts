@@ -3,7 +3,7 @@ import type { Arguments, CommandBuilder } from "yargs";
 import { init } from "@tableland/sqlparser";
 import { type GlobalOptions } from "../cli.js";
 import { setupCommand } from "../lib/commandSetup.js";
-import { logger, jsonFileAliases } from "../utils.js";
+import { logger, getTableNameFromAlias } from "../utils.js";
 
 export interface Options extends GlobalOptions {
   name: string;
@@ -29,35 +29,17 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   try {
     await init();
-    const { receiver, chain, aliases } = argv;
+    const { receiver, chain } = argv;
     let { name } = argv;
 
-    let chainId;
-    // Check if the passed `name` is valid, otherwise, if it's a table alias,
-    // making sure standard table names take precedence
-    try {
-      ({ chainId } = await globalThis.sqlparser.validateTableName(name));
-    } catch (err: any) {
-      if (aliases) {
-        try {
-          const nameMap = await jsonFileAliases(aliases).read();
-          const nameFromAlias = nameMap[name];
-          ({ chainId } = await globalThis.sqlparser.validateTableName(
-            nameFromAlias
-          ));
-          name = nameFromAlias;
-        } catch (err: any) {
-          logger.error(
-            "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
-          );
-          return;
-        }
-      }
-    }
+    // Check if the passed `name` is a table alias
+    if (argv.aliases) name = await getTableNameFromAlias(argv.aliases, name);
+
+    const tableDetails = await globalThis.sqlparser.validateTableName(name);
+    const chainId = tableDetails.chainId;
 
     const { registry } = await setupCommand({
       ...argv,
-      // @ts-ignore TODO: fix this
       chain: chain != null ? chain : chainId,
     });
 

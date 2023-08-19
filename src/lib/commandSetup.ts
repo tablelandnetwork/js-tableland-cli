@@ -2,12 +2,7 @@ import { helpers, Database, Registry, Validator } from "@tableland/sdk";
 import { init } from "@tableland/sqlparser";
 import { type Signer } from "ethers";
 import { type GlobalOptions } from "../cli.js";
-import {
-  getWalletWithProvider,
-  logger,
-  isValidAliasesFile,
-  jsonFileAliases,
-} from "../utils.js";
+import { getWalletWithProvider, logger, jsonFileAliases } from "../utils.js";
 import EnsResolver from "./EnsResolver.js";
 
 export class Connections {
@@ -128,7 +123,6 @@ export class Connections {
     if (chain != null) {
       try {
         this._network = helpers.getChainInfo(chain);
-        /* c8 ignore next 3 */
       } catch (e) {
         logger.error("unsupported chain (see `chains` command for details)");
       }
@@ -139,10 +133,6 @@ export class Connections {
 
     let aliasesNameMap;
     if (aliases) {
-      const isValid = isValidAliasesFile(aliases);
-      if (!isValid) {
-        throw new Error(`invalid table aliases file`);
-      }
       aliasesNameMap = jsonFileAliases(aliases);
     }
 

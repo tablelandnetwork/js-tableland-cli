@@ -189,10 +189,11 @@ interface AliasesNameMap {
   write: (map: NameMapping) => Promise<void>;
 }
 
-// note: slight modification from the original SDK helper
-// since we check if the file exists before calling this, we don't need to use
-// the original `findOrCreateFile` function as no file will be created
 export function jsonFileAliases(filepath: string): AliasesNameMap {
+  const isValid = isValidAliasesFile(filepath);
+  if (!isValid) {
+    throw new Error(`invalid table aliases file`);
+  }
   return {
     read: async function (): Promise<NameMapping> {
       const file = readFileSync(filepath);
@@ -205,4 +206,13 @@ export function jsonFileAliases(filepath: string): AliasesNameMap {
       writeFileSync(filepath, JSON.stringify(merged));
     },
   };
+}
+
+export async function getTableNameFromAlias(
+  path: string,
+  name: string
+): Promise<string> {
+  const nameMap = await jsonFileAliases(path).read();
+  const uuName = nameMap[name];
+  return uuName ?? name;
 }

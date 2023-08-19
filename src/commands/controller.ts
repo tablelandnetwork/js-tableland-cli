@@ -3,11 +3,11 @@ import type { Arguments, CommandBuilder } from "yargs";
 import { Registry } from "@tableland/sdk";
 import { init } from "@tableland/sqlparser";
 import {
+  getTableNameFromAlias,
   getWalletWithProvider,
   getLink,
   logger,
   getChainName,
-  jsonFileAliases,
 } from "../utils.js";
 import { type GlobalOptions } from "../cli.js";
 
@@ -44,23 +44,11 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
             chain,
             providerUrl,
           });
-          const reg = new Registry({ signer });
 
-          // Check if the passed `name` is valid, otherwise, if it's a table alias
-          try {
-            await globalThis.sqlparser.validateTableName(name);
-          } catch (err: any) {
-            if (aliases) {
-              const nameMap = await jsonFileAliases(aliases).read();
-              name = nameMap[name];
-            }
-            if (!name) {
-              logger.error(
-                "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
-              );
-              return;
-            }
-          }
+          // Check if the passed `name` is a table alias
+          if (aliases) name = await getTableNameFromAlias(aliases, name);
+
+          const reg = new Registry({ signer });
           const res = await reg.getController(name);
 
           logger.log(res);
@@ -96,22 +84,10 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
             providerUrl,
           });
 
+          // Check if the passed `name` is a table alias
+          if (aliases) name = await getTableNameFromAlias(aliases, name);
+
           const reg = new Registry({ signer });
-          // Check if the passed `name` is valid, otherwise, if it's a table alias
-          try {
-            await globalThis.sqlparser.validateTableName(name);
-          } catch (err: any) {
-            if (aliases) {
-              const nameMap = await jsonFileAliases(aliases).read();
-              name = nameMap[name];
-            }
-            if (!name) {
-              logger.error(
-                "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
-              );
-              return;
-            }
-          }
           const res = await reg.setController({ tableName: name, controller });
 
           const link = getLink(chain, res.hash);
@@ -144,22 +120,10 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
             providerUrl,
           });
 
+          // Check if the passed `name` is a table alias
+          if (aliases) name = await getTableNameFromAlias(aliases, name);
+
           const reg = new Registry({ signer });
-          // Check if the passed `name` is valid, otherwise, if it's a table alias
-          try {
-            await globalThis.sqlparser.validateTableName(name);
-          } catch (err: any) {
-            if (aliases) {
-              const nameMap = await jsonFileAliases(aliases).read();
-              name = nameMap[name];
-            }
-            if (!name) {
-              logger.error(
-                "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
-              );
-              return;
-            }
-          }
           const res = await reg.lockController(name);
 
           const link = getLink(chain, res.hash);

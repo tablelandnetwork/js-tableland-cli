@@ -1,10 +1,9 @@
 import type yargs from "yargs";
 import type { Arguments, CommandBuilder } from "yargs";
-import { helpers } from "@tableland/sdk";
 import { init } from "@tableland/sqlparser";
 import { type GlobalOptions } from "../cli.js";
 import { setupCommand } from "../lib/commandSetup.js";
-import { jsonFileAliases, logger } from "../utils.js";
+import { getTableNameFromAlias, logger } from "../utils.js";
 
 export interface Options extends GlobalOptions {
   name: string;
@@ -24,67 +23,40 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
 export const handler = async (argv: Arguments<Options>): Promise<void> => {
   await init();
   try {
-    const { name, aliases, enableEnsExperiment, ensProviderUrl } = argv;
+    let { name } = argv;
 
-    let chainId, tableId;
-    // Check if the passed `name` is valid, otherwise, if it's a table alias,
-    // making sure standard table names take precedence
-    try {
-      ({ chainId, tableId } = await globalThis.sqlparser.validateTableName(
-        name
-      ));
-    } catch (err: any) {
-      if (aliases) {
-        try {
-          const nameMap = await jsonFileAliases(aliases).read();
-          const nameFromAlias = nameMap[name];
-          ({ chainId, tableId } = await globalThis.sqlparser.validateTableName(
-            nameFromAlias
-          ));
-        } catch (err: any) {
-          // Throw only if ENS isn't enabled, which is checked next
-          if (!(enableEnsExperiment && ensProviderUrl)) {
-            logger.error("invalid table alias, table name not found");
-            return;
-          }
-        }
-      }
-      // We'll throw later if `chainId` or `tableId` are undefined
-    }
-    // If ENS is enabled, perform a last attempt on validation
-    if (enableEnsExperiment && ensProviderUrl) {
+    // Check if the passed `name` is a table alias
+    if (argv.aliases) name = await getTableNameFromAlias(argv.aliases, name);
+    // Check if the passed `name` uses ENS
+    // Note: duplicative `setupCommand` calls will occur with ENS, but this is
+    // required to properly parse the chainId from the table name
+    if (argv.enableEnsExperiment != null && argv.ensProviderUrl != null) {
       const { ens } = await setupCommand({
         ...argv,
       });
-      try {
-        const nameFromEns = await ens?.resolveTable(name);
-        if (nameFromEns)
-          ({ chainId, tableId } = await globalThis.sqlparser.validateTableName(
-            nameFromEns
-          ));
-      } catch (err: any) {
-        logger.error("invalid ENS namespace, table record not found");
-        return;
-      }
+      if (ens) name = await ens.resolveTable(name);
     }
 
-    // The "standard" table name was passed and is invalid if these are undefined
-    if (tableId === undefined || chainId === undefined) {
+    const [tableId, chainId] = name.split("_").reverse();
+    const parts = name.split("_");
+
+    if (parts.length < 3 && argv.enableEnsExperiment == null) {
       logger.error(
         "invalid table name (name format is `{prefix}_{chainId}_{tableId}`)"
       );
       return;
     }
 
-    // Note: should `setupCommand` be used again, or instantiate a validator directly?
     const { validator } = await setupCommand({
       ...argv,
-      chain: helpers.getChainInfo(chainId).chainName,
+      chain: parseInt(chainId) as any,
     });
 
+    // Get the table ID, now that the name comes from either an alias, ENS, or
+    // the standard naming convention
     const res = await validator.getTableById({
       tableId: tableId.toString(),
-      chainId,
+      chainId: parseInt(chainId),
     });
     logger.log(JSON.stringify(res));
     /* c8 ignore next 7 */

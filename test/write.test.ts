@@ -639,4 +639,77 @@ describe("commands/write", function () {
     equal(results.length, 1);
     equal(results[0].id, 1);
   });
+
+  test("passes with table aliases when writing to two different tables", async function () {
+    const account = accounts[1];
+    const privateKey = account.privateKey.slice(2);
+    // Set up test aliases file
+    const aliasesFilePath = await temporaryWrite(`{}`, { extension: "json" });
+    // Create new db instance to enable aliases
+    const db = new Database({
+      signer: account,
+      baseUrl: helpers.getBaseUrl("local-tableland"),
+      autoWait: true,
+      aliases: jsonFileAliases(aliasesFilePath),
+    });
+    const { meta: meta1 } = await db
+      .prepare("create table multi_tbl_1 (a int, b text);")
+      .all();
+    const { meta: meta2 } = await db
+      .prepare("create table multi_tbl_2 (a int, b text);")
+      .all();
+
+    const tableName1 = meta1.txn!.name;
+    const tablePrefix1 = meta1.txn!.prefix;
+    const tableName2 = meta2.txn!.name;
+    const tablePrefix2 = meta2.txn!.prefix;
+
+    // Check the aliases file was updated and matches with the prefix
+    const nameMap = await jsonFileAliases(aliasesFilePath).read();
+    const tableAlias1 = Object.keys(nameMap).find(
+      (alias) => nameMap[alias] === tableName1
+    );
+    const tableAlias2 = Object.keys(nameMap).find(
+      (alias) => nameMap[alias] === tableName2
+    );
+    equal(tableAlias1, tablePrefix1);
+    equal(tableAlias2, tablePrefix2);
+
+    // Write to the tables using the aliases
+    const consoleLog = spy(logger, "log");
+    await yargs([
+      "write",
+      `insert into ${tableAlias1} (a, b) values (1, 'one');
+      insert into ${tableAlias2} (a, b) values (2, 'two');`,
+      "--chain",
+      "local-tableland",
+      "--privateKey",
+      privateKey,
+      "--aliases",
+      aliasesFilePath,
+    ])
+      .command(mod)
+      .parse();
+
+    const res = consoleLog.getCall(0).firstArg;
+    const value = JSON.parse(res);
+    const { transactionHash, link } = value.meta?.txn;
+
+    equal(typeof transactionHash, "string");
+    equal(transactionHash.startsWith("0x"), true);
+    equal(link, undefined);
+
+    const results = await db.batch([
+      db.prepare(`select * from ${tableName1};`),
+      db.prepare(`select * from ${tableName2};`),
+    ]);
+
+    const result1 = (results[0] as any)?.results;
+    const result2 = (results[1] as any)?.results;
+
+    equal(result1[0].a, 1);
+    equal(result1[0].b, "one");
+    equal(result2[0].a, 2);
+    equal(result2[0].b, "two");
+  });
 });

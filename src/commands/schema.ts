@@ -26,7 +26,8 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
     let { name } = argv;
 
     // Check if the passed `name` is a table alias
-    if (argv.aliases) name = await getTableNameFromAlias(argv.aliases, name);
+    if (argv.aliases != null)
+      name = await getTableNameFromAlias(argv.aliases, name);
     // Check if the passed `name` uses ENS
     // Note: duplicative `setupCommand` calls will occur with ENS, but this is
     // required to properly parse the chainId from the table name
@@ -34,7 +35,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
       const { ens } = await setupCommand({
         ...argv,
       });
-      if (ens) name = await ens.resolveTable(name);
+      if (ens != null) name = await ens.resolveTable(name);
     }
 
     const [tableId, chainId] = name.split("_").reverse();

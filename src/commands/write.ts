@@ -108,7 +108,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
           const norm = (await normalize(stmt)) as NormalizedStatement;
           let name = norm.tables[0];
           // Check if the passed `name` is a table alias
-          if (argv.aliases)
+          if (argv.aliases != null)
             name = await getTableNameFromAlias(argv.aliases, name);
           const { tableId } = await globalThis.sqlparser.validateTableName(
             name

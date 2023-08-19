@@ -34,7 +34,7 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
         }) as yargs.Argv<Options>,
       async (argv) => {
         await init();
-        const { privateKey, providerUrl, aliases } = argv;
+        const { privateKey, providerUrl } = argv;
         const chain = getChainName(argv.chain);
         let { name } = argv;
 
@@ -46,7 +46,8 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
           });
 
           // Check if the passed `name` is a table alias
-          if (aliases) name = await getTableNameFromAlias(aliases, name);
+          if (argv.aliases != null)
+            name = await getTableNameFromAlias(argv.aliases, name);
 
           const reg = new Registry({ signer });
           const res = await reg.getController(name);
@@ -73,7 +74,7 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
           }) as yargs.Argv<Options>,
       async (argv) => {
         await init();
-        const { controller, privateKey, providerUrl, aliases } = argv;
+        const { controller, privateKey, providerUrl } = argv;
         const chain = getChainName(argv.chain);
         let { name } = argv;
 
@@ -85,7 +86,8 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
           });
 
           // Check if the passed `name` is a table alias
-          if (aliases) name = await getTableNameFromAlias(aliases, name);
+          if (argv.aliases != null)
+            name = await getTableNameFromAlias(argv.aliases, name);
 
           const reg = new Registry({ signer });
           const res = await reg.setController({ tableName: name, controller });
@@ -109,7 +111,7 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
         }) as yargs.Argv<Options>,
       async (argv) => {
         await init();
-        const { privateKey, providerUrl, aliases } = argv;
+        const { privateKey, providerUrl } = argv;
         const chain = getChainName(argv.chain);
         let { name } = argv;
 
@@ -121,7 +123,8 @@ export const builder: CommandBuilder<Record<string, unknown>, Options> = (
           });
 
           // Check if the passed `name` is a table alias
-          if (aliases) name = await getTableNameFromAlias(aliases, name);
+          if (argv.aliases != null)
+            name = await getTableNameFromAlias(argv.aliases, name);
 
           const reg = new Registry({ signer });
           const res = await reg.lockController(name);

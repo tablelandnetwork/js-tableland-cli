@@ -132,7 +132,7 @@ export class Connections {
       this._registry = new Registry({ signer: this._signer });
 
     let aliasesNameMap;
-    if (aliases) {
+    if (aliases != null) {
       aliasesNameMap = jsonFileAliases(aliases);
     }
 

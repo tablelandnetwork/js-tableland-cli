@@ -60,7 +60,6 @@ async function fireFullQuery(
   try {
     const { database, ens } = tablelandConnection;
 
-    const aliasesEnabled = database.config.aliases !== undefined;
     if (argv.enableEnsExperiment != null && ens != null) {
       statement = await ens.resolve(statement);
     }
@@ -75,30 +74,31 @@ async function fireFullQuery(
     const tableName = response.meta.txn?.name;
     // Check if table aliases are enabled and, if so, include them in the logging
     let tableAlias;
+    const aliasesEnabled = database.config.aliases != null;
     if (aliasesEnabled) {
       const tableAliases = await database.config.aliases?.read();
-      if (tableAliases) {
+      if (tableAliases != null) {
         tableAlias = Object.keys(tableAliases).find(
           (alias) => tableAliases[alias] === tableName
         );
       }
     }
+    const logDataCreate: Partial<{ createdTable: string; alias: string }> = {
+      createdTable: tableName,
+    };
+    const logDataWrite: Partial<{ updatedTable: string; alias: string }> = {
+      updatedTable: tableName,
+    };
+    if (tableAlias != null) {
+      logDataCreate.alias = tableAlias;
+      logDataWrite.alias = tableAlias;
+    }
     switch (type) {
       case "create":
-        logger.log(
-          JSON.stringify({
-            createdTable: tableName,
-            ...(tableAlias && { alias: tableAlias }),
-          })
-        );
+        logger.log(JSON.stringify(logDataCreate));
         break;
       case "write":
-        logger.log(
-          JSON.stringify({
-            updatedTable: tableName,
-            ...(tableAlias && { alias: tableAlias }),
-          })
-        );
+        logger.log(JSON.stringify(logDataWrite));
         break;
       default:
     }

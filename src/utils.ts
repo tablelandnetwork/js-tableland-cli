@@ -1,7 +1,7 @@
-import { Wallet, providers, getDefaultProvider } from "ethers";
-import { helpers } from "@tableland/sdk";
 import { readFileSync, writeFileSync, statSync } from "node:fs";
 import { extname } from "path";
+import { Wallet, providers, getDefaultProvider } from "ethers";
+import { helpers } from "@tableland/sdk";
 
 export const getChains = function (): typeof helpers.supportedChains {
   return Object.fromEntries(
@@ -82,7 +82,7 @@ export async function getWalletWithProvider({
 
   const wallet = new Wallet(privateKey);
 
-  // We want to aquire a provider using the params given by the caller.
+  // We want to acquire a provider using the params given by the caller.
   let provider: providers.BaseProvider | undefined;
   // first we check if a providerUrl was given.
   if (typeof providerUrl === "string") {
@@ -128,7 +128,7 @@ export async function getWalletWithProvider({
   return wallet.connect(provider);
 }
 
-// Wrap any direct calls to console.log, so that test spies can distinguise between
+// Wrap any direct calls to console.log, so that test spies can distinguish between
 // the CLI's output, and messaging that originates outside the CLI
 export const logger = {
   log: function (message: string) {
@@ -149,7 +149,7 @@ export const logger = {
  * @returns The type of the path, either "file" or "dir".
  */
 /* c8 ignore start */
-export function checkAliasesPath(path: string) {
+export function checkAliasesPath(path: string): string {
   let type;
   let isStatErr;
   try {
@@ -159,7 +159,7 @@ export function checkAliasesPath(path: string) {
   } catch {
     isStatErr = true;
   }
-  if (type === undefined || isStatErr)
+  if (type === undefined || isStatErr != null)
     throw new Error("invalid table aliases path");
   return type;
 }
@@ -170,7 +170,7 @@ export function checkAliasesPath(path: string) {
  * @param path Path to existing aliases file.
  * @returns true if the file exists and is JSON, false otherwise.
  */
-export function isValidAliasesFile(path: string) {
+export function isValidAliasesFile(path: string): boolean {
   try {
     const stats = statSync(path);
     if (stats.isFile() && extname(path) === ".json") return true;

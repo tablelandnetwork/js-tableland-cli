@@ -105,9 +105,9 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   }
   // Create the config file
   const { path, format, aliases, ...rest } = output;
-  const configFilePath = resolve(path || `.${moduleName}rc`);
+  const configFilePath = resolve(path ?? `.${moduleName}rc`);
   // Make sure the table aliases file or provided directory exists
-  if (aliases) {
+  if (aliases != null) {
     try {
       const type = checkAliasesPath(aliases);
       if (type === "file") {
@@ -126,7 +126,7 @@ export const handler = async (argv: Arguments<Options>): Promise<void> => {
   let stream = process.stdout as unknown as WriteStream;
   if (path !== ".") {
     mkdirSync(dirname(configFilePath), { recursive: true });
-    stream = createWriteStream(configFilePath, "utf-8") as WriteStream;
+    stream = createWriteStream(configFilePath, "utf-8");
   }
   try {
     switch (format) {

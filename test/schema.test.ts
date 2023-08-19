@@ -9,8 +9,8 @@ import { temporaryWrite } from "tempy";
 import ensLib from "../src/lib/EnsCommand";
 import * as mod from "../src/commands/schema";
 import * as ns from "../src/commands/namespace.js";
-import { getResolverMock } from "./mock.js";
 import { jsonFileAliases, logger, wait } from "../src/utils.js";
+import { getResolverMock } from "./mock.js";
 
 describe("commands/schema", function () {
   this.timeout("30s");
@@ -117,11 +117,9 @@ describe("commands/schema", function () {
         },
       };
     });
-    stub(
-      ethers.providers.JsonRpcProvider.prototype,
-      "getResolver"
-      // @ts-ignore
-    ).callsFake(getResolverMock);
+    stub(ethers.providers.JsonRpcProvider.prototype, "getResolver").callsFake(
+      getResolverMock
+    );
 
     const consoleLog = spy(logger, "log");
     await yargs([
@@ -175,11 +173,9 @@ describe("commands/schema", function () {
         },
       };
     });
-    stub(
-      ethers.providers.JsonRpcProvider.prototype,
-      "getResolver"
-      // @ts-ignore
-    ).callsFake(getResolverMock);
+    stub(ethers.providers.JsonRpcProvider.prototype, "getResolver").callsFake(
+      getResolverMock
+    );
 
     const consoleLog = spy(logger, "log");
     await yargs([
@@ -247,14 +243,14 @@ describe("commands/schema", function () {
 
     // Check the aliases file was updated and matches with the prefix
     const nameMap = await jsonFileAliases(aliasesFilePath).read();
-    const tableAlias = Object.keys(nameMap).find(
-      (alias) => nameMap[alias] === nameFromCreate
-    );
+    const tableAlias =
+      Object.keys(nameMap).find((alias) => nameMap[alias] === nameFromCreate) ??
+      "";
     equal(tableAlias, prefix);
 
     // Get table schema via alias
     const consoleLog = spy(logger, "log");
-    await yargs(["schema", tableAlias!, "--aliases", aliasesFilePath])
+    await yargs(["schema", tableAlias, "--aliases", aliasesFilePath])
       .command(mod)
       .parse();
 

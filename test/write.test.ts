@@ -604,9 +604,8 @@ describe("commands/write", function () {
 
     // Check the aliases file was updated and matches with the prefix
     const nameMap = await jsonFileAliases(aliasesFilePath).read();
-    const tableAlias = Object.keys(nameMap).find(
-      (alias) => nameMap[alias] === name
-    );
+    const tableAlias =
+      Object.keys(nameMap).find((alias) => nameMap[alias] === name) ?? "";
     equal(tableAlias, prefix);
 
     // Write to the table using the alias
@@ -630,7 +629,7 @@ describe("commands/write", function () {
 
     equal(typeof transactionHash, "string");
     equal(transactionHash.startsWith("0x"), true);
-    equal(!link, true);
+    equal(link != null, true);
 
     // Make sure data was materialized (note aliases aren't enabled on `db`)
     const { results } = await db
@@ -666,12 +665,10 @@ describe("commands/write", function () {
 
     // Check the aliases file was updated and matches with the prefix
     const nameMap = await jsonFileAliases(aliasesFilePath).read();
-    const tableAlias1 = Object.keys(nameMap).find(
-      (alias) => nameMap[alias] === tableName1
-    );
-    const tableAlias2 = Object.keys(nameMap).find(
-      (alias) => nameMap[alias] === tableName2
-    );
+    const tableAlias1 =
+      Object.keys(nameMap).find((alias) => nameMap[alias] === tableName1) ?? "";
+    const tableAlias2 =
+      Object.keys(nameMap).find((alias) => nameMap[alias] === tableName2) ?? "";
     equal(tableAlias1, tablePrefix1);
     equal(tableAlias2, tablePrefix2);
 

@@ -6,7 +6,6 @@ import { temporaryWrite } from "tempy";
 import mockStd from "mock-stdin";
 import { getAccounts } from "@tableland/local";
 import { ethers } from "ethers";
-import { helpers } from "@tableland/sdk";
 import * as mod from "../src/commands/create.js";
 import { wait, logger, jsonFileAliases } from "../src/utils.js";
 import { getResolverMock } from "./mock.js";

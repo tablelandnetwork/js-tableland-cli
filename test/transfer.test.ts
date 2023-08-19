@@ -200,15 +200,14 @@ describe("commands/transfer", function () {
 
     // Check the aliases file was updated and matches with the prefix
     const nameMap = await jsonFileAliases(aliasesFilePath).read();
-    const tableAlias = Object.keys(nameMap).find(
-      (alias) => nameMap[alias] === name
-    );
+    const tableAlias =
+      Object.keys(nameMap).find((alias) => nameMap[alias] === name) ?? "";
     equal(tableAlias, prefix);
 
     // Transfer the table
     await yargs([
       "transfer",
-      tableAlias!,
+      tableAlias,
       account2Address,
       "--privateKey",
       privateKey,

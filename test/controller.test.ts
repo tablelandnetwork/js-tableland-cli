@@ -279,9 +279,10 @@ describe("commands/controller", function () {
 
       // Check the aliases file was updated and matches with the prefix
       const nameMap = await jsonFileAliases(aliasesFilePath).read();
-      const tableAlias = Object.keys(nameMap).find(
-        (alias) => nameMap[alias] === nameFromCreate
-      );
+      const tableAlias =
+        Object.keys(nameMap).find(
+          (alias) => nameMap[alias] === nameFromCreate
+        ) ?? "";
       equal(tableAlias, prefix);
 
       // Now, set the controller
@@ -290,7 +291,7 @@ describe("commands/controller", function () {
         "controller",
         "set",
         accounts[2].address,
-        tableAlias!,
+        tableAlias,
         "--privateKey",
         privateKey,
         "--chain",
@@ -305,7 +306,7 @@ describe("commands/controller", function () {
       const { hash, link } = JSON.parse(res);
       equal(typeof hash, "string");
       equal(hash.startsWith("0x"), true);
-      equal(!link, true);
+      equal(link != null, true);
     });
 
     test("passes when getting a controller", async function () {
@@ -330,9 +331,10 @@ describe("commands/controller", function () {
 
       // Check the aliases file was updated and matches with the prefix
       const nameMap = await jsonFileAliases(aliasesFilePath).read();
-      const tableAlias = Object.keys(nameMap).find(
-        (alias) => nameMap[alias] === nameFromCreate
-      );
+      const tableAlias =
+        Object.keys(nameMap).find(
+          (alias) => nameMap[alias] === nameFromCreate
+        ) ?? "";
       equal(tableAlias, prefix);
 
       // Now, get the controller
@@ -340,7 +342,7 @@ describe("commands/controller", function () {
       await yargs([
         "controller",
         "get",
-        tableAlias!,
+        tableAlias,
         "--privateKey",
         privateKey,
         "--chain",
@@ -377,9 +379,10 @@ describe("commands/controller", function () {
 
       // Check the aliases file was updated and matches with the prefix
       const nameMap = await jsonFileAliases(aliasesFilePath).read();
-      const tableAlias = Object.keys(nameMap).find(
-        (alias) => nameMap[alias] === nameFromCreate
-      );
+      const tableAlias =
+        Object.keys(nameMap).find(
+          (alias) => nameMap[alias] === nameFromCreate
+        ) ?? "";
       equal(tableAlias, prefix);
 
       // Now, lock the controller
@@ -387,7 +390,7 @@ describe("commands/controller", function () {
       await yargs([
         "controller",
         "lock",
-        tableAlias!,
+        tableAlias,
         "--privateKey",
         privateKey,
         "--chain",

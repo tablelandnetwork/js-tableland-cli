@@ -1,5 +1,7 @@
 # @tableland/cli
 
+**NOTICE**: Development has moved to: https://github.com/tablelandnetwork/tableland-js/
+
 [![Review](https://github.com/tablelandnetwork/js-tableland-cli/actions/workflows/review.yml/badge.svg)](https://github.com/tablelandnetwork/js-tableland-cli/actions/workflows/review.yml)
 [![License](https://img.shields.io/github/license/tablelandnetwork/js-tableland-cli.svg)](./LICENSE)
 [![Version](https://img.shields.io/github/package-json/v/tablelandnetwork/js-tableland-cli.svg)](./package.json)
